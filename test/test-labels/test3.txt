@@ -1,0 +1,21 @@
+zone	cavity	cav#	fault	time
+0L04	4	4	Microphonics	2020/01/01 10:00:34
+1L07	1	9	E_Quench	2020/01/01 10:29:09
+1L23	4	28	Single Cav Turn off	2020/01/07 12:18:54
+0L04	4	4	Microphonics	2020/01/08 07:12:44
+1L24	1	33	Single Cav Turn off	2020/01/08 09:13:00
+1L25	5	45	Microphonics	2020/01/08 09:13:07
+1L24	7	39	Quench_100ms	2020/01/08 11:24:21
+2L25	8	88	Single Cav Turn off	2020/01/09 19:55:57
+1L25	7	47	Single Cav Turn off	2020/01/10 07:04:59
+0L04	4	4	Microphonics	2020/01/10 09:13:50
+1L25	2	42	Quench_100ms	2020/01/10 09:47:05
+2L22	0	57	Multi Cav turn off	2020/01/28 09:00:39
+1L07	0	9	Multi Cav turn off	2020/01/28 09:07:12
+1L23	4	28	Single Cav Turn off	2020/01/28 10:00:56
+0L04	1	1	E_Quench	2020/01/28 10:29:14
+1L23	4	28	Single Cav Turn off	2020/01/30 16:06:40
+0L04	5	5	Heat Riser Choke	2020/01/30 16:47:22
+2L22	6	62	Quench_3ms	2020/01/30 21:22:23
+0L04	2	2	Quench_3ms	2020/01/30 23:34:18
+1L25	4	44	Microphonics	2020/03/09 07:55:34

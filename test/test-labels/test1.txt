@@ -1,0 +1,14 @@
+zone	cavity	cav#	fault	time
+# Singular label
+1L23	0	25	Multi Cav turn off	2020/01/08 09:12:53
+# Two identical labels
+1L24	1	33	Single Cav Turn off	2020/01/08 09:13:00
+1L24	1	33	Single Cav Turn off	2020/01/08 09:13:00
+# Three identical labels - mismatch in other file
+1L25	5	45	Microphonics	2020/01/08 09:13:07
+1L25	5	45	Microphonics	2020/01/08 09:13:07
+1L25	5	45	Microphonics	2020/01/08 09:13:07
+# Mismatch cavity label
+1L24	7	39	Quench_100ms	2020/01/08 11:24:21
+1L24	8	39	Quench_100ms	2020/01/08 11:24:21
+

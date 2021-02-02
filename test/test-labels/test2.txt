@@ -1,0 +1,6 @@
+zone	cavity	cav#	fault	time
+# Singular label - note the absence of some leading zeros
+1L24	7	39	Quench_100ms	2020/01/8 11:24:32
+# Mismatched with label from other file in other file
+1L25	6	45	Microphonics	2020/01/08 09:13:07
+
