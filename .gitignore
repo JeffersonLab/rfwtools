@@ -11,6 +11,9 @@
 # JetBrains IDE config folder
 .idea/
 
+# Editor temp files
+.*.swp
+
 # Python virtual environment used for development
 venv/
 
