@@ -10,7 +10,7 @@ from tsfresh.utilities.dataframe_functions import impute
 from ..utils import get_signal_names
 
 
-def tsfresh_extractor(example, query=None, impute_function=impute, disable_progress_bar=True, n_jobs=0,
+def tsfresh_extractor(example, signals=None, query=None, impute_function=impute, disable_progress_bar=True, n_jobs=0,
                       default_fc_parameters=EfficientFCParameters(), **kwargs):
     """Uses tsfresh to extract features.
 
@@ -18,6 +18,8 @@ def tsfresh_extractor(example, query=None, impute_function=impute, disable_progr
 
     Args:
         example (Example) - The Example for which features are extracted
+        signals (list(str)) - A list of signal names to extract features from.
+                                Default: combination of caivties 1-8 and waveforms = ['GMES', 'GASK', 'CRFP', 'DETA2']
         query (str) - Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. "Time <= 0".
         **kwargs (dict) - All other key word arguments are passed directly to tsfresh.extract_features
 
@@ -25,6 +27,15 @@ def tsfresh_extractor(example, query=None, impute_function=impute, disable_progr
 
     # Get the Example's data
     event_df = get_example_data(example, query)
+
+    # List of signals for feature extraction
+    sel_col = signals
+    if signals is None:
+        sel_col = get_signal_names(cavities=('1', '2', '3', '4', '5', '6', '7', '8'),
+                                   waveforms=("GMES", "GASK", "CRFP", "DETA2"))
+
+    # Get the data that matches the request
+    event_df = event_df[["Time"] + sel_col]
 
     # Add the ID column tsfresh wants.  Mostly useless here since we only give tsfresh a single example at a time.
     event_df.insert(loc=0, column='id', value=1)
