@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="rfwtools-adamc",
+    name="rfwtools-jlab",
     version="0.0.1",
     author="Adam Carpenter",
     author_email="adamc@jlab.org",
