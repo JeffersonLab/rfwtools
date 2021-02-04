@@ -104,7 +104,7 @@ Number of mismatched labels: 6
 5  1L25 2020-01-08 09:13:07.800            5  Microphonics          NaN         NaN  <1L25 2020-01-08 09:13:07.800000>    test1.txt
 6  1L24 2020-01-08 11:24:21.300            7  Quench_100ms          NaN         NaN  <1L24 2020-01-08 11:24:21.300000>    test1.txt
 7  1L24 2020-01-08 11:24:21.300            8  Quench_100ms          NaN         NaN  <1L24 2020-01-08 11:24:21.300000>    test1.txt
-1  1L25 2020-01-08 09:13:07.800            6  Microphonics          NaN         NaN  <1L25 2020-01-08 09:13:07.800000>    test2.txt 
+9  1L25 2020-01-08 09:13:07.800            6  Microphonics          NaN         NaN  <1L25 2020-01-08 09:13:07.800000>    test2.txt 
 """
         self.assertEqual(exp_report, es.get_label_file_report())
 
