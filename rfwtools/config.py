@@ -10,7 +10,7 @@ class Config:
 
         def __init__(self):
             # The base directory of the application.
-            self.app_dir = os.path.dirname(os.path.realpath(os.path.join(__file__, "..")))
+            self.app_dir = os.path.realpath(os.getcwd())
 
             # The path to the root of the data directory for all events (similar to /usr/opsdata/waveforms/data/rf)
             self.data_dir = os.path.join(self.app_dir, "data", "waveforms", "data", "rf")
@@ -54,6 +54,35 @@ class Config:
     @staticmethod
     def load_yaml_string(string):
         Config.instance.__dict__ = yaml.safe_load(string)
+
+    @staticmethod
+    def write_config_file(file):
+        """Writes out the current configuration to the specified file."""
+
+        # Make sure the singleton config exists
+        Config()
+        with open(file, mode="w") as f:
+            f.write(Config.dump_yaml_string())
+
+    @staticmethod
+    def read_config_file(file=None):
+        """Parses a YAML-formatted config file.  Defaults to rfwtools.cfg in the current working directory.
+
+        Relative files will be considered relative to the current working directory.
+        """
+
+        if file is None:
+            path = os.path.join(os.getcwd(), 'rfwtools.cfg')
+        elif os.path.isabs(file):
+            path = file
+        else:
+            path = os.path.join(os.getcwd(), file)
+
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"File not found - '{path}'")
+
+        with open(path, mode="r") as f:
+            Config.load_yaml_string(f.read())
 
     def __getattr__(self, name):
         """Redirect unresolved attribute queries to the single instance"""
