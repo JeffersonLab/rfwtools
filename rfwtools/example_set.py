@@ -75,16 +75,17 @@ class ExampleSet:
             out_dir = Config().output_dir
         self.__example_df.to_csv(os.path.join(out_dir, filename), index=False)
 
-    def load_csv(self, filename, in_dir=None):
+    def load_csv(self, filename, in_dir=None, sep=','):
         """Read in a CSV file that has ExampleSet data.
 
         Args:
             filename (str) - The filename to save.  Will be relative out_dir
             in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
+            sep (str) - Delimeter string used by Pandas to parse given "csv" file
         """
         if in_dir is None:
             in_dir = Config().output_dir
-        df = pd.read_csv(os.path.join(in_dir, filename))
+        df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
 
         if sorted(df.columns.to_list()) != sorted(ExampleSet.__columns[0:6] + ExampleSet.__columns[7:]):
             raise ValueError("Cannot load CSV file.  Unexpected column format.")
