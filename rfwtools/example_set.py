@@ -25,6 +25,9 @@ class ExampleSet:
     __known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
                             'Quench_100ms', 'Microphonics', 'Controls Fault', 'Heat Riser Choke', 'Unknown']
 
+    # Expected column names
+    __columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'cavity_conf', 'fault_conf', 'example', 'label_source']
+
     def __init__(self, known_zones=None, known_cavity_labels=None, known_fault_labels=None):
         """Create an instance of an ExampleSet"""
 
@@ -60,6 +63,38 @@ class ExampleSet:
         # Create a hash for holding on to the label file data.  This will preserve the original data after cleaning for
         # duplicates, mismatches, etc.
         self.label_file_dataframes = {}
+
+    def save_csv(self, filename, out_dir=None):
+        """Write out the ExampleSet data as a CSV file relative to out_dir.
+
+        Args:
+            filename (str) - The filename to save.  Will be relative out_dir
+            out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
+        """
+        if out_dir is None:
+            out_dir = Config().output_dir
+        self.__example_df.to_csv(os.path.join(out_dir, filename), index=False)
+
+    def load_csv(self, filename, in_dir=None):
+        """Read in a CSV file that has ExampleSet data.
+
+        Args:
+            filename (str) - The filename to save.  Will be relative out_dir
+            in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
+        """
+        if in_dir is None:
+            in_dir = Config().output_dir
+        df = pd.read_csv(os.path.join(in_dir, filename))
+
+        if sorted(df.columns.to_list()) != sorted(ExampleSet.__columns[0:6] + ExampleSet.__columns[7:]):
+            raise ValueError("Cannot load CSV file.  Unexpected column format.")
+
+        # Add the example column
+        df['example'] = df.apply(ExampleSet.__Example_from_row, axis=1, raw=False)
+
+        # Put the DataFrame into a standard structure - categories, column order, etc.
+        ExampleSet.__standardize_df_format(df)
+        self.__example_df = df
 
     def update_example_set(self, df, keep_label_file_dataframes=False):
         """Replaces the contents of this ExampleSet with the supplied DataFrame.
@@ -419,34 +454,8 @@ Number of mismatched labels: {num_mismatched_labels}
         for event in extracted_events:
             df = df.append(event, ignore_index=True)
 
-        # Seems like the datetime dtype doesn't want to stick
-        df['dtime'] = df['dtime'].astype('datetime64[ns]')
-
-        # Update the dtypes so that we get categories, etc. where it makes sense
-        df['zone'] = df['zone'].astype('category')
-        df['fault_label'] = df['fault_label'].astype('category')
-        df['cavity_label'] = df['cavity_label'].astype('category')
-
-        # Construct the Example objects based on row values
-        df['example'] = df.apply(
-            lambda x: Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf,
-                              x.label_source), axis=1, raw=False)
-
-        # Ensure a consistent set of category levels and their order.
-        master = {
-            'zone': ExampleSet.__known_zones,
-            'fault_label': ExampleSet.__known_fault_labels,
-            'cavity_label': ExampleSet.__known_cavity_labels
-        }
-
-        # Add any missing levels and the make sure they are in a predictable order
-        for factor in master.keys():
-            for f in master[factor]:
-                # Add the category if it is not present
-                if f not in df[factor].cat.categories.values:
-                    df[factor].cat.add_categories(f, inplace=True)
-            # Enforce a known ordering
-            df[factor].cat.reorder_categories(sorted(df[factor].cat.categories), inplace=True)
+        # Operates in place on DataFrame
+        ExampleSet.__standardize_df_format(df)
 
         return df
 
@@ -559,13 +568,8 @@ Number of mismatched labels: {num_mismatched_labels}
              'fault_conf': f_confs,
              'label_source': l_sources})
 
-        df.fault_conf = df.fault_conf.astype("float64")
-        df.cavity_conf = df.cavity_conf.astype("float64")
-
-        # Construct the Example objects based on row values
-        df['example'] = df.apply(
-            lambda x: Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf,
-                              x.label_source), axis=1, raw=False)
+        # Update the DataFrame to have a standard format (column dtypes, order, etc.)  Should add example column.
+        ExampleSet.__standardize_df_format(df)
 
         return df
 
@@ -845,3 +849,51 @@ Number of mismatched labels: {num_mismatched_labels}
                     break
 
         return eq
+
+    @staticmethod
+    def __Example_from_row(x):
+        """Creates an Example object from a row of a standard ExampleSet DataFrame"""
+        return Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf, x.label_source)
+
+    @staticmethod
+    def __standardize_df_format(df):
+        """Attempts to put a DataFrame in a 'standard' format.
+
+        This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
+        if not already present.  Columns are reordered.
+
+        Args:
+            df (pd.DataFrame) - The DataFrame to reformat
+
+        Returns: None
+        """
+
+        # Seems like the datetime dtype doesn't want to stick
+        df['dtime'] = df['dtime'].astype('datetime64[ns]')
+
+        # Update the dtypes so that we get categories, etc. where it makes sense
+        df['zone'] = df['zone'].astype('category')
+        df['fault_label'] = df['fault_label'].astype('category')
+        df['cavity_label'] = df['cavity_label'].astype('category')
+        df.fault_conf = df.fault_conf.astype("float64")
+        df.cavity_conf = df.cavity_conf.astype("float64")
+
+        # Construct the Example objects based on row values if needed
+        if 'example' not in df.columns.to_list():
+            df['example'] = df.apply(ExampleSet.__Example_from_row, axis=1, raw=False)
+
+        # Ensure a consistent set of category levels and their order.
+        master = {
+            'zone': ExampleSet.__known_zones,
+            'fault_label': ExampleSet.__known_fault_labels,
+            'cavity_label': ExampleSet.__known_cavity_labels
+        }
+
+        # Add any missing levels and the make sure they are in a predictable order
+        for factor in master.keys():
+            for f in master[factor]:
+                # Add the category if it is not present
+                if f not in df[factor].cat.categories.values:
+                    df[factor].cat.add_categories(f, inplace=True)
+            # Enforce a known ordering
+            df[factor].cat.reorder_categories(sorted(df[factor].cat.categories), inplace=True)
