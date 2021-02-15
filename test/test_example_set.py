@@ -1,3 +1,4 @@
+import filecmp
 import math
 import unittest
 import os
@@ -21,7 +22,7 @@ Config().data_dir = os.path.join(test.test_data_dir, 'tmp')
 
 
 class TestValidator(ExampleValidator):
-    #A very simple validator for testing purposes.
+    # A very simple validator for testing purposes.
 
     def validate_data(self, deployment="ops"):
         """It's not valid if it's not zone 1L24"""
@@ -163,6 +164,35 @@ Number of mismatched labels: 6
                                 end=datetime.strptime("2020-03-24", "%Y-%m-%d"))
 
         self.assertEqual(14, len(es.get_example_df()))
+
+    def test_load_save_csv(self):
+        # Test that we can load and save CSV files.
+        es = ExampleSet()
+
+        csv_file = "test-example_set.csv"
+        tsv_file = "test-example_set.tsv"
+
+        # Load the TSV file and save it to a tmp dir.  Make sure the files match, and that at least one field matches
+        es.load_csv(tsv_file, in_dir=test.test_data_dir, sep='\t')
+        es.save_csv(tsv_file, out_dir=test.tmp_data_dir, sep='\t')
+        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, tsv_file),
+                                    os.path.join(test.tmp_data_dir, tsv_file)))
+        self.assertEqual(es.get_example_df().loc[0, 'cavity_label'], "5")
+        self.assertTrue(math.isnan(es.get_example_df().loc[0, 'cavity_conf']))
+
+        # Clean up the tmp TSV file
+        os.unlink(os.path.join(test.tmp_data_dir, tsv_file))
+
+        # Do the same test with CSV file/separator
+        es.load_csv(csv_file, in_dir=test.test_data_dir)
+        es.save_csv(csv_file, out_dir=test.tmp_data_dir)
+        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, csv_file),
+                                    os.path.join(test.tmp_data_dir, csv_file)))
+        self.assertEqual(es.get_example_df().loc[0, 'fault_label'], "Microphonics")
+        self.assertTrue(math.isnan(es.get_example_df().loc[0, 'fault_conf']))
+
+        # Clean up the tmp CSV file
+        os.unlink(os.path.join(test.tmp_data_dir, csv_file))
 
 
 if __name__ == '__main__':
