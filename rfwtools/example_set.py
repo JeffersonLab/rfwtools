@@ -64,16 +64,17 @@ class ExampleSet:
         # duplicates, mismatches, etc.
         self.label_file_dataframes = {}
 
-    def save_csv(self, filename, out_dir=None):
+    def save_csv(self, filename, out_dir=None, sep=','):
         """Write out the ExampleSet data as a CSV file relative to out_dir.
 
         Args:
             filename (str) - The filename to save.  Will be relative out_dir
             out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
+            sep (str) - Delimiter string used by Pandas to parse given "csv" file
         """
         if out_dir is None:
             out_dir = Config().output_dir
-        self.__example_df.to_csv(os.path.join(out_dir, filename), index=False)
+        self.__example_df.drop('example', axis=1).to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
 
     def load_csv(self, filename, in_dir=None, sep=','):
         """Read in a CSV file that has ExampleSet data.
@@ -81,7 +82,7 @@ class ExampleSet:
         Args:
             filename (str) - The filename to save.  Will be relative out_dir
             in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
-            sep (str) - Delimeter string used by Pandas to parse given "csv" file
+            sep (str) - Delimiter string used by Pandas to parse given "csv" file
         """
         if in_dir is None:
             in_dir = Config().output_dir
@@ -875,6 +876,7 @@ Number of mismatched labels: {num_mismatched_labels}
         # Update the dtypes so that we get categories, etc. where it makes sense
         df['zone'] = df['zone'].astype('category')
         df['fault_label'] = df['fault_label'].astype('category')
+        df['cavity_label'] = df['cavity_label'].astype('str')
         df['cavity_label'] = df['cavity_label'].astype('category')
         df.fault_conf = df.fault_conf.astype("float64")
         df.cavity_conf = df.cavity_conf.astype("float64")
