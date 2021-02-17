@@ -1,48 +1,101 @@
+import os
+import pandas as pd
+
 from rfwtools.dim_reduction import pca
 from rfwtools.visualize import scatterplot
+from rfwtools.config import Config
+from rfwtools.example_set import ExampleSet
 
 
-
-class FeatureSet:
+class FeatureSet(ExampleSet):
     """A class for managing common operations on a collection of labeled faults and associated features
 
     This class is a light wrapper on a Pandas DataFrame.
     """
 
-    def __init__(self, df, name="", metadata_columns=None):
-        """Construct a FeatureSet.
+    def __init__(self, df=None, filename=None, in_dir=None, sep=None, name="", metadata_columns=None):
+        """Construct a FeatureSet.  Use the supplied DataFrame, or load filename if no df argument is given
 
         Args:
             df (DataFrame): A DataFrame containing the FeatureSet data to include.  The following columns must be
                             included - ['zone', 'dtime', 'cavity_label', 'fault_label', 'label_source'].  Any
                             additional columns will be treated as the features.  Note: A copy of df is saved.
+            filename (str) - The filename to save.  Will be relative in_dir
+            in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
+            sep (str) - Delimiter string used by Pandas to parse given "csv" file
             name (str): A string that may be used to help identify this FeatureSet in plot titles, etc.
             metadata_columns (list(str)): A list of the names of the columns that are metadata (e.g., "zone" or
                                           "cavity_label").  If None, a standard set is assumed.
         """
 
         if metadata_columns is None:
-            self.metadata_columns = ('zone', 'dtime', 'cavity_label', 'fault_label', 'label_source')
+            self.metadata_columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'label_source']
         else:
             self.metadata_columns = metadata_columns
 
-        for col in self.metadata_columns:
-            if col not in df.columns:
-                raise ValueError(f"column {col} is missing from the supplied DataFrame")
+        if df is not None:
+            for col in self.metadata_columns:
+                if col not in df.columns:
+                    raise ValueError(f"column {col} is missing from the supplied DataFrame")
+
+            # The feature data, one example per row
+            self.__feature_df = df.copy()
+
+        elif filename is not None:
+            self.load_csv(filename=filename, in_dir=in_dir, sep=sep)
 
         # A brief human friendly name for this FeatureSet
         self.name = name
 
-        # The feature data, one example per row
-        self.__feature_df = df.copy()
-
         # The pca reduced feature data, one example per row
         self.__pca_df = None
 
-        # The pca model.  Either None or is the fitted sklearn PCA object.  This is left publicly accesible so users
+        # The pca model.  Either None or is the fitted sklearn PCA object.  This is left publicly accessible so users
         # have access for custom analysis or visualization (e.g., transforming future examples).  Users beware
         # modifying this!
         self.pca = None
+
+    def save_csv(self, filename, out_dir=None, sep=','):
+        """Write out the FeatureSet data as a CSV file relative to out_dir.
+
+        Args:
+            filename (str) - The filename to save.  Will be relative out_dir
+            out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
+            sep (str) - Delimiter string used by Pandas to parse given "csv" file
+        """
+        if out_dir is None:
+            out_dir = Config().output_dir
+        self.__feature_df.to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
+
+    def load_csv(self, filename, in_dir=None, sep=',', metadata_columns=None):
+        """Read in a CSV file that has FeatureSet data.
+
+        Args:
+            filename (str) - The filename to save.  Will be relative out_dir
+            in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
+            sep (str) - Delimiter string used by Pandas to parse given "csv" file
+            metadata_columns (list) - A list of column names to treat as metadata.  This updates the FeatureSet's list.
+        """
+        if in_dir is None:
+            in_dir = Config().output_dir
+        df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+
+        if metadata_columns is not None:
+            self.metadata_columns = metadata_columns
+
+        # Test that we actually have a the columns we expect
+        try:
+            # If the columns don't exist, this will raise an exception
+            df[self.metadata_columns]
+        except KeyError as ex:
+            print(df[['']])
+            raise KeyError(f"File missing metadata columns -- {ex}")
+
+        # Make it a standard FeatureSet
+        FeatureSet.__standardize_df_format(df)
+
+        self.__feature_df = df
+        self.__pca_df = None
 
     def get_feature_df(self):
         """Return a copy of the FeatureSet as a DataFrame."""
@@ -149,3 +202,41 @@ class FeatureSet:
             return False
 
         return True
+
+    @staticmethod
+    def __standardize_df_format(df):
+        """Attempts to put a DataFrame in a 'standard' format.
+
+        This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
+        if not already present.  Columns are reordered.
+
+        Args:
+            df (pd.DataFrame) - The DataFrame to reformat
+
+        Returns: None
+        """
+
+        # Seems like the datetime dtype doesn't want to stick
+        df['dtime'] = df['dtime'].astype('datetime64[ns]')
+
+        # Update the dtypes so that we get categories, etc. where it makes sense
+        df['zone'] = df['zone'].astype('category')
+        df['fault_label'] = df['fault_label'].astype('category')
+        df['cavity_label'] = df['cavity_label'].astype('str')
+        df['cavity_label'] = df['cavity_label'].astype('category')
+
+        # Ensure a consistent set of category levels and their order.
+        master = {
+            'zone': ExampleSet._known_zones,
+            'fault_label': ExampleSet._known_fault_labels,
+            'cavity_label': ExampleSet._known_cavity_labels
+        }
+
+        # Add any missing levels and the make sure they are in a predictable order
+        for factor in master.keys():
+            for f in master[factor]:
+                # Add the category if it is not present
+                if f not in df[factor].cat.categories.values:
+                    df[factor].cat.add_categories(f, inplace=True)
+            # Enforce a known ordering
+            df[factor].cat.reorder_categories(sorted(df[factor].cat.categories), inplace=True)
