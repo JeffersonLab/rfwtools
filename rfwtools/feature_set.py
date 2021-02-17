@@ -204,7 +204,7 @@ class FeatureSet(ExampleSet):
         return True
 
     @staticmethod
-    def __standardize_df_format(df):
+    def __standardize_df_format(df, zones=None, cavity_labels=None, fault_labels=None):
         """Attempts to put a DataFrame in a 'standard' format.
 
         This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
@@ -225,11 +225,25 @@ class FeatureSet(ExampleSet):
         df['cavity_label'] = df['cavity_label'].astype('str')
         df['cavity_label'] = df['cavity_label'].astype('category')
 
+        # Figure out what categories to enforce
+        if zones is None:
+            z = ExampleSet.known_zones
+        else:
+            z = zones
+        if cavity_labels is None:
+            cl = ExampleSet.known_cavity_labels
+        else:
+            cl = cavity_labels
+        if fault_labels is None:
+            fl = ExampleSet.known_fault_labels
+        else:
+            fl = fault_labels
+
         # Ensure a consistent set of category levels and their order.
         master = {
-            'zone': ExampleSet._known_zones,
-            'fault_label': ExampleSet._known_fault_labels,
-            'cavity_label': ExampleSet._known_cavity_labels
+            'zone': z,
+            'fault_label': fl,
+            'cavity_label': cl
         }
 
         # Add any missing levels and the make sure they are in a predictable order
