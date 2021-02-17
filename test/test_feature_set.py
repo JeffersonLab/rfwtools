@@ -1,9 +1,13 @@
+import filecmp
+import os
 import unittest
 
 from unittest import TestCase
 from rfwtools.feature_set import FeatureSet
 import pandas as pd
 import numpy as np
+import math
+import test
 
 
 def make_dummy_df(n, standard=False):
@@ -99,6 +103,35 @@ class TestFeatureSet(TestCase):
         # Check the equal cases
         self.assertEqual(fs1, fs1)
         self.assertEqual(fs1, fs1_same)
+
+    def test_load_save_csv(self):
+        # Test that we can load and save CSV files.
+        fs = FeatureSet()
+
+        csv_file = "test-feature_set.csv"
+        tsv_file = "test-feature_set.tsv"
+
+        # Load the TSV file and save it to a tmp dir.  Make sure the files match, and that at least one field matches
+        fs.load_csv(tsv_file, in_dir=test.test_data_dir, sep='\t')
+        fs.save_csv(tsv_file, out_dir=test.tmp_data_dir, sep='\t')
+        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, tsv_file),
+                                    os.path.join(test.tmp_data_dir, tsv_file)), "TSV files did not match.")
+        self.assertEqual(fs.get_feature_df().loc[0, 'cavity_label'], "5")
+        self.assertEqual(fs.get_feature_df().loc[0, 'f1'], 6)
+
+        # Clean up the tmp TSV file
+        os.unlink(os.path.join(test.tmp_data_dir, tsv_file))
+
+        # Do the same test with CSV file/separator
+        fs.load_csv(csv_file, in_dir=test.test_data_dir)
+        fs.save_csv(csv_file, out_dir=test.tmp_data_dir)
+        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, csv_file),
+                                    os.path.join(test.tmp_data_dir, csv_file)), "CSV files did not match.")
+        self.assertEqual(fs.get_feature_df().loc[0, 'fault_label'], "Microphonics")
+        self.assertEqual(fs.get_feature_df().loc[2, 'f3'], 3)
+
+        # Clean up the tmp CSV file
+        os.unlink(os.path.join(test.tmp_data_dir, csv_file))
 
 
 if __name__ == '__main__':
