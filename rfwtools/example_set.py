@@ -20,9 +20,9 @@ class ExampleSet:
     """A class for managing a collection of examples, including metadata about the collection of examples"""
 
     # The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.
-    __known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
-    __known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
-    __known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
+    known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
+    known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
+    known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
                             'Quench_100ms', 'Microphonics', 'Controls Fault', 'Heat Riser Choke', 'Unknown']
 
     # Expected column names
@@ -33,26 +33,26 @@ class ExampleSet:
 
         # Setup the standard default values for zone and label options
         if known_zones is None:
-            self.__known_zones = ExampleSet.__known_zones
+            self.known_zones = ExampleSet.known_zones
         else:
-            self.__known_zones = known_zones
+            self.known_zones = known_zones
 
         if known_cavity_labels is None:
-            self.__known_cavity_labels = ExampleSet.__known_cavity_labels
+            self.known_cavity_labels = ExampleSet.known_cavity_labels
         else:
-            self.__known_cavity_labels = known_cavity_labels
+            self.known_cavity_labels = known_cavity_labels
 
         if known_fault_labels is None:
-            self.__known_fault_labels = ExampleSet.__known_fault_labels
+            self.known_fault_labels = ExampleSet.known_fault_labels
         else:
-            self.__known_fault_labels = known_fault_labels
+            self.known_fault_labels = known_fault_labels
 
         # Construct an empty DataFrame with proper dtypes
         self.__example_df = pd.DataFrame(
-            {'zone': pd.Categorical([], categories=self.__known_zones),
+            {'zone': pd.Categorical([], categories=self.known_zones),
              'dtime': pd.Series([], dtype='datetime64[ns]'),
-             'cavity_label': pd.Categorical([], categories=self.__known_cavity_labels),
-             'fault_label': pd.Categorical([], categories=self.__known_fault_labels),
+             'cavity_label': pd.Categorical([], categories=self.known_cavity_labels),
+             'fault_label': pd.Categorical([], categories=self.known_fault_labels),
              'cavity_conf': pd.Series([], dtype="float64"),
              'fault_conf': pd.Series([], dtype='float64'),
              'example': pd.Series([], dtype="object"),
@@ -887,9 +887,9 @@ Number of mismatched labels: {num_mismatched_labels}
 
         # Ensure a consistent set of category levels and their order.
         master = {
-            'zone': ExampleSet.__known_zones,
-            'fault_label': ExampleSet.__known_fault_labels,
-            'cavity_label': ExampleSet.__known_cavity_labels
+            'zone': ExampleSet.known_zones,
+            'fault_label': ExampleSet.known_fault_labels,
+            'cavity_label': ExampleSet.known_cavity_labels
         }
 
         # Add any missing levels and the make sure they are in a predictable order
