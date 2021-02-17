@@ -2,10 +2,11 @@
 *.pyc
 */__pycache__/
 
-# Setuptools distribution/ folder.
+# Setuptools distribution, build, tox testing folder.
 /dist/
 /build/
 /rfwtools_adamc.egg-info/
+/.tox/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
