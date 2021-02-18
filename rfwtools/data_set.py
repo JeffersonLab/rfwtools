@@ -219,7 +219,7 @@ class DataSet:
             return ds
 
     def save_feature_set(self, filename, out_dir=None):
-        """Saves a binary pickle file containing the feature set DataFrame."""
+        """DEPRECATED.  Saves a binary pickle file containing the feature set DataFrame."""
         if out_dir is None:
             out_dir = Config().output_dir
 
@@ -227,25 +227,45 @@ class DataSet:
             f.write(pickle.dumps(self.feature_set))
 
     def load_feature_set(self, filename, in_dir=None):
-        """Loads a binary pickle file containing a feature set."""
+        """DEPRECATED.  Loads a binary pickle file containing a feature set."""
         if in_dir is None:
             in_dir = Config().output_dir
         with bz2.open(os.path.join(in_dir, filename), mode="rb") as f:
             self.feature_set = pickle.loads(f.read())
 
+    def save_feature_set_csv(self, filename, **kwargs):
+        """Save a FeatureSet CSV file.  All keyword args are passed to FeatureSet.save_csv method."""
+        self.feature_set.save_csv(filename=filename, **kwargs)
+
+    def load_feature_set_csv(self, filename, **kwargs):
+        """Load a FeatureSet CSV file.  Overwrites existing feature_set with new FeatureSet."""
+        fs = FeatureSet()
+        fs.load_csv(filename=filename, **kwargs)
+        self.feature_set = fs
+
     def save_example_set(self, filename, out_dir=None):
-        """Save a binary bzipped pickle file of the current example set."""
+        """DEPRECATED.  Save a binary bzipped pickle file of the current example set."""
         if out_dir is None:
             out_dir = Config().output_dir
         with bz2.open(os.path.join(out_dir, filename), mode="wb") as f:
             f.write(pickle.dumps(self.example_set))
 
     def load_example_set(self, filename, in_dir=None):
-        """Loads a binary bzipped pickle file containing an example set."""
+        """DEPRECATED.  Loads a binary bzipped pickle file containing an example set.  Old versions used pickle files"""
         if in_dir is None:
             in_dir = Config().output_dir
         with bz2.open(os.path.join(in_dir, filename), mode="rb") as f:
             self.example_set = pickle.loads(f.read())
+
+    def save_example_set_csv(self, filename, **kwargs):
+        """Save an ExampleSet CSV file.  All keyword args are passed to ExampleSet.save_csv method."""
+        self.example_set.save_csv(filename=filename, **kwargs)
+
+    def load_example_set_csv(self, filename, **kwargs):
+        """Load an ExampleSet CSV file.  Overwrites existing example_set with new ExampleSet."""
+        es = ExampleSet()
+        es.load_csv(filename=filename, **kwargs)
+        self.example_set = es
 
     def __eq__(self, other):
         """Compares DataSet objects by their label_file_events, example_sets, and feature_sets"""
@@ -257,13 +277,10 @@ class DataSet:
         eq = True
 
         if not self.example_set == other.example_set:
-            # These should be nested dictionaries of Examples.  Looks like a pure python == compares works fine.
             eq = False
         elif self.feature_set is None and other.feature_set is not None:
-            # These should be Pandas DataFrames which has an equals method.  Check for None first.
             eq = False
         elif self.feature_set != other.feature_set:
-            # Now try the DataFrame.equals method since it's not None
             eq = False
 
         return eq
