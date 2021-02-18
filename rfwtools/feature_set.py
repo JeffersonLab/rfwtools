@@ -68,7 +68,7 @@ class FeatureSet(ExampleSet):
         self.__feature_df.to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
 
     def load_csv(self, filename, in_dir=None, sep=',', metadata_columns=None):
-        """Read in a CSV file that has FeatureSet data.
+        """Read in a CSV file that has FeatureSet data.  Relative to in_dir if filename is str.
 
         Args:
             filename (str) - The filename to save.  Will be relative out_dir
@@ -78,7 +78,11 @@ class FeatureSet(ExampleSet):
         """
         if in_dir is None:
             in_dir = Config().output_dir
-        df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+        if type(filename).__name__ == 'str':
+            df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+        else:
+            # Allows for tricks with file-like objects
+            df = pd.read_csv(filename, sep=sep)
 
         if metadata_columns is not None:
             self.metadata_columns = metadata_columns

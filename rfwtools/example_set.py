@@ -86,7 +86,11 @@ class ExampleSet:
         """
         if in_dir is None:
             in_dir = Config().output_dir
-        df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+        if type(filename).__name__ == 'str':
+            df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+        else:
+            # Allows for tricks with file-like objects
+            df = pd.read_csv(filename, sep=sep)
 
         if sorted(df.columns.to_list()) != sorted(ExampleSet.__columns[0:6] + ExampleSet.__columns[7:]):
             raise ValueError("Cannot load CSV file.  Unexpected column format.")
