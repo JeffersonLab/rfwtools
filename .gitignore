@@ -12,13 +12,13 @@
 /*.egg-info
 
 # JetBrains IDE config folder
-.idea/
+/.idea/
 
 # Editor temp files
 .*.swp
 
 # Python virtual environment used for development
-venv/
+/venv/
 
 # Volatile test data
-test/test-data/tmp/
+/test/test-data/tmp/
