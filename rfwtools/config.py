@@ -45,6 +45,8 @@ class Config:
         """Only make an instance of the inner Config object if its missing"""
         if Config.instance is None:
             Config.instance = Config.__Config()
+            if os.path.exists('./rfwtools.cfg'):
+                Config.read_config_file()
 
     @staticmethod
     def dump_yaml_string():
