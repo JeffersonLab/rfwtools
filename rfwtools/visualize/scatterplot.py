@@ -38,12 +38,12 @@ def scatterplot(data, x, y, title=None, figsize=None, drop_categories=True, **kw
         # Drop the the unused style categories
         if "style" in kwargs.keys():
             if dat[kwargs["style"]].dtype.name == "category":
-                dat[kwargs["style"]].cat.remove_unused_categories(inplace=True)
+                dat[kwargs["style"]] = dat[kwargs["style"]].cat.remove_unused_categories()
 
         # Drop the the unused hue categories
         if "hue" in kwargs.keys():
             if dat[kwargs["hue"]].dtype.name == "category":
-                dat[kwargs["hue"]].cat.remove_unused_categories(inplace=True)
+                dat[kwargs["hue"]] = dat[kwargs["hue"]].cat.remove_unused_categories()
 
     # Create the scatterplot
     sns.scatterplot(data=dat, x=x, y=y, **kwargs)
