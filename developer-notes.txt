@@ -34,8 +34,20 @@ python3 -m unittest
 # To build distributions.  You may need to remove directory content if rebuilding
 python setup.py sdist bdist_wheel
 
-# To upload to the test PyPI repo
+# To upload to the test PyPI repo.
+edit setup.cfg with latest info
 twine upload --repository testpypi dist/*
 
 # To upload to the production PyPI repo
+edit setup.cfg with latest info
 twine upload --repository pypi dist/*
+
+## Some other comments
+requirements.txt are the versions that were used from within my IDE and with my IDE unit test runner.  This is the set
+that worked during development, installation set will probably be different.
+
+requirements_dev.txt are the versions of tools required to build, test, and distribute the package.  These are the set
+that worked during the last development cycle.
+
+requirements.testing.txt are the packages that needed to be installed for testing to work.  They are basically the same
+as requirements.txt, but with a few extras used exclusively in tests and the local rfwtools package itself.
