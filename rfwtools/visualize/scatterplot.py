@@ -55,6 +55,7 @@ def scatterplot(data, x, y, title=None, figsize=None, drop_categories=True, **kw
     # Add a legend if we have color or marker differences to explain
     if "hue" in kwargs.keys() or "style" in kwargs.keys():
         plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        plt.subplots_adjust(right=0.75)
 
     # Show the plot
     plt.show()
