@@ -102,7 +102,6 @@ def _show_fault_cavity_count_by_zone(data, zones, title=None, nrows=1, ncols=Non
     # fig, axn = plt.subplots(nrows, ncols, sharex="all", sharey="all", figsize=(20, 3))
     # The exact size to reserve for the figure is sort of a guess.  3x3 for each plot plus extra for cbar and y labels
     fig, axn = plt.subplots(nrows, ncols, sharex="all", sharey="all", figsize=(2 + 3 * ncols, 3 * nrows))
-    plt.tight_layout(pad=3)
 
     if title is None:
         start = data['dtime'].min().strftime('%Y-%d-%m %H:%M:%S')
@@ -164,4 +163,5 @@ def _show_fault_cavity_count_by_zone(data, zones, title=None, nrows=1, ncols=Non
         i += 1
 
     # Display the plot
+    plt.subplots_adjust(top=0.8, bottom=0.2, right=0.95)
     plt.show()
