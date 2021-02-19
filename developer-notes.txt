@@ -1,0 +1,41 @@
+# Here are some notes on the development process.
+
+# First clone the repo.
+git clone https://github.com/JeffersonLab/rfwtools
+
+# Then create a venv for development
+python3.7 -m venv venv
+
+# Activate the venv and install the development requirements
+# These packages are used strictly in packaging, deploying, and testing
+source venv/bin/activate.csh
+pip3 install -r requirements_dev.txt
+
+# Now you can build wheels and source distributions, run unit tests, and upload to the test PyPI or PyPI.  One thing
+# I like to do is create a project in a different directory and then install this package in editable mode.  Instead
+# of actually installing it, pip creates a symlink back to your package directory and your source changes are reflected
+# in the downstream project without reinstalling.
+mkdir /some/other/my_project
+cd /some/other/my_project
+python -m venv venv
+source venv/bin/activate.csh
+pip install -e /path/to/rfwtools
+
+# If you want to make source changes then you will need to install the packages in requirements.txt.  The versions
+# listed where the ones used in the last development cycle.  You may want to update those versions, but make sure to
+# test!
+
+# To run a unittests in multiple environments
+tox
+# To run them directly in an IDE with builtin test runner, do the equivalent of this
+cd /path/to/.../rfwtools
+python3 -m unittest
+
+# To build distributions.  You may need to remove directory content if rebuilding
+python setup.py sdist bdist_wheel
+
+# To upload to the test PyPI repo
+twine upload --repository testpypi dist/*
+
+# To upload to the production PyPI repo
+twine upload --repository pypi dist/*
