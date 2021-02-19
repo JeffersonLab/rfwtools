@@ -65,8 +65,8 @@ ds = DataSet(label_files=['my-sample-labels.txt'])
 # This will process the label files you have and create an ExampleSet under ds.example_set
 ds.produce_example_set()
 
-# Save a CSV of the examples.  Let's say it was summer 2020 data
-ds.save_example_set_csv("my_example_set_summer_2020.csv")
+# Save a CSV of the examples.
+ds.save_example_set_csv("my_example_set.csv")
 
 # Show data from label sources, color by fault_label
 ds.example_set.display_frequency_barplot(x='label_source', color_by="fault_label")
@@ -78,10 +78,10 @@ ds.example_set.display_zone_label_heatmap(zones=['1L22', '1L23', '1L24', '1L25',
 ds.produce_feature_set(autoregressive_extractor)
 
 # Save the feature_set to a CSV
-ds.save_feature_set_csv("my_feature_set_summer_2020.csv")
+ds.save_feature_set_csv("my_feature_set.csv")
 
 # Do dimensionality reduction
-ds.feature_set.do_pca_dim_reduction(n_components=10)
+ds.feature_set.do_pca_reduction(n_components=10)
 
 # Plot out some different aspects
 # Color by fault, marker style by cavity
