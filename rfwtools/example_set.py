@@ -774,9 +774,9 @@ Number of mismatched labels: {num_mismatched_labels}
 
         # Set a reasonable default
         if title is None:
-            start = df["dtime"].min()
-            end = df["dtime"].max()
-            title = f"{x} ({start} - {end})"
+            start = df["dtime"].min().strftime("%Y-%m-%d %H:%M:%S.%f")[:-5]
+            end = df["dtime"].max().strftime("%Y-%m-%d %H:%M:%S.%f")[:-5]
+            title = f"{x}\n({start} - {end})"
 
         if color_by is None:
             # Simple chart if no factor to color by
@@ -794,6 +794,7 @@ Number of mismatched labels: {num_mismatched_labels}
             ax.legend(reversed(handles), reversed(labels), loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
 
         # Display it
+        plt.subplots_adjust(left=0.1, top=0.9, right=0.7, bottom=0.4)
         plt.show()
 
     def get_classification_report(self, other, label="cavity_label", query=None, other_query=None):
