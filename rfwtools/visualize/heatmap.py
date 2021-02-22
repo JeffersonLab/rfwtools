@@ -31,6 +31,7 @@ def heatmap_cavity_vs_fault_label_counts(data, title=None, vmin=None, vmax=None,
     ax.set_title(title)
 
     # Show the plot
+    plt.subplots_adjust(top=0.85, bottom=0.15, right=0.95, left=0.3)
     plt.show()
 
 

@@ -755,6 +755,7 @@ Number of mismatched labels: {num_mismatched_labels}
         ax.legend(reversed(handles), reversed(labels), loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
 
         # Display it
+        plt.gcf().subplots_adjust(left=0.1, top=0.9, right=0.7, bottom=0.2)
         plt.show()
 
     def display_frequency_barplot(self, x, color_by=None, title=None, query=None):
