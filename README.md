@@ -9,7 +9,7 @@ extraction tasks, and generating data reports and visualizations.
 This package has been posted to PyPI to ease installation.
 
 ```bash
-pip install rfwtools-jlab
+pip install rfwtools_jlab
 ```
 
 If you would rather edit the code while using it you should do a git clone to a local directory, then install that
