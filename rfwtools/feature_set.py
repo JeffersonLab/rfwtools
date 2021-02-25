@@ -13,7 +13,7 @@ class FeatureSet(ExampleSet):
     This class is a light wrapper on a Pandas DataFrame.
     """
 
-    def __init__(self, df=None, filename=None, in_dir=None, sep=None, name="", metadata_columns=None):
+    def __init__(self, df=None, filename=None, in_dir=None, sep=",", name="", metadata_columns=None):
         """Construct a FeatureSet.  Use the supplied DataFrame, or load filename if no df argument is given
 
         Args:
