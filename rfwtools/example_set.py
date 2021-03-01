@@ -257,13 +257,12 @@ Number of mismatched labels: {num_mismatched_labels}
             num_dupes = orig_size - len(self.__example_df)
             print(f"## Removed {num_dupes} entries from the ExampleSet for being duplicates ##")
 
-    def purge_invalid_examples(self, validator, download_data=True, report=True, progress=True):
+    def purge_invalid_examples(self, validator, report=True, progress=True):
         """Removes all examples from the ExampleSet that do not pass validation
 
         Args:
             validator (callable) - A function that accepts an Example as an argument and raises an exception if the
                                    Example is not valid
-            download_data (bool) - Should we check that we have the waveform data downloaded and get it if needed?
             report (bool) - Should information about what is purged be printed?
             progress (bool) - Should a progress bar be displayed
         """
@@ -282,7 +281,6 @@ Number of mismatched labels: {num_mismatched_labels}
                 row (DataFrame) - A DataFrame row containing the example to be validated.  Should contain an Example
                                   under a column named 'example'
                 _validator (ExampleValidator) - Object doing the validation
-                _download_data (bool) - Should we check that we have the waveform data downloaded and get it if needed?
 
             Returns:
                 (bool) - True if example passed validation,  Otherwise, False.
@@ -292,10 +290,7 @@ Number of mismatched labels: {num_mismatched_labels}
             nonlocal out
             nonlocal count
 
-            if _download_data:
-                row.example.download_waveforms_if_needed()
-
-            validator.set_example(row.example)
+            _validator.set_example(row.example)
             try:
                 _validator.validate_data()
             except Exception as exc:
@@ -321,12 +316,10 @@ Number of mismatched labels: {num_mismatched_labels}
                 tqdm.pandas()
 
                 # Apply the validator to generate a bool column we can filter on
-                valid = self.__example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator,
-                                                         _download_data=download_data)
+                valid = self.__example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator)
         else:
             # Apply the validator to generate a bool column we can filter on
-            valid = self.__example_df.apply(func=__apply_validator, axis=1, _validator=validator,
-                                            _download_data=download_data)
+            valid = self.__example_df.apply(func=__apply_validator, axis=1, _validator=validator)
 
         if report:
             print(out)
