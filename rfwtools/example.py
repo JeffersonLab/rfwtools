@@ -1,5 +1,27 @@
+"""A package for managing the data associated with a single Example.
+
+The has a single class that manages basic data access for an individual fault event Example.  If the data is not found
+in the specified location, then it will attempt to download the data and create the appropriate directory structure.
+This functionality typically requires access to JLab's internal networks (e.g., VPN).
+
+Expected data structure is <data_dir>/<zone>/<date>/<timestamp>/<capture files>.  Alternatively, event data may be
+compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
+
+    Typical usage example:
+
+    import Example
+    e = Example(zone="1L23", dt=datetime.strptime("%Y-%m-%d %H:%M:%S.%f"), cavity_label="1", fault_label="Microphonics",
+                cavity_conf=math.nan, fault_conf=math.nan, label_source='my_label_file.txt')
+    e.load_data()
+    df = e.event_df
+    e.unload_data()
+    # Now do something with the data
+
+"""
+
 import math
 import tarfile
+from typing import Tuple
 
 import requests
 import os
@@ -16,26 +38,34 @@ from rfwtools.config import Config
 
 
 class Example:
-    """A class representing a (SME) labeled fault event.
+    """A class representing a (SME) labeled fault event.  Manages data access and can download missing data.
 
-    zone - CED string (e.g., 1L21)
-    timestamp - timestamp string of format ts_fmt
-    cavity_label - an int label specifying the cavity that caused fault
-    fault_label - the string label specifying the type of fault that occurred
-    ts_fmt - strftime format specifier
-    data_dir - where can the root of the data directory be found on the local filesystem
+    Harvester fault data typically occupies ~10 MB of memory/disk space, and collections of these events often number in
+    the thousands.  Holding all of this event data in memory is typically not an option.  Additionally, the data is
+    found in multiple files organized in a directory tree, saved as a single tar.gz file, or is downloadable from web
+    services.  This class provides methods for easing access of this data and quickly loading/unloading it from memory.
+
+    If the data is not found in the specified location, then it will attempt to download the data and create the
+    appropriate directory structure.  This functionality typically requires access to JLab's internal networks (e.g.,
+    VPN).
+
+    Expected data structure is <data_dir>/<zone>/<date>/<timestamp>/<capture files>.  Alternatively, event data may be
+    compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
+
+    Attributes:
+
+    zone: A string identifying the zone in CED format (e.g., 1L21)
+    dt: datetime object matching the local time of the fault event
+    cavity_label: a string label specifying the cavity that caused fault (typically "0", "1", ..., "8")
+    fault_label: a string label specifying the type of fault that occurred (ExampleSet has a list of "known" labels")
+    data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.
     """
 
     # A regex for matching
     capture_file_regex = re.compile(r"R.*harv\..*\.txt")
 
     def __init__(self, zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir=None):
-        """Expects timestamp to be YYYY-mm-dd HH:MM:SS.f formatted string and CED zone (1L21)
-
-        Note: The data_dir defaults to the local data/waveforms/... path.  data/waveforms is a symlink which can either
-        removed to save in place or updated to point to another location on the local system.  I use it to point to my
-        local SSD while the project lives in my NFS mounted home directory.
-        """
+        """Construct an instance of the Example class."""
 
         # Expert/model provided labels
         self.cavity_label = cavity_label
@@ -52,19 +82,18 @@ class Example:
         self.event_df = None
         self.data_dir = data_dir
 
-    def get_event_path(self):
-        data_dir = self.data_dir if self.data_dir is not None else Config().data_dir
-        return os.path.join(data_dir, self.event_zone, self.get_file_system_time_string())
+    def load_data(self, verbose: bool = False) -> None:
+        """Top-level method for loading data associated with Example instance.
 
-    def get_event_path_compressed(self):
-        """Return the expected path the event if it has been compressed (i.e. tar/gzipped)."""
-        return f"{self.get_event_path()}.tar.gz"
+        Some early waveforms were saved with the Time column essentially inverted.  This method checks for and fixes
+        that problem by means a simple criteria.  If Time[0] > -1000, then the Time array is flipped.
 
-    def load_data(self, verbose=False):
-        """A catch-all for all activity needed to finish constructing the Example data"""
+        Arguments:
+            verbose: Should extra information be printed to STDOUT
+        """
         if verbose:
             print("loading data - " + str(self))
-        self.retrieve_event_df()
+        self._retrieve_event_df()
 
         # Some early events had a bug where the Time column was wrong.  Flip the order and change sign to fix.
         if self.event_df.Time[0] > -1000.0:
@@ -72,29 +101,68 @@ class Example:
                 print(f"{self.event_zone} {self.event_datetime}: Found flipped Time column.  Fixing.")
             self.event_df.Time = -1 * self.event_df.Time.values[::-1]
 
-    def unload_data(self, verbose=False):
-        """A catch-all for deleting the Examples data (event_df) from memory"""
+    def unload_data(self, verbose: bool = False) -> None:
+        """Top-level method for deleting the Examples data (event_df) from memory.
+
+        Arguments:
+            verbose: Should extra information be printed to STDOUT
+        """
         if verbose:
             print("unloading data - " + str(self))
         self.event_df = None
 
-    def get_file_system_time_string(self):
+    def _get_event_path(self) -> str:
+        """Generates the expected location for uncompressed event waveform data.
+
+        Returns:
+            The expected path to uncompressed directory of waveform data.
+        """
+        data_dir = self.data_dir if self.data_dir is not None else Config().data_dir
+        return os.path.join(data_dir, self.event_zone, self._get_file_system_time_string())
+
+    def _get_event_path_compressed(self) -> str:
+        """Generate the expected path the event if it has been compressed (i.e. tar/gzipped).
+
+        Returns:
+             The expected path the event if it has been compressed (i.e. tar/gzipped).
+        """
+        return f"{self._get_event_path()}.tar.gz"
+
+    def _get_file_system_time_string(self) -> str:
         """Return the file system formatted time string.
 
-        Well almost, because Tom doesn't record the fractional seconds so we have to figure that part out on the fly.
+        A common issue here is that Tom records faults down to the second, while the filesystem records them to the
+        tenth of a second.  This method simply returns the Example's timestamp (dt) as a string in the proper format.
+
+
+        Note :The ExamlpeSet class has functionality for determining the proper timestamp from the the waveform browser
+        service.
+
+        Returns:
+            The timestamp formatted in as expected in the accelerator filesystem. e.g. "2020_01_28/234556.1".
         """
         return self.event_datetime.strftime("%Y_%m_%d/%H%M%S.%f")[:-5]
 
-    def get_normal_time_string(self):
+    def _get_normal_time_string(self) -> str:
         """Return a 'normally' formatted time string (not quite ISO-8601) formatted time string.
 
-        Down to 0.1 since that is as much as we record on the file system. The fractional part is probably wrong since
-        Tom does not save that in the label files.
+        Accuracy down to 0.1 since that is as much as we record on the file system.
+
+        Returns:
+            The event timestamp in local time and nearly ISO-8601 - "%Y-%m-%d_%H:%M:%S.%f".
         """
         return self.event_datetime.strftime("%Y-%m-%d_%H:%M:%S.%f")[:-5]
 
-    def get_web_time_strings(self, fmt="%Y-%m-%d %H:%M:%S"):
-        """Return the web api formatted time strings (begin, end).  Needs to be formatted for url queries.
+    def _get_web_time_strings(self, fmt: str = "%Y-%m-%d %H:%M:%S") -> Tuple[str, str]:
+        """Generates two datetime strings that bound the fault at one second accuracy.
+
+        Many label files do not record the timestamps down to the tenth of a second as is needed by the web interface.
+        This method generates the two timestamps that should bound the actual event time.  These are not URL formatted.
+
+        Arguments:
+            fmt: datetime.strftime format string
+        Returns:
+            Tuple of the web API formatted time strings (begin, end).  Needs to be encoded for url queries.
 
         Since Tom only has down to the second, we have to query the API for begin and end times that will surround the
         event.
@@ -104,7 +172,7 @@ class Example:
         end = self.event_datetime + datetime.timedelta(seconds=1)
         return begin.strftime(fmt), end.strftime(fmt)
 
-    def retrieve_event_df(self):
+    def _retrieve_event_df(self) -> None:
         """Get the event waveform data and save it into event_df.  Saves capture files to disk after retrieval.
 
         First tries to get it from disk if it exists.  If not, then it downloads it from the web and saves it to disk.
@@ -125,11 +193,6 @@ class Example:
         else:
             self.event_df = self.download_waveforms_from_web()
 
-    def download_waveforms_if_needed(self):
-        """Downloads the fault waveform data and save it if it is not already present on disk."""
-        if not self.capture_files_on_disk():
-            self.download_waveforms_from_web()
-
     def download_waveforms_from_web(self, data_server='accweb.acc.jlab.org'):
         """Downloads the data from accweb for the specified zone and timestamp.
 
@@ -142,7 +205,7 @@ class Example:
         # Setup to download the data
         base = 'https://' + data_server + '/wfbrowser/ajax/event?'
         z = urllib.parse.quote_plus(self.event_zone)
-        (begin, end) = self.get_web_time_strings()
+        (begin, end) = self._get_web_time_strings()
         b = urllib.parse.quote_plus(begin)
         e = urllib.parse.quote_plus(end)
         url = base + 'out=csv&includeData=true&location=' + z + '&begin=' + b + '&end=' + e
@@ -173,7 +236,7 @@ class Example:
 
     def retrieve_event_df_from_disk(self, compressed=False):
         """Loads the cached copy of event's capture file into a DataFrame and returns it."""
-        return Example.parse_event_dir(event_path=self.get_event_path(), compressed=compressed)
+        return Example.parse_event_dir(event_path=self._get_event_path(), compressed=compressed)
 
     @staticmethod
     def is_capture_file(filename):
@@ -273,8 +336,8 @@ class Example:
         """
 
         # Create the event directory tree
-        if not os.path.exists(self.get_event_path()):
-            os.makedirs(self.get_event_path())
+        if not os.path.exists(self._get_event_path()):
+            os.makedirs(self._get_event_path())
 
         # Get the capture file name components
         date = self.event_datetime.strftime("%Y_%m_%d")
@@ -285,7 +348,7 @@ class Example:
         for i in range(1, 9):
             cav = base + str(i)
             cav_columns = ['Time'] + [col for col in event_df.columns.values if cav in col]
-            out_file = os.path.join(self.get_event_path(), "{}WFSharv.{}_{}.txt".format(cav, date, time))
+            out_file = os.path.join(self._get_event_path(), "{}WFSharv.{}_{}.txt".format(cav, date, time))
             if not os.path.exists(out_file):
                 event_df[cav_columns].to_csv(out_file, index=False, sep='\t')
 
@@ -293,22 +356,22 @@ class Example:
         """Deletes the 'cached' event waveform data for this event from disk."""
 
         # Remove the event directory if uncompressed
-        if os.path.exists(self.get_event_path()):
-            shutil.rmtree(self.get_event_path())
+        if os.path.exists(self._get_event_path()):
+            shutil.rmtree(self._get_event_path())
 
         # Remove the tar.gz compressed event directory if on disk
         if self.compressed_capture_files_on_disk():
-            os.unlink(self.get_event_path_compressed())
+            os.unlink(self._get_event_path_compressed())
 
         return
 
     def capture_files_on_disk(self):
         """Checks if captures files are currently saved to disk"""
-        return os.path.exists(self.get_event_path()) and len(os.listdir(self.get_event_path())) > 0
+        return os.path.exists(self._get_event_path()) and len(os.listdir(self._get_event_path())) > 0
 
     def compressed_capture_files_on_disk(self):
         """Checks if captures files are currently saved to disk in a compressed format"""
-        return os.path.exists(self.get_event_path_compressed())
+        return os.path.exists(self._get_event_path_compressed())
 
     def has_matching_labels(self, example):
         """Check if the supplied example has the same cavity and fault type label"""
