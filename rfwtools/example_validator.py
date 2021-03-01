@@ -28,7 +28,11 @@ class ExampleValidator:
         self.event_path = example.get_event_path()
         self.event_datetime = example.event_datetime
         self.event_zone = example.event_zone
-        self.event_df = example.event_df
+
+        # Need to load the data and make an internal copy for later use.
+        example.load_data()
+        self.event_df = example.event_df.copy()
+        example.unload_data()
 
     def validate_data(self, deployment='ops'):
         """Check that the event directory and it's data is of the expected format.
