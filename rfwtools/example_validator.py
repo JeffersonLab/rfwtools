@@ -144,24 +144,11 @@ class ExampleValidator:
 
         """
 
-        time = None
         if self.event_df is None:
-            # Check that all of the file have the same time series
-            first_filename = ""
-            for filename in os.listdir(self.event_path):
-                if Example.is_capture_file(filename=filename):
-                    if time is None:
-                        first_filename = filename
-                        time = Example.parse_capture_file(os.path.join(self.event_path, filename))['Time']
-                    else:
-                        if not time.equals(Example.parse_capture_file(os.path.join(self.event_path, filename))['Time']):
-                            raise ValueError(
-                                "Found Time series mismatch between '{}' and '{}'".format(first_filename, filename))
-        else:
-            # The DataFrame only has one time field so we can't check that.
-            time = self.event_df['Time']
+            raise ValueError("Missing fault event waveform data (event_df)")
 
         # Check that the time range is somewhere in the [-1.6s, 1.6s] range
+        time = self.event_df['Time']
         min_t = min(time)
         max_t = max(time)
         if max_start < min_t or min_end > max_t:
