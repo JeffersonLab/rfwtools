@@ -274,7 +274,7 @@ Number of mismatched labels: {num_mismatched_labels}
         count = 0
 
         # Private function that allows for easy reporting
-        def __apply_validator(row, _validator, _download_data):
+        def __apply_validator(row, _validator):
             """Applies the validator function in the context of DataFrame apply method.  Updates out, count from parent
 
             Args:
