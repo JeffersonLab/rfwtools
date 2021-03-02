@@ -111,22 +111,23 @@ class Example:
             print("unloading data - " + str(self))
         self.event_df = None
 
-    def _get_event_path(self) -> str:
+    def get_event_path(self, compressed: bool = False) -> str:
         """Generates the expected location for uncompressed event waveform data.
+
+        Arguments:
+            compressed: Should the returned path be for a compressed (tgz) event
 
         Returns:
             The expected path to uncompressed directory of waveform data.
         """
         data_dir = self.data_dir if self.data_dir is not None else Config().data_dir
-        return os.path.join(data_dir, self.event_zone, self._get_file_system_time_string())
 
-    def _get_event_path_compressed(self) -> str:
-        """Generate the expected path the event if it has been compressed (i.e. tar/gzipped).
+        path = os.path.join(data_dir, self.event_zone, self._get_file_system_time_string())
+        if compressed:
+            return f"{path}.tar.gz"
+        else:
+            return path
 
-        Returns:
-             The expected path the event if it has been compressed (i.e. tar/gzipped).
-        """
-        return f"{self._get_event_path()}.tar.gz"
 
     def _get_file_system_time_string(self) -> str:
         """Return the file system formatted time string.
@@ -184,26 +185,40 @@ class Example:
 
         self.event_df = None
         # Try to get the data from the web if we don't already have it
-        if self.capture_files_on_disk():
+        if self.capture_files_on_disk(compressed=False):
             # Load up the data into event_df
-            self.event_df = self.retrieve_event_df_from_disk()
-        elif self.compressed_capture_files_on_disk():
+            self.event_df = Example.parse_event_dir(event_path=self.get_event_path(compresd=False), compressed=False)
+        elif self.capture_files_on_disk(compressed=True):
             # Uncompress and load the data into event_df
-            self.event_df = self.retrieve_event_df_from_disk(compressed=True)
+            self.event_df = Example.parse_event_dir(event_path=self.get_event_path(compressed=True), compressed=True)
         else:
-            self.event_df = self.download_waveforms_from_web()
+            self.event_df = self._download_waveforms_from_web()
 
-    def download_waveforms_from_web(self, data_server='accweb.acc.jlab.org'):
+    def _download_waveforms_from_web(self, data_server: str = None, web_base_url: str = None) -> pd.DataFrame:
         """Downloads the data from accweb for the specified zone and timestamp.
 
         This has to do some guesstimating about which event to download because of imprecise time stamps.  Also access
         to accweb requires that you be on a JLab network (VPN should be fine, but probably not the guest wifi).
 
-        Returns a viable event_df waveform DataFrame
+        Arguments:
+            data_server:
+                The hostname of the server to query for the event data.  If None, Config.data_server is used.
+            web_base_url:
+                The base URL/context root of the web-based data app.  If None, Config.web_base_rul is used.  E.g.,
+                "wfbrowser"
+
+        Returns:
+             A viable event_df waveform DataFrame
         """
 
+        # Use default config values if none supplied.
+        if data_server is None:
+            data_server = Config().data_server
+        if web_base_url is None:
+            web_base_url = Config().web_base_url
+
         # Setup to download the data
-        base = 'https://' + data_server + '/wfbrowser/ajax/event?'
+        base = f'https://{data_server}/{web_base_url}/ajax/event?'
         z = urllib.parse.quote_plus(self.event_zone)
         (begin, end) = self._get_web_time_strings()
         b = urllib.parse.quote_plus(begin)
@@ -233,10 +248,6 @@ class Example:
         event_df.columns = Example.convert_waveform_column_names(event_df.columns)
 
         return event_df
-
-    def retrieve_event_df_from_disk(self, compressed=False):
-        """Loads the cached copy of event's capture file into a DataFrame and returns it."""
-        return Example.parse_event_dir(event_path=self._get_event_path(), compressed=compressed)
 
     @staticmethod
     def is_capture_file(filename):
@@ -336,8 +347,8 @@ class Example:
         """
 
         # Create the event directory tree
-        if not os.path.exists(self._get_event_path()):
-            os.makedirs(self._get_event_path())
+        if not os.path.exists(self.get_event_path(compressed=False)):
+            os.makedirs(self.get_event_path(compressed=False))
 
         # Get the capture file name components
         date = self.event_datetime.strftime("%Y_%m_%d")
@@ -348,7 +359,7 @@ class Example:
         for i in range(1, 9):
             cav = base + str(i)
             cav_columns = ['Time'] + [col for col in event_df.columns.values if cav in col]
-            out_file = os.path.join(self._get_event_path(), "{}WFSharv.{}_{}.txt".format(cav, date, time))
+            out_file = os.path.join(self.get_event_path(compressed=False), "{}WFSharv.{}_{}.txt".format(cav, date, time))
             if not os.path.exists(out_file):
                 event_df[cav_columns].to_csv(out_file, index=False, sep='\t')
 
@@ -356,22 +367,22 @@ class Example:
         """Deletes the 'cached' event waveform data for this event from disk."""
 
         # Remove the event directory if uncompressed
-        if os.path.exists(self._get_event_path()):
-            shutil.rmtree(self._get_event_path())
+        if self.capture_files_on_disk(compressed=True):
+            shutil.rmtree(self.get_event_path(compressed=False))
 
         # Remove the tar.gz compressed event directory if on disk
-        if self.compressed_capture_files_on_disk():
-            os.unlink(self._get_event_path_compressed())
+        if self.capture_files_on_disk(compressed=True):
+            os.unlink(self.get_event_path(compressed=True))
 
         return
 
-    def capture_files_on_disk(self):
+    def capture_files_on_disk(self, compressed: bool = False):
         """Checks if captures files are currently saved to disk"""
-        return os.path.exists(self._get_event_path()) and len(os.listdir(self._get_event_path())) > 0
-
-    def compressed_capture_files_on_disk(self):
-        """Checks if captures files are currently saved to disk in a compressed format"""
-        return os.path.exists(self._get_event_path_compressed())
+        if compressed:
+            return os.path.exists(self.get_event_path(compressed=True))
+        else:
+            return os.path.exists(self.get_event_path(compressed=False)) and\
+                   len(os.listdir(self.get_event_path(compressed=False))) > 0
 
     def has_matching_labels(self, example):
         """Check if the supplied example has the same cavity and fault type label"""
