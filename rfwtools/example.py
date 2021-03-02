@@ -187,14 +187,14 @@ class Example:
         # Try to get the data from the web if we don't already have it
         if self.capture_files_on_disk(compressed=False):
             # Load up the data into event_df
-            self.event_df = Example.parse_event_dir(event_path=self.get_event_path(compresd=False), compressed=False)
+            self.event_df = Example.parse_event_dir(event_path=self.get_event_path(compressed=False), compressed=False)
         elif self.capture_files_on_disk(compressed=True):
             # Uncompress and load the data into event_df
             self.event_df = Example.parse_event_dir(event_path=self.get_event_path(compressed=True), compressed=True)
         else:
             self.event_df = self._download_waveforms_from_web()
 
-    def _download_waveforms_from_web(self, data_server: str = None, web_base_url: str = None) -> pd.DataFrame:
+    def _download_waveforms_from_web(self, data_server: str = None, wfb_base_url: str = None) -> pd.DataFrame:
         """Downloads the data from accweb for the specified zone and timestamp.
 
         This has to do some guesstimating about which event to download because of imprecise time stamps.  Also access
@@ -203,8 +203,8 @@ class Example:
         Arguments:
             data_server:
                 The hostname of the server to query for the event data.  If None, Config.data_server is used.
-            web_base_url:
-                The base URL/context root of the web-based data app.  If None, Config.web_base_rul is used.  E.g.,
+            wfb_base_url:
+                The base URL/context root of the web-based data app.  If None, Config.wfb_base_rul is used.  E.g.,
                 "wfbrowser"
 
         Returns:
@@ -214,11 +214,11 @@ class Example:
         # Use default config values if none supplied.
         if data_server is None:
             data_server = Config().data_server
-        if web_base_url is None:
-            web_base_url = Config().web_base_url
+        if wfb_base_url is None:
+            wfb_base_url = Config().wfb_base_url
 
         # Setup to download the data
-        base = f'https://{data_server}/{web_base_url}/ajax/event?'
+        base = f'https://{data_server}/{wfb_base_url}/ajax/event?'
         z = urllib.parse.quote_plus(self.event_zone)
         (begin, end) = self._get_web_time_strings()
         b = urllib.parse.quote_plus(begin)
@@ -367,7 +367,7 @@ class Example:
         """Deletes the 'cached' event waveform data for this event from disk."""
 
         # Remove the event directory if uncompressed
-        if self.capture_files_on_disk(compressed=True):
+        if self.capture_files_on_disk(compressed=False):
             shutil.rmtree(self.get_event_path(compressed=False))
 
         # Remove the tar.gz compressed event directory if on disk

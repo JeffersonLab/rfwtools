@@ -105,8 +105,8 @@ class TestExample(TestCase):
                                      cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None,
                                      label_source="test",
                                      data_dir=os.path.join(test.test_data_dir, "compressed-example"))
-        compress_res = Example.parse_event_dir(compressed_example.get_event_path_compressed(), compressed=True)
-        uncompressed_res = Example.parse_event_dir(compressed_example.get_event_path(), compressed=False)
+        compress_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=True), compressed=True)
+        uncompressed_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=False), compressed=False)
 
         # assert_frame_equal will raise if there is a problem and print out an error message
         pd._testing.assert_frame_equal(exp_df, compress_res)
@@ -124,8 +124,8 @@ class TestExample(TestCase):
         e = Example(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=None, fault_conf=None,
                     label_source="test")
         # Test that the string operations are working as expected
-        self.assertEqual(e.get_file_system_time_string(), "2019_02_24/042201.0")
-        self.assertTupleEqual(e.get_web_time_strings(), ("2019-02-24 04:22:01", "2019-02-24 04:22:02"))
+        self.assertEqual(e._get_file_system_time_string(), "2019_02_24/042201.0")
+        self.assertTupleEqual(e._get_web_time_strings(), ("2019-02-24 04:22:01", "2019-02-24 04:22:02"))
 
     def test_example_data_ops(self):
         Config().data_dir = test.tmp_data_dir
@@ -135,7 +135,7 @@ class TestExample(TestCase):
         # Check that the web api download is working as expected
         self.assertIsNone(e.event_df)  # Starts out as none
         t1 = datetime.datetime.now()
-        e.download_waveforms_from_web()
+        e._download_waveforms_from_web()
         t2 = datetime.datetime.now()
         if (t2 - t1).total_seconds() > 10:
             print(
@@ -146,7 +146,7 @@ class TestExample(TestCase):
         e.event_df = None
         self.assertIsNone(e.event_df)  # Probably overkill, but I want it to fail here if so
         t1 = datetime.datetime.now()
-        e.event_df = e.retrieve_event_df_from_disk()
+        e._retrieve_event_df()  # Will download data if not present, but we know it's downloaded now.
         t2 = datetime.datetime.now()
         self.check_event_df(e)
         if (t2 - t1).total_seconds() > 1:
@@ -160,7 +160,7 @@ class TestExample(TestCase):
         # Check that the high level command works
         e.event_df = None
         self.assertIsNone(e.event_df)
-        e.retrieve_event_df()  # Should do a second web download
+        e._retrieve_event_df()  # Should do a second web download
         self.check_event_df(e)
         self.check_data_on_disk(e)
 
