@@ -26,7 +26,7 @@ class ExampleValidator:
 
     def set_example(self, example):
         """Set internal information about the example to validate."""
-        self.event_cf_content = example.get_capture_file_content()
+        self.event_cf_content = example.get_capture_file_contents()
         self.event_datetime = example.event_datetime
         self.event_zone = example.event_zone
 
@@ -209,7 +209,7 @@ class ExampleValidator:
 
         # We need the zone to check the bypass bit word that has bit 0-7 corresponding to cavity 1-8
         zone = None
-        cfs = self.event_cf_content.keys()
+        cfs = list(self.event_cf_content.keys())
         if len(cfs) > 0:
             filename = cfs[0]
             zone = filename[0:3]
