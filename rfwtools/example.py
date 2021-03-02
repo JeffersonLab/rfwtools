@@ -21,7 +21,7 @@ compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
 
 import math
 import tarfile
-from typing import Tuple
+from typing import Tuple, Dict
 
 import requests
 import os
@@ -128,8 +128,12 @@ class Example:
         else:
             return path
 
-    def get_capture_file_contents(self):
-        """Returns a dictionary of capture file contents keyed on file name.  Typically eight files, each is ~1 MB."""
+    def get_capture_file_contents(self) -> Dict[str, str]:
+        """Creates a dictionary of capture file content.  Typically eight files, each is ~1 MB.
+
+        Returns:
+            A dictionary of capture file content keyed on the name of the capture file.
+        """
 
         content = {}
         # Directly read each file into the dictionary
@@ -272,7 +276,7 @@ class Example:
         return event_df
 
     @staticmethod
-    def is_capture_file(filename):
+    def is_capture_file(filename: str) -> bool:
         """Validates if filename appears to be a valid capture file.
 
             Args:
@@ -284,7 +288,7 @@ class Example:
         return Example.capture_file_regex.match(filename)
 
     @staticmethod
-    def parse_capture_file(file):
+    def parse_capture_file(file: str) -> pd.DataFrame:
         """Parses an individual capture file into a Pandas DataFrame object.
 
         Reads all data in as float64 dtypes because a column of all integers will default to integers (e.g., all zeroes)
@@ -295,24 +299,20 @@ class Example:
             Returns:
                 DataFrame: A pandas DataFrame containing the data from the specified capture file
         """
-        return pd.read_csv(file, sep="\t", comment='#', skip_blank_lines=True,
-                           dtype='float64')
-
-    def set_event_df(self):
-        """"""
+        return pd.read_csv(file, sep="\t", comment='#', skip_blank_lines=True, dtype='float64')
 
     @staticmethod
-    def parse_event_dir(event_path, compressed=False):
+    def parse_event_dir(event_path: str, compressed: bool = False) -> None:
         """Parses the  capture files in the BaseModel's event_dir and sets event_df to the appropriate pandas DataFrame.
 
         The waveform names are converted from <EPICS_NAME><Waveform> (e.g., R123WFSGMES), to <Cavity_Number>_<Waveform>
         (e.g., 3_GMES).  This allows analysis code to more easily handle waveforms from different zones.
 
-            Returns:
-                None
-
-            Raises:
-                 ValueError: if a column name is discovered with an unexpected format
+        Arguments:
+            event_path: The path to the event directory or compressed tar.gz file
+            compressed: Is the data a compressed tar.gz file or a regular directory
+        Raises:
+             ValueError: if a column name is discovered with an unexpected format
         """
         zone_df = None
 
