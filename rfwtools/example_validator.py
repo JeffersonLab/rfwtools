@@ -2,6 +2,7 @@ import datetime
 import itertools
 import os
 import re
+import tarfile
 
 from rfwtools import mya
 from rfwtools.example import Example
@@ -18,27 +19,31 @@ class ExampleValidator:
 
     def __init__(self):
         """Create an instance for validating Example."""
-        self.event_path = None
         self.event_datetime = None
         self.event_zone = None
         self.event_df = None
+        self.event_cf_content = None
 
     def set_example(self, example):
         """Set internal information about the example to validate."""
-        self.event_path = example.get_event_path()
+        self.event_cf_content = example.get_capture_file_content()
         self.event_datetime = example.event_datetime
         self.event_zone = example.event_zone
 
         # Need to load the data and make an internal copy for later use.
-        example.load_data()
-        self.event_df = example.event_df.copy()
-        example.unload_data()
+        try:
+            example.load_data()
+            self.event_df = example.event_df.copy()
+            example.unload_data()
+        except Exception:
+            self.event_df = None
 
     def validate_data(self, deployment='ops'):
         """Check that the event directory and it's data is of the expected format.
 
         This method inspects the event directory and raises an exception if a problem is found.  The following aspects
         of the event directory and waveform data are validated.
+           # Data can be found on disk
            # All eight cavities are represented by exactly one capture file
            # All of the required waveforms are represented exactly once
            # All of the capture files use the same timespan and have constant sampling intervals
@@ -48,6 +53,8 @@ class ExampleValidator:
             None: Subroutines raise an exception if an error condition is found.
 
         """
+        if self.event_df is None:
+            raise ValueError("Error getting event_df during set_example()")
         self.validate_capture_file_counts()
         self.validate_capture_file_waveforms()
         self.validate_waveform_times()
@@ -70,13 +77,13 @@ class ExampleValidator:
 
         # Count capture files per cavity
         capture_file_counts = {"1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0}
-        for filename in os.listdir(self.event_path):
-            cavity = filename[3]
-            if cavity not in capture_file_counts.keys():
-                raise ValueError("Found capture file for an unsupported cavity - " + cavity)
 
+        # Count the filenames that match each cavity
+        for filename in self.event_cf_content.keys():
+            cavity = filename[3]
             capture_file_counts[cavity] += 1
 
+        # Verify that we have the right counts - one for each cavity
         for cavity in capture_file_counts.keys():
             if capture_file_counts[cavity] > 1:
                 raise ValueError("Duplicate capture files exist for zone '" + cavity + "'")
@@ -100,66 +107,22 @@ class ExampleValidator:
         req_signals = ["IMES", "QMES", "GMES", "PMES", "IASK", "QASK", "GASK", "PASK", "CRFP", "CRFPP",
                        "CRRP", "CRRPP", "GLDE", "PLDE", "DETA2", "CFQE2", "DFQES"]
 
-        # Since we have the event_df from the event, first compare the DataFrame columns to the required signals
-        # If we don't have the event_df for some reason, try to look at the files on disk
-        if self.event_df is not None:
-            # Generate the list of required and actual columns
-            req_columns = [i + j for i, j in itertools.product(("1_", "2_", "3_", "4_", "5_", "6_", "7_", "8_"),
-                                                               req_signals)]
-            req_columns.insert(0, "Time")
-            columns = [i for i in self.event_df.columns.values]  # Don't want to modify the actual event_df
+        # Assume we have the event_df.  Compare the DataFrame columns to the required signals
+        if self.event_df is None:
+            raise ValueError("Missing fault event waveform data (event_df)")
 
-            # Sort them so we can do element wise comparison
-            req_columns.sort()
-            columns.sort()
+        # Generate the list of required and actual columns
+        req_columns = [i + j for i, j in itertools.product(("1_", "2_", "3_", "4_", "5_", "6_", "7_", "8_"),
+                                                           req_signals)]
+        req_columns.insert(0, "Time")
+        columns = [i for i in self.event_df.columns.values]  # Don't want to modify the actual event_df
 
-            if len(req_columns) != len(columns) or req_columns != columns:
-                raise ValueError("Found event_df does not have the required waveform columns.")
+        # Sort them so we can do element wise comparison
+        req_columns.sort()
+        columns.sort()
 
-        else:
-            # Will contain regex's that are used to check for required waveforms, and the count of how many matches
-            req_waveforms = {re.compile("Time"): 0}
-            for sig in req_signals:
-                for cav in [1, 2, 3, 4, 5, 6, 7, 8]:
-                    wf = r"R\d\w" + str(cav) + "WF[ST]" + sig + "$"
-                    req_waveforms[re.compile(wf)] = 0
-
-            # Metadata are lines at the top of the file that start with a #.  Probably no spaces, but just to be safe
-            metadata_regex = re.compile(r"^\s*#")
-
-            # Go through each capture file and make sure that the required waveforms are present
-            for filename in os.listdir(self.event_path):
-                if not Example.is_capture_file(filename):
-                    continue
-                file = open(os.path.join(self.event_path, filename), "r")
-
-                # Get the header line, should be either the first line just after the metadata or the very first line
-                line = "#"
-                while metadata_regex.match(line):
-                    line = file.readline().rstrip("\n")
-
-                # Check each column header for a match
-                for col_name in line.split("\t"):
-                    for pattern in req_waveforms.keys():
-                        if pattern.match(col_name):
-                            req_waveforms[pattern] += 1
-
-                # Supposedly garbage collector would take care of this, but this seems cleaner
-                file.close()
-
-            # Validate that each of the patterns had exactly one match
-            for pattern in req_waveforms.keys():
-                if pattern.pattern == "Time":
-                    if req_waveforms[pattern] != 8:
-                        raise ValueError(
-                            "Model found " + str(req_waveforms[pattern]) + " Time columns.  Expected eight.")
-                else:
-                    if req_waveforms[pattern] > 1:
-                        raise ValueError(
-                            "Model found multiple waveforms that matched pattern '" + pattern.pattern + "'")
-                    if req_waveforms[pattern] < 1:
-                        raise ValueError(
-                            "Model could not identify require waveform matching pattern '" + pattern.pattern + "'")
+        if len(req_columns) != len(columns) or req_columns != columns:
+            raise ValueError("Found event_df does not have the required waveform columns.")
 
     def validate_waveform_times(self, max_start=-100.0, min_end=100.0, step_size=0.2, delta_max=0.02):
         """Verify the Time column of all capture files are identical and have a valid range and sample interval.
