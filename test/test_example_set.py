@@ -148,7 +148,7 @@ Number of mismatched labels: 6
         # This is using the larger label file
         es.add_label_file_data(label_files=('test3.txt',))
         es.remove_duplicates_and_mismatches()
-        es.purge_invalid_examples(TestValidator(), download_data=False, progress=False, report=False)
+        es.purge_invalid_examples(TestValidator(), progress=False, report=False)
 
         # Verify that the only values in there are for zone 1L24
         exp = ('1L24',)
