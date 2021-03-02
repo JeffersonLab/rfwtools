@@ -209,11 +209,13 @@ class ExampleValidator:
 
         # We need the zone to check the bypass bit word that has bit 0-7 corresponding to cavity 1-8
         zone = None
-        for filename in os.listdir(self.event_path):
-            if not Example.is_capture_file(filename):
-                continue
+        cfs = self.event_cf_content.keys()
+        if len(cfs) > 0:
+            filename = cfs[0]
             zone = filename[0:3]
-            break
+        else:
+            raise ValueError("No capture file content found.")
+
         if zone is None:
             raise ValueError("Could parse zone name from capture file name")
 
@@ -233,24 +235,23 @@ class ExampleValidator:
         if bypassed is not None:
             bypassed_bits = format(bypassed, "08b")[::-1]
 
-        for filename in os.listdir(self.event_path):
-            if Example.is_capture_file(filename):
-                cav = filename[0:4]
+        for filename in self.event_cf_content.keys():
+            cav = filename[0:4]
 
-                # Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don't care about it's
-                # control mode
-                gset = mya.get_pv_value(PV=gset_template.format(cav), datetime=pre_fault_dt, deployment=deployment)
-                if gset == 0:
-                    continue
+            # Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don't care about it's
+            # control mode
+            gset = mya.get_pv_value(PV=gset_template.format(cav), datetime=pre_fault_dt, deployment=deployment)
+            if gset == 0:
+                continue
 
-                # Check if the cavity was formally bypassed.  bypassed_bits is zero indexed, while cavities are one
-                # indexed.  1 is bypassed, 0 is not
-                if bypassed_bits[int(cav[3]) - 1] == 0:
-                    continue
+            # Check if the cavity was formally bypassed.  bypassed_bits is zero indexed, while cavities are one
+            # indexed.  1 is bypassed, 0 is not
+            if bypassed_bits[int(cav[3]) - 1] == 0:
+                continue
 
-                val = mya.get_pv_value(PV=mode_template.format(cav), datetime=pre_fault_dt, deployment=deployment)
-                if val != mode:
-                    raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
+            val = mya.get_pv_value(PV=mode_template.format(cav), datetime=pre_fault_dt, deployment=deployment)
+            if val != mode:
+                raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
 
     def validate_zones(self):
         """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.
