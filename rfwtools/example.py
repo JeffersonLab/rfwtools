@@ -128,6 +128,28 @@ class Example:
         else:
             return path
 
+    def get_capture_file_contents(self):
+        """Returns a dictionary of capture file contents keyed on file name.  Typically eight files, each is ~1 MB."""
+
+        content = {}
+        # Directly read each file into the dictionary
+        if self.capture_files_on_disk(compressed=False):
+            for filename in os.listdir(self.get_event_path(compressed=False)):
+                if Example.is_capture_file(filename):
+                    with open(os.path.join(self.get_event_path(compressed=False), filename), "r") as f:
+                        content[filename] = f.read()
+
+        # Wend our way through the tarfile and read the content
+        elif self.capture_files_on_disk(compressed=True):
+            with tarfile.open(self.get_event_path(compressed=True), mode="r:gz") as f:
+                for member in f.getmembers():
+                    if member.isfile():
+                        # Make sure to remove the base directory from the name
+                        file = os.path.basename(member.name)
+                        if Example.is_capture_file(file):
+                            content[file] = f.extractfile(member)
+
+        return content
 
     def _get_file_system_time_string(self) -> str:
         """Return the file system formatted time string.
