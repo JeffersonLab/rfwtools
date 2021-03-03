@@ -21,7 +21,7 @@ compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
 
 import math
 import tarfile
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 
 import requests
 import os
@@ -337,8 +337,8 @@ class Example:
                 else:
                     # Join the existing zone data with the new capture file by using the "Time" column as an index to
                     # match rows
-                    zone_df = zone_df.join(Example.parse_capture_file(os.path.join(event_path, filename)).set_index("Time"),
-                                           on="Time")
+                    zone_df = zone_df.join(
+                        Example.parse_capture_file(os.path.join(event_path, filename)).set_index("Time"), on="Time")
 
         # Now format the column names to remove the zone information but keep a cavity and signal identifiers
         zone_df.columns = Example.convert_waveform_column_names(zone_df.columns)
@@ -346,10 +346,14 @@ class Example:
         return zone_df
 
     @staticmethod
-    def convert_waveform_column_names(columns):
-        """Turns waveform PV names (R1M1WFSGMES) into more uniform name (1_GMES)
+    def convert_waveform_column_names(columns: List[str]) -> List[str]:
+        """Turns waveform PV names (R1M1WFSGMES) into more uniform name based on cavity and waveform (1_GMES)
 
-        Expects a list of waveform columns from within a single zone, i.e., a list of event waveform names to convert
+        Arguments:
+            columns: List of waveform columns from a single zone, i.e., a list of event waveform names to convert.
+
+        Returns:
+            The updated/standardized column names sans zone identifier.
         """
         pattern = re.compile(r'R\d\w\dWF[TS]')
         new_columns = []
@@ -362,11 +366,19 @@ class Example:
             new_columns.append(column)
         return new_columns
 
-    def save_event_df_to_disk(self, event_df):
+    def save_event_df_to_disk(self, event_df: pd.DataFrame) -> None:
         """This method is saves the event waveform DataFrame to disk.  Can provide faster access to 'raw' data later.
 
-        If capture files already exist, it won't try to overwrite them.  Does nothing if event_path is None.
+        If capture files already exist, it won't try to overwrite them.  Does nothing if event_path is None.  Note that
+        every capture file will end up with the same timestamp as self.event_datetime.
+
+        Arguments:
+            event_df: The DataFrame for which we should create a fault event directory of capture files.
         """
+
+        # Do nothing if compressed file exists
+        if os.path.exists(self.get_event_path(compressed=True)):
+            return
 
         # Create the event directory tree
         if not os.path.exists(self.get_event_path(compressed=False)):
@@ -385,8 +397,8 @@ class Example:
             if not os.path.exists(out_file):
                 event_df[cav_columns].to_csv(out_file, index=False, sep='\t')
 
-    def remove_event_df_from_disk(self):
-        """Deletes the 'cached' event waveform data for this event from disk."""
+    def remove_event_df_from_disk(self) -> None:
+        """Deletes the 'cached' event waveform data for this event from disk.  Both compressed and uncompressed data."""
 
         # Remove the event directory if uncompressed
         if self.capture_files_on_disk(compressed=False):
@@ -398,29 +410,44 @@ class Example:
 
         return
 
-    def capture_files_on_disk(self, compressed: bool = False):
-        """Checks if captures files are currently saved to disk"""
+    def capture_files_on_disk(self, compressed: bool = False) -> bool:
+        """Checks if captures files are currently saved to disk.
+
+        Arguments:
+            compressed: Are we checking for compressed file (True), or uncompressed (False, default)?
+
+        Returns:
+            True if the compressed file or regular directors were found.
+        """
         if compressed:
             return os.path.exists(self.get_event_path(compressed=True))
         else:
             return os.path.exists(self.get_event_path(compressed=False)) and\
                    len(os.listdir(self.get_event_path(compressed=False))) > 0
 
-    def has_matching_labels(self, example):
-        """Check if the supplied example has the same cavity and fault type label"""
+    def has_matching_labels(self, example: 'Example') -> bool:
+        """Check if the supplied example has the same cavity and fault type label.
+
+        Arguments:
+            example: A Example object to compare labels against
+
+        Returns:
+            True if both cavity and fault labels match.  False otherwise.
+        """
         if example is not None:
             if self.fault_label == example.fault_label and self.cavity_label == example.cavity_label:
                 return True
         return False
 
-    def plot_waveforms(self, signals=None, downsample=32):
-        """Plot the waveform data associated with this example.
+    def plot_waveforms(self, signals: List[str] = None, downsample: int = 32) -> None:
+        """Plot the waveform data associated with this example.  Optionally down sample the signals.
 
         Args:
-            signals (list(str)) - A list of signal names to plot, e.g. '1_GMES'.  If None, then GMES, DETA2, GASK, CRFP,
-                                  and PMES will be plotted for all cavities
-            downsample (integer) - The downsampling factor, i.e., keep every <downsample>-th point.  By default keep
-                                   every 16th point
+            signals:
+                A list of signal names to plot, e.g. '1_GMES'.  If None, then GMES, DETA2, GASK, CRFP, and PMES will be
+                plotted for all cavities
+            downsample:
+                The down sampling factor, i.e., keep every <downsample>-th point.  By default keep every 32nd point
         """
 
         # Make sure we've downloaded the data if needed and loaded it into memory
@@ -472,14 +499,24 @@ class Example:
         fig.suptitle(f"{self.event_zone} {self.event_datetime} - cav={self.cavity_label}, fault={self.fault_label} ({self.label_source})")
         plt.show()
 
-    def to_string(self):
-        """This provides a more descriptive string than __str__"""
+    def to_string(self) -> str:
+        """This provides a more descriptive string than __str__.
+
+        Returns:
+            A string representation of the example including zone, time, label info, and label source."""
         return f"<zone:{self.event_zone}  ts:{self.event_datetime}  cav_label:{self.cavity_label}  fault_label:" \
                f"{self.fault_label}  cav_conf:{self.cavity_conf}  fault_conf:{self.fault_conf}  " \
                f"label_source:{self.label_source}>"
 
-    def __eq__(self, other):
-        """Determines equality by zone, datetime, labels, and confidence values."""
+    def __eq__(self, other: 'Example') -> bool:
+        """Determines equality by zone, datetime, labels, and confidence values.
+
+        Arguments:
+            other: An Example object to compare.
+
+        Returns:
+            True if the Examples are equivalent, False otherwise.
+        """
         if other is not None:
             if self.event_datetime != other.event_datetime:
                 return False
@@ -506,17 +543,23 @@ class Example:
 
         return (x == y) or (math.isnan(x) and math.isnan(y))
 
-    def __key(self):
+    def __key(self) -> Tuple[str, datetime.datetime, str, float, str, float]:
+        """Returns essential attributes of the Example."""
         return self.event_zone, self.event_datetime, self.cavity_label, self.cavity_conf, self.fault_label, \
                self.fault_conf
 
-    def __hash__(self):
-        """Returns the hash of """
+    def __hash__(self) -> int:
+        """Returns the hash of self's key attributes.  Needed for inclusion in dictionaries.
+
+        Returns:
+            The results of hash.
+        """
         return hash(self.__key())
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Example') -> bool:
         """Determines inequality.  Inverse of __eq__"""
         return not self == other
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Returns a short string representing this Example - only zone and datetime."""
         return f"<{self.event_zone} {self.event_datetime}>"
