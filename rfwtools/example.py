@@ -491,12 +491,14 @@ class Example:
             # default column names after melting
             sns.lineplot(x='Time', y='value', hue='variable', data=pd.melt(plot_df.iloc[::downsample, :], ['Time']))
             ax.set_title(wf + f" - down sampled {downsample}:1")
-            plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+            plt.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
 
             i += 1
 
         # Add the main title and display
-        fig.suptitle(f"{self.event_zone} {self.event_datetime} - cav={self.cavity_label}, fault={self.fault_label} ({self.label_source})")
+        fig.suptitle(f"{self.event_zone} {self.event_datetime} - cav={self.cavity_label}, fault={self.fault_label} "
+                     f"({self.label_source})")
+        plt.subplots_adjust(left=0.025, right=0.925, wspace=0.35, hspace=0.35)
         plt.show()
 
     def to_string(self) -> str:
