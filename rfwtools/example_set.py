@@ -1,3 +1,47 @@
+"""This package is for managing a collection of Examples.
+
+ExampleSet objects are typically created by a DataSet, but may be created directly.
+
+Basic Usage Examples:
+
+Start by saving this data in my-sample-labels.txt in the Config().label_dir directory (defaults to ./data/labels/).
+::
+
+    zone	cavity	cav#	fault	time
+    1L25	4	44	Microphonics	2020/03/10 01:08:41
+    2L24	5	77	Controls Fault	2020/03/10 01:42:03
+    1L25	5	45	Microphonics	2020/03/10 02:50:07
+    2L26	8	96	E_Quench	2020/03/10 02:58:13
+    1L25	5	45	Microphonics	2020/03/10 04:55:21
+    1L22	4	20	Quench_3ms	2020/03/10 05:06:13
+    1L25	5	45	Microphonics	2020/03/10 07:35:32
+    2L22	0	57	Multi Cav turn off	2020/03/10 07:59:49
+    2L23	0	65	Multi Cav turn off	2020/03/10 07:59:56
+    2L24	0	73	Multi Cav turn off	2020/03/10 08:00:03
+
+Creating from scratch.  This assumes you have label files in Config().label_dir, and will save a CSV file to
+Config().output_dir (defaults to ./processed-output/)
+::
+    from rfwtools.example_set import ExampleSet
+    from rfwtools.example_validator import ExampleValidator
+    es = ExampleSet()
+    es.add_label_file_data(label_files=['my-sample-labels.txt'])
+    es.get_label_file_report()
+    es.remove_duplicates_and_mismatches()
+    es.purge_invalid_examples(ExampleValidator())
+    es.save_csv("my_example_set.csv")
+
+Reporting and Visualization.  This assumes that you have created and saved an ExampleSet as in the example above.
+::
+    from rfwtools.example_set import ExampleSet
+    es.load_csv("my_example_set.csv")
+    es.display_frequency_barplot(x='zone', color_by='cavity_label')
+    es.display_zone_label_heatmap(zones=['1L22', '1L23', '1L24', '1L25', '1L26'])
+
+es.display_summary_label_heatmap(title='2L22 7AM Summary',
+                                 query = 'zone=="2L22" & dtime < "2020-03-10 08:00:00" & dtime > "2020-03-10 07:00:00"')
+"""
+
 import datetime
 import warnings
 
@@ -17,7 +61,14 @@ from rfwtools.visualize import heatmap
 
 
 class ExampleSet:
-    """A class for managing a collection of examples, including metadata about the collection of examples"""
+    """A class for managing a collection of examples, including metadata about the collection of examples.
+
+    This class has methods for building collections of examples from our standard label files or from the waveform
+    browser webservice.  It also includes many methods for visualizing and reporting.
+
+    Attributes:
+
+    """
 
     # The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.
     known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
@@ -95,11 +146,12 @@ class ExampleSet:
         if sorted(df.columns.to_list()) != sorted(ExampleSet.__columns[0:6] + ExampleSet.__columns[7:]):
             raise ValueError("Cannot load CSV file.  Unexpected column format.")
 
+        # Put the DataFrame into a standard structure - categories, column order, etc.
+        ExampleSet.__standardize_df_format(df)
+
         # Add the example column
         df['example'] = df.apply(ExampleSet.__Example_from_row, axis=1, raw=False)
 
-        # Put the DataFrame into a standard structure - categories, column order, etc.
-        ExampleSet.__standardize_df_format(df)
         self.__example_df = df
 
     def update_example_set(self, df, keep_label_file_dataframes=False):
