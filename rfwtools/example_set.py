@@ -5,6 +5,8 @@ ExampleSet objects are typically created by a DataSet, but may be created direct
 Basic Usage Examples:
 
 Start by saving this data in my-sample-labels.txt in the Config().label_dir directory (defaults to ./data/labels/).
+**THESE FIELDS SHOULD BE TAB SEPARATED.  DOCUMENTATION SYSTEM INSISTS ON CONVERTING THEM TO SPACES.  PLEASE FIX IF YOU
+TRY THIS EXAMPLE ON YOUR OWN**
 ::
 
     zone	cavity	cav#	fault	time
@@ -34,6 +36,7 @@ Config().output_dir (defaults to ./processed-output/)
 Reporting and Visualization.  This assumes that you have created and saved an ExampleSet as in the example above.
 ::
     from rfwtools.example_set import ExampleSet
+    es = ExampleSet()
     es.load_csv("my_example_set.csv")
     es.display_frequency_barplot(x='zone', color_by='cavity_label')
     es.display_zone_label_heatmap(zones=['1L22', '1L23', '1L24', '1L25', '1L26'])
