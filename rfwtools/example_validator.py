@@ -1,12 +1,7 @@
 import datetime
 import itertools
-import os
-import re
-import tarfile
 
 from rfwtools import mya
-from rfwtools.example import Example
-
 
 class ExampleValidator:
     """This class provides functionality for checking that an individual example meets the criteria for validity.
