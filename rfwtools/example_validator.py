@@ -1,26 +1,75 @@
+"""This package manages the validation of Examples.  While much data is collected, some data is unsuitable for analysis.
+
+An ExampleValidator object is responsible for investigating an Example object and determining if it suitable for
+analysis.  ExampleValidator should be subclassed as needed to support the individual requirements of different analytical approaches.
+
+Typically you won't use these directly, and instead pass it to the ExapmleSet.purge_invalid_examples() method.
+Basic Usage Example:
+::
+
+    import math
+    from datetime import datetime
+    from rfwtools.example import Example
+    from rfwtools.example_validator import ExampleValidator
+
+    # Make an example to validate
+    ex = Example(zone='1L25',
+                 dtime=datetime.strptime("2020-03-10 01:08:41.2", "%Y-%m-%d %H:%M:%S.%f),
+                 cavity_label="4",
+                 fault_label="Microphonics",
+                 cavity_conf=math.nan,
+                 fault_conf=math.nan,
+                 label_source='my_label_file.txt'
+                )
+
+    # Setup the validator
+    ev = ExampleValidator()
+    ev.set_example(ex)
+
+    # If anything is wrong with the example, the validator will raise an exception.  The exception clause is
+    # intentionally broad to capture the bevy of problems that could be encountered.
+    try:
+        ev.validate_data()
+    except Exception as exc:
+        print(f"Invalid event - {ex}\\n  {exc}\\n")
+
+"""
+
 import datetime
 import itertools
 
 from rfwtools import mya
+from rfwtools.example import Example
+
 
 class ExampleValidator:
     """This class provides functionality for checking that an individual example meets the criteria for validity.
 
-    Note: This class assumes the data is present on disk to check at the location specified by the supplied example.
-
     Some checks are very basic, e.g., do we have all of the necessary data from the fault event.  Others are a bit more
-    nuanced, e.g., was the cavity in the proper RF mode.
+    nuanced, e.g., was the cavity in the proper RF mode. See validate_data and other validation methods for details.
+
+    Note:
+        This class loads capture file data at set_example, but defers any exceptions from that process until
+        validate_data() is called.
     """
 
     def __init__(self):
         """Create an instance for validating Example."""
+        #: (datetime): The datetime of the fault.
         self.event_datetime = None
+        #: (str): The zone where the fault occurred
         self.event_zone = None
+        #: (pd.DataFrame): The DataFrame of waveform signals
         self.event_df = None
+        #: (dict of str:str): The raw capture file content (typically produced by the harvester daemon)
         self.event_cf_content = None
 
-    def set_example(self, example):
-        """Set internal information about the example to validate."""
+    def set_example(self, example: Example) -> None:
+        """Set internal information about the example to validate.
+
+        Arguments:
+            example: The example that is to be validated.
+        """
         self.event_cf_content = example.get_capture_file_contents()
         self.event_datetime = example.event_datetime
         self.event_zone = example.event_zone
@@ -33,19 +82,27 @@ class ExampleValidator:
         except Exception:
             self.event_df = None
 
-    def validate_data(self, deployment='ops'):
+    def validate_data(self, deployment: str = 'ops') -> None:
         """Check that the event directory and it's data is of the expected format.
 
         This method inspects the event directory and raises an exception if a problem is found.  The following aspects
         of the event directory and waveform data are validated.
-           # Data can be found on disk
-           # All eight cavities are represented by exactly one capture file
-           # All of the required waveforms are represented exactly once
-           # All of the capture files use the same timespan and have constant sampling intervals
-           # All of the cavity are in the appropriate control mode (GDR I/Q => 4)
 
-        Returns:
-            None: Subroutines raise an exception if an error condition is found.
+        * Data can be found on disk
+
+        * All eight cavities are represented by exactly one capture file
+
+        * All of the required waveforms are represented exactly once
+
+        * All of the capture files use the same timespan and have constant sampling intervals
+
+        * All of the cavity are in the appropriate control mode (GDR I/Q => 4) or bypassed
+
+        Arguments:
+            deployment: Which MYA deployment should be used when checking archiver data.
+
+        Raises:
+            ValueError: If a problem is found with the data.
 
         """
         if self.event_df is None:
@@ -56,18 +113,15 @@ class ExampleValidator:
         self.validate_cavity_modes(deployment=deployment)
         self.validate_zones()
 
-    def validate_capture_file_counts(self):
+    def validate_capture_file_counts(self) -> None:
         """This method checks that we have exactly one capture file per cavity/IOC.
 
         The harvester grouping logic coupled with unreliable IOC behavior seems to produce fault event directories where
         either an IOC has multiple capture files or are missing.  We want to make sure we have exactly eight capture
         files - one per IOC.  Raises an exception in the case that something is amiss.
 
-            Returns:
-                None
-
-            Raises:
-                ValueError: if either missing or "duplicate" capture files are found.
+        Raises:
+            ValueError: if either missing or "duplicate" capture files are found.
         """
 
         # Count capture files per cavity
@@ -85,17 +139,14 @@ class ExampleValidator:
             if capture_file_counts[cavity] == 0:
                 raise ValueError("Missing capture file for zone '" + cavity + "'")
 
-    def validate_capture_file_waveforms(self):
+    def validate_capture_file_waveforms(self) -> None:
         """Checks that all of the required waveforms are present exactly one time across all capture files.
 
         If event_df is None, then the capture files themselves are loaded.  If event_df is not None, then the files are
         checked directly.
 
-            Returns:
-                None
-
-            Raises:
-                ValueError: if any required waveform is repeated
+        Raises:
+            ValueError: if any required waveform is repeated or missing
         """
 
         # Get a structure for counting matches of waveforms
@@ -119,24 +170,21 @@ class ExampleValidator:
         if len(req_columns) != len(columns) or req_columns != columns:
             raise ValueError("Found event_df does not have the required waveform columns.")
 
-    def validate_waveform_times(self, max_start=-100.0, min_end=100.0, step_size=0.2, delta_max=0.02):
+    def validate_waveform_times(self, max_start: float = -100.0, min_end: float = 100.0, step_size: float = 0.2,
+                                delta_max: float = 0.02) -> None:
         """Verify the Time column of all capture files are identical and have a valid range and sample interval.
 
         Note: The default 0.02 delta_max is chosen because the actual time step ranges from 0.18... to 0.21... when
         a time step of 0.2 is specified.
 
-            Args:
-                max_start (float): The latest acceptable start time for the waveforms
-                min_end (float): The earliest acceptable end time for the waveforms
-                step_size (float): The expected step_size of each waveform in milliseconds
-                delta_max (float): The maximum difference between the observed time steps and step_size in milliseconds.
+        Arguments:
+            max_start: The latest acceptable start time for the waveforms
+            min_end: The earliest acceptable end time for the waveforms
+            step_size: The expected step_size of each waveform in milliseconds
+            delta_max: The maximum difference between the observed time steps and step_size in milliseconds.
 
-            Returns:
-                None
-
-            Raises:
-                ValueError: if either Time columns mismatch or Time columns are beyond expected thresholds
-
+        Raises:
+            ValueError: if either Time columns mismatch or Time columns are beyond expected thresholds
         """
 
         if self.event_df is None:
@@ -161,8 +209,8 @@ class ExampleValidator:
             raise ValueError("Found improper step size.  Expect: {}, Step size range: ({}, {}), Acceptable delta: {}"
                              .format(step_size, min_step, max_step, delta_max))
 
-    def validate_cavity_modes(self, mode=4, offset=-1.0, deployment='ops'):
-        """Checks that each cavity was in the appropriate control mode.
+    def validate_cavity_modes(self, mode: int = 4, offset: float = -1.0, deployment: str = 'ops') -> None:
+        """Checks that each cavity was in the appropriate control mode or is bypassed.
 
         A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event
         timestamp.  Currently the proper mode is GDR (I/Q).
@@ -178,16 +226,13 @@ class ExampleValidator:
         the zone is working normally and is considered to produce valid data for modeling purposes.  Only the control
         modes of the non-bypassed cavities will be considered for invalidating the data.
 
-            Args:
-                mode (int):  The mode number associated with the proper control mode.
-                offset (float): The number of seconds before the fault event the mode setting should be checked.
-                deployment (str): The MYA archiver deployment used for querying historical PV values
+        Arguments:
+            mode:  The mode number associated with the proper control mode.
+            offset: The number of seconds before the fault event the mode setting should be checked.
+            deployment: The MYA archiver deployment used for querying historical PV values
 
-            Returns:
-                None
-
-            Raises:
-                ValueError: if any cavity mode does not match the value specified by the mode parameter.
+        Raises:
+            ValueError: if any cavity mode does not match the value specified by the mode parameter.
         """
 
         # The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.
@@ -248,14 +293,11 @@ class ExampleValidator:
             if val != mode:
                 raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
 
-    def validate_zones(self):
+    def validate_zones(self) -> None:
         """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.
 
-            Returns:
-                None
-
-            Raises:
-                ValueError: if the zone name is 0L04.
+        Raises:
+            ValueError: if the zone name is 0L04.
         """
         invalid_zones = ['0L04']
         if self.event_zone in invalid_zones:
