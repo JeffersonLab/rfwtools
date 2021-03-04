@@ -24,6 +24,7 @@ TRY THIS EXAMPLE ON YOUR OWN**
 Creating from scratch.  This assumes you have label files in Config().label_dir, and will save a CSV file to
 Config().output_dir (defaults to ./processed-output/)
 ::
+
     from rfwtools.example_set import ExampleSet
     from rfwtools.example_validator import ExampleValidator
     es = ExampleSet()
@@ -35,17 +36,17 @@ Config().output_dir (defaults to ./processed-output/)
 
 Reporting and Visualization.  This assumes that you have created and saved an ExampleSet as in the example above.
 ::
+
     from rfwtools.example_set import ExampleSet
     es = ExampleSet()
     es.load_csv("my_example_set.csv")
     es.display_frequency_barplot(x='zone', color_by='cavity_label')
     es.display_zone_label_heatmap(zones=['1L22', '1L23', '1L24', '1L25', '1L26'])
-
-es.display_summary_label_heatmap(title='2L22 7AM Summary',
+    es.display_summary_label_heatmap(title='2L22 7AM Summary',
                                  query = 'zone=="2L22" & dtime < "2020-03-10 08:00:00" & dtime > "2020-03-10 07:00:00"')
 """
 
-import datetime
+from datetime import datetime
 import warnings
 from typing import List, Tuple
 
@@ -59,6 +60,7 @@ from tqdm import tqdm
 from rfwtools import utils
 from rfwtools.config import Config
 from rfwtools.example import Example
+from rfwtools.example_validator import ExampleValidator
 from rfwtools.timestamp import is_datetime_in_range, TimestampMapper
 from rfwtools.visualize.timeline import swarm_timeline
 from rfwtools.visualize import heatmap
@@ -83,7 +85,7 @@ class ExampleSet:
 
     """
 
-    # The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.
+    #: The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.
     known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
     known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
     known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
@@ -106,22 +108,22 @@ class ExampleSet:
         """
 
         # Setup the standard default values for zone and label options
-        if known_zones is None:
-            self.known_zones = ExampleSet.known_zones
-        else:
+        #: Instance's customized default list of known zones
+        self.known_zones = ExampleSet.known_zones
+        if known_zones is not None:
             self.known_zones = known_zones
 
-        if known_cavity_labels is None:
-            self.known_cavity_labels = ExampleSet.known_cavity_labels
-        else:
+        #: Instance's customized default list of known cavity_labels
+        self.known_cavity_labels = ExampleSet.known_cavity_labels
+        if known_cavity_labels is not None:
             self.known_cavity_labels = known_cavity_labels
 
-        if known_fault_labels is None:
-            self.known_fault_labels = ExampleSet.known_fault_labels
-        else:
+        #: Instance's customized default list of known fault_labels
+        self.known_fault_labels = ExampleSet.known_fault_labels
+        if known_fault_labels is not None:
             self.known_fault_labels = known_fault_labels
 
-        # Construct an empty DataFrame with proper dtypes
+        #: ExampleSet DataFrame with proper dtypes
         self.__example_df = pd.DataFrame(
             {'zone': pd.Categorical([], categories=self.known_zones),
              'dtime': pd.Series([], dtype='datetime64[ns]'),
@@ -136,6 +138,7 @@ class ExampleSet:
 
         # Create a hash for holding on to the label file data.  This will preserve the original data after cleaning for
         # duplicates, mismatches, etc.
+        #: A dictionary holding label file contents, keyed on file names
         self.label_file_dataframes = {}
 
     def save_csv(self, filename: str, out_dir: str = None, sep: str = ',') -> None:
@@ -222,7 +225,7 @@ class ExampleSet:
         return self.__example_df.copy()
 
     def add_label_file_data(self, label_files: List[str] = None, exclude_zones: List[str] = None,
-                            exclude_times: List[Tuple[datetime.datetime, datetime.datetime]] = None) -> None:
+                            exclude_times: List[Tuple[datetime, datetime]] = None) -> None:
         """Process and add label files' data to the ExampleSet's internal collection.
 
         Arguments:
@@ -261,28 +264,27 @@ class ExampleSet:
             # Add the DataFrame to the internal collection
             self._add_example_df(df)
 
-    def add_web_service_data(self, server=None, begin=None, end=None, models=None):
-        """Add web service data (faults labeled by in-service model) to the example set.
+    def add_web_service_data(self, server: str = None, begin: datetime = None, end: datetime = None,
+                             models: List[str] = None) -> None:
+        """Add web service data (faults labeled by in-service model) to the ExampleSet.
 
-        Note - should be used exclusive of label data since they will largely overlap
+        Note: Should be used exclusive of label data since they will largely overlap
 
         Arguments:
-            server (str) - The server to query for the data.  If None, use the value in Config
-            begin (datetime) - The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018
-            end (datetime) - The latest time for which a fault should be included.  If None defaults to "now"
-            models (list(str)) - A list of model names that should be included in the results.  None means include all
-
-        Returns (None) - Returns nothing.
+            server: The server to query for the data.  If None, use the value in Config
+            begin: The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018
+            end: The latest time for which a fault should be included.  If None defaults to "now"
+            models: A list of model names that should be included in the results.  None means include all
         """
 
         if server is None:
             server = Config().data_server
 
         if begin is None:
-            begin = datetime.datetime(year=2018, month=1, day=1)
+            begin = datetime(year=2018, month=1, day=1)
 
         if end is None:
-            end = datetime.datetime.now()
+            end = datetime.now()
 
         # Get the data from the web service
         df = ExampleSet._create_dataframe_from_web_query(server=server, begin=begin, end=end, models=models)
@@ -290,8 +292,12 @@ class ExampleSet:
         # Add it to the existing ExampleSet
         self._add_example_df(df)
 
-    def get_label_file_report(self):
-        """Generate a string containing a report on the processed label files"""
+    def get_label_file_report(self) -> str:
+        """Generate a string containing a report on the processed label files
+
+        Returns:
+            A formatted string containing the report.
+        """
 
         # Check to see if we have any duplicates and print them out
         num_total_events = self.count_events()
@@ -322,11 +328,11 @@ Number of mismatched labels: {num_mismatched_labels}
 
         return out
 
-    def remove_duplicates_and_mismatches(self, report=False):
-        """Removes duplicate example entries and removes all instances of examples that have mismatched labels
+    def remove_duplicates_and_mismatches(self, report: bool = False) -> None:
+        """Removes duplicate example entries and removes all instances of examples that have mismatched labels.
 
         Args:
-            report (bool) - Should information about what was removed be included?
+            report: Should information about what was removed be included?
         """
         # Split into event groups
         gb = self.__example_df.groupby(['zone', 'dtime'])
@@ -352,14 +358,13 @@ Number of mismatched labels: {num_mismatched_labels}
             num_dupes = orig_size - len(self.__example_df)
             print(f"## Removed {num_dupes} entries from the ExampleSet for being duplicates ##")
 
-    def purge_invalid_examples(self, validator, report=True, progress=True):
+    def purge_invalid_examples(self, validator: ExampleValidator, report: bool = True, progress: bool = True) -> None:
         """Removes all examples from the ExampleSet that do not pass validation
 
         Args:
-            validator (callable) - A function that accepts an Example as an argument and raises an exception if the
-                                   Example is not valid
-            report (bool) - Should information about what is purged be printed?
-            progress (bool) - Should a progress bar be displayed
+            validator: A object that follows the ExampleValidator interface.
+            report: Should information about what is purged be printed?
+            progress: Should a progress bar be displayed
         """
 
         # Variable for report output
@@ -423,14 +428,18 @@ Number of mismatched labels: {num_mismatched_labels}
         # Keep only the events that are valid
         self.__example_df = self.__example_df[valid]
 
-    def _add_example_df(self, df, allow_new_columns=False):
+    def _add_example_df(self, df: pd.DataFrame, allow_new_columns: bool = False) -> None:
         """Add a DataFrame of examples to the ExampleSet's internal collection.
 
         Args:
-            df (DataFrame) - A dataframe of examples to be added to the existing examples
-            allow_new_columns (bool) - An exception will be raised if df has any columns that do not map to existing
-                                       attributes in the existing collection (e.g., you would be adding new columns to
-                                       an existing DataFrame)
+            df:
+                A dataframe of examples to be added to the existing examples
+            allow_new_columns:
+                An exception will be raised if df has any columns that do not map to existing attributes in the existing
+                collection (e.g., you would be adding new columns to an existing DataFrame)
+
+        Raises:
+            ValueError: If new columns are being added and allow_new_columns != True
         """
 
         # Union the categories present in the existing examples with those presented in new examples
@@ -450,15 +459,18 @@ Number of mismatched labels: {num_mismatched_labels}
         self.__example_df = pd.concat((self.__example_df, df), ignore_index=True)
 
     @staticmethod
-    def _create_dataframe_from_web_query(server=None, begin=None, end=None, models=None):
+    def _create_dataframe_from_web_query(server: str = None, begin: datetime = None, end: datetime = None,
+                                         models: List[str] = None) -> pd.DataFrame:
         """This creates a ExampleSet consistent DataFrame based on the responses of the web query.  Labeled faults only.
 
-        Args:
-            server (str) - The server to query for the data.  If None, use the value in Config
-            begin (datetime) - The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018
-            end (datetime) - The latest time for which a fault should be included.  If None defaults to "now"
+        Arguments:
+            server: The server to query for the data.  If None, use the value in Config
+            begin: The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018
+            end: The latest time for which a fault should be included.  If None defaults to "now"
+            models: A list of model names that are to be included.  All other results are excluded.
 
-        Returns (DataFrame) - The ExampleSet consistent DataFrame containing the web query response
+        Returns:
+            The ExampleSet consistent DataFrame containing the web query response
         """
 
         # Make the web query and get results
@@ -468,14 +480,14 @@ Number of mismatched labels: {num_mismatched_labels}
         # Parse the web query.  The web service returns fault events with a UTC timestamp.  We convert it to the
         # localtime zone for simplicity and compatibility with the (untimezoned) label files.  Assumption here is
         # that we are running this code in the same timezone as CEBAF is in.
-        # TODO - Address this timezone problem in both label file and here
+        # TODO - Is there a better way to handle this?  The label files not being TZ'ed throw a wrench in the works.
         fmt = "%Y-%m-%d %H:%M:%S.%f%z"
         event_list = web_events['events']
         extracted_events = list()
         for event in event_list:
             # Get a timezone aware datetime object of UTC timestamp (manually add GMT offset string) then convert it
             # to local time
-            dt_local = datetime.datetime.strptime(event['datetime_utc'] + "-00:00", fmt).astimezone(
+            dt_local = datetime.strptime(event['datetime_utc'] + "-00:00", fmt).astimezone(
                 tzlocal.get_localzone()).replace(tzinfo=None)
             zone = event['location']
 
@@ -554,8 +566,21 @@ Number of mismatched labels: {num_mismatched_labels}
         return df
 
     @staticmethod
-    def _create_dataframe_from_label_file(filepath, exclude_zones=None, exclude_times=None):
-        """This parses the DataSet's specified label files and saves the constructed Examples"""
+    def _create_dataframe_from_label_file(filepath: str, exclude_zones: List[str] = None,
+                                          exclude_times: List[List[datetime]] = None) -> pd.DataFrame:
+        """This parses the DataSet's specified label files and saves the constructed Examples.
+
+        Arguments:
+            filepath:
+                Location of the label file
+            exclude_zones:
+                List of zones to exclude.  Defaults to Config().exclude_zones.
+            exclude_times:
+                List of 2-tuples of datetime objects.  Each 2-tuple specifies a range to exclude.  None implie +/-Inf.
+
+        Returns:
+            A DataFrame of the Examlpes listed in the label file.
+        """
 
         # This is the header we expect in all files - tab separated
         exp_header = "zone	cavity	cav#	fault	time\n"
@@ -622,7 +647,7 @@ Number of mismatched labels: {num_mismatched_labels}
 
                 try:
                     tsm = TimestampMapper()
-                    ts = tsm.get_full_timestamp(zone, datetime.datetime.strptime(fields[4], "%Y/%m/%d %H:%M:%S"))
+                    ts = tsm.get_full_timestamp(zone, datetime.strptime(fields[4], "%Y/%m/%d %H:%M:%S"))
                 except ValueError as exc:
                     skip_count += 1
                     print("Error processing line '{}'.".format(line))
@@ -668,30 +693,42 @@ Number of mismatched labels: {num_mismatched_labels}
         return df
 
     #### Reporting-related methods ####
-    def count_events(self):
-        """Returns the number of unique events (zone/datetime combinations
+    def count_events(self) -> int:
+        """Count the number of unique events (zone/datetime combinations
 
         This would count as two since two unique zone/datetime pairs appeared
         4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
         4241  2L26 2020-09-22 06:53:17.500            6             E_Quench
         4242  2L26 2020-09-22 06:53:17.500            6             E_Quench
+
+        Returns:
+            the number of unique events (zone/datetime combinations
         """
         return len(self.__example_df.drop_duplicates(subset=['zone', 'dtime']))
 
-    def count_labels(self):
-        """Returns the number of labels (rows in label files)"""
+    def count_labels(self) -> int:
+        """Counts the number of labels (rows in label files)
+
+        Returns:
+             the number of labels (rows in label files)"""
         return len(self.__example_df)
 
-    def get_duplicated_labels(self):
-        """"Returns a DataFrame containing labels for events that appear multiple times"""
+    def get_duplicated_labels(self) -> pd.DataFrame:
+        """"Identify the fault events that appear multiple times in the ExampleSet.
+
+        Returns:
+            A DataFrame containing labels for events that appear multiple times"""
         # Split on event.  observed=True only includes categorical levels that are seen and improves performance
         gb = self.__example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
 
         # Keep event groups that have > 1 rows.  Return length of the resulting DataFrame
         return gb.filter(lambda x: len(x) > 1)
 
-    def count_duplicated_events(self):
-        """Returns the number of events that appear multiple times, i.e., were labeled more than once.
+    def count_duplicated_events(self) -> int:
+        """Count the number of events that appear multiple times, i.e., were labeled more than once.
+
+        Returns:
+            the number of events that appear multiple times, i.e., were labeled more than once.
 
         This would count as one since only one event appeared that did occur multiple times
         4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
@@ -701,20 +738,31 @@ Number of mismatched labels: {num_mismatched_labels}
         # Get the duplicated labels, then remove duplicate zone/timestamp pairs
         return len(self.get_duplicated_labels().drop_duplicates(["zone", "dtime"]))
 
-    def count_duplicated_labels(self):
-        """Returns the number of labeling occurrences for events that appear multiple times"""
+    def count_duplicated_labels(self) -> int:
+        """Count the number of labeling occurrences for events that appear multiple times.
+
+        This is basically the number of rows in the label files that are not for unique fault events.
+
+        Returns:
+             The number of labeling occurrences for events that appear multiple times"""
         return len(self.get_duplicated_labels())
 
-    def get_unduplicated_events(self):
-        """Returns a DataFrame of the events that appear exactly once in the ExampleSet"""
+    def get_unduplicated_events(self) -> pd.DataFrame:
+        """Identify the fault events that appear exactly once in the ExampleSet.
+
+        Returns:
+            DataFrame of the events that appear exactly once in the ExampleSet"""
         # Split on event.  observed=True only includes categorical levels that are seen and improves performance
         gb = self.__example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
 
         # Keep event groups that have exactly one row.
         return gb.filter(lambda x: len(x) == 1)
 
-    def count_unduplicated_events(self):
-        """Returns the number of events that appear exactly once.
+    def count_unduplicated_events(self) -> pd.DataFrame:
+        """Count the number of events that appear exactly once.
+
+        Returns:
+             The number of events that appear exactly once.
 
         This would count as one since only one event appeared that did not occur multiple times
         4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
@@ -725,8 +773,11 @@ Number of mismatched labels: {num_mismatched_labels}
         #  Return the length of resulting DataFrame
         return len(self.get_unduplicated_events())
 
-    def get_events_with_mismatched_labels(self):
-        """Returns a DataFrame containing the events that have mismatched labels"""
+    def get_events_with_mismatched_labels(self) -> pd.DataFrame:
+        """Identify fault events that appear multiple times with different labels.
+
+        Returns:
+             A DataFrame containing the events that have mismatched labels"""
         # Split on events.
         gb = self.__example_df.groupby(['zone', 'dtime'], as_index=False, observed=True)
 
@@ -734,8 +785,11 @@ Number of mismatched labels: {num_mismatched_labels}
         # DataFrame.
         return gb.filter(lambda x: x.cavity_label.nunique() > 1 or x.fault_label.nunique() > 1)
 
-    def count_duplicated_events_with_mismatched_labels(self):
-        """Returns the number of events that appear multiple times with different labels
+    def count_duplicated_events_with_mismatched_labels(self) -> int:
+        """Count the number of events that appear multiple times with different labels.
+
+        Returns:
+            The number of events that appear multiple times with different labels
 
         This would count as one since one event appeared that had mismatched labels
         4240  2L26 2020-09-21 06:53:16.500            5             E_Quench
@@ -749,8 +803,11 @@ Number of mismatched labels: {num_mismatched_labels}
         # of resulting DataFrame
         return len(mismatch_df.drop_duplicates(['zone', 'dtime']))
 
-    def count_mismatched_labels(self):
-        """Returns the number of times an event with mismatched labels appears in the ExampleSet.
+    def count_mismatched_labels(self) -> int:
+        """Count the number of times an event with mismatched labels appears in the ExampleSet.
+
+        Returns:
+            The number of times an event with mismatched labels appears in the ExampleSet.
 
         This would count as three mismatched labels since one event with mismatched labels appeared three times
         4240  2L26 2020-09-21 06:53:16.500            5             E_Quench
@@ -760,36 +817,36 @@ Number of mismatched labels: {num_mismatched_labels}
         return len(self.get_events_with_mismatched_labels())
 
     #### Visualization Methods ####
-    def display_timeline(self, query=None, **kwargs):
+    def display_timeline(self, query: str = None, **kwargs) -> None:
         """Display a timeline of examples as a swarmplot
 
-        Args:
-            query (str) - The expr argument to DataFrame.query.  Subsets data before plot
-            kwargs (dict) - Other named parameters are passed to swarm_timeline method
+        Arguments:
+            query: The expr argument to DataFrame.query.  Subsets data before plot
+            kwargs: Other named parameters are passed to swarm_timeline method
         """
         df = self.__example_df.copy()
         if query is not None:
             df = df.query(query)
         swarm_timeline(df, **kwargs)
 
-    def display_summary_label_heatmap(self, title="Label Summary", query=None):
+    def display_summary_label_heatmap(self, title: str = "Label Summary", query: str = None) -> None:
         """Display a heatmap of fault vs cavity labels for all examples in this object
 
-        Args:
-            title (str) - The title of the plot
-            query (str) - The expr argument to DataFrame.query.  Subsets data before plot
+        Arguments:
+            title: The title of the plot
+            query: The expr argument to DataFrame.query.  Subsets data before plot
         """
         df = self.__example_df.copy()
         if query is not None:
             df = df.query(query)
         heatmap.heatmap_cavity_vs_fault_label_counts(data=df, title=title)
 
-    def display_zone_label_heatmap(self, zones=None, query=None):
+    def display_zone_label_heatmap(self, zones: List[str] = None, query: str = None) -> None:
         """Display a heatmap of fault vs cavity labels for all examples in this object for each unique zone category
 
-        Args:
-            zones (list(str)) - A list of the zones to display.
-            query (str) - The expr argument to DataFrame.query.  Subsets data before plot
+        Arguments:
+            zones: A list of the zones to display.
+            query: The expr argument to DataFrame.query.  Subsets data before plot
         """
 
         if zones is None:
@@ -801,13 +858,13 @@ Number of mismatched labels: {num_mismatched_labels}
 
         heatmap.show_fault_cavity_count_by_zone(df, zones=zones)
 
-    def display_examples_by_weekday_barplot(self, color_by=None, title=None, query=None):
+    def display_examples_by_weekday_barplot(self, color_by: str = None, title: str = None, query: str = None) -> None:
         """Show example counts by the day of the week as a stacked barplot
 
-        Args:
-            color_by (str) - The DataFrame column on which the bars will be split/colored.
-            title (str) - The title to put on the plot.  A reasonable default will be generated if None.
-            query (str) - The expr argument to DataFrame.query.  Subsets data before plot
+        Arguments:
+            color_by: The DataFrame column on which the bars will be split/colored.
+            title: The title to put on the plot.  A reasonable default will be generated if None.
+            query: The expr argument to DataFrame.query.  Subsets data before plot
         """
 
         df = self.__example_df.copy()
@@ -846,15 +903,15 @@ Number of mismatched labels: {num_mismatched_labels}
         plt.gcf().subplots_adjust(left=0.1, top=0.9, right=0.7, bottom=0.2)
         plt.show()
 
-    def display_frequency_barplot(self, x, color_by=None, title=None, query=None):
+    def display_frequency_barplot(self, x: str, color_by: str = None, title: str = None, query: str = None) -> None:
         """Display the example count against one or two different factors, as a (stacked) bar chart.
 
-        Args:
-            x (str) - The column name for which each bar will appear.  Should probably be categorical.
-            color_by (str) - The column name by which each bar will be split and colored (for a stacked bar plot).  If
+        Arguments:
+            x: The column name for which each bar will appear.  Should probably be categorical.
+            color_by: The column name by which each bar will be split and colored (for a stacked bar plot).  If
                               None, then a simple bar plot will be displayed.
-            title (str) - The title to put on the chart.  If None, a reasonable default will be generated.
-            query (str) - The expr argument to DataFrame.query.  Subsets data before plot
+            title: The title to put on the chart.  If None, a reasonable default will be generated.
+            query: The expr argument to DataFrame.query.  Subsets data before plot
         """
 
         df = self.__example_df.copy()
@@ -886,15 +943,17 @@ Number of mismatched labels: {num_mismatched_labels}
         plt.subplots_adjust(left=0.1, top=0.9, right=0.7, bottom=0.4)
         plt.show()
 
-    def get_classification_report(self, other, label="cavity_label", query=None, other_query=None):
+    def get_classification_report(self, other: 'ExampleSet', label: str = "cavity_label", query: str = None,
+                                  other_query: str = None):
         """This prints a classification report of this ExampleSet's cavity labels considering other as ground truth.
 
         Only examples from other for which there is an example in this ExampleSet are considered
 
-        Args:
+        Arguments:
             other (ExampleSet): An ExampleSet that contains cavity labels considered the ground truth.
             label (str): The column name of containing the label values to compare.
             query (str) - The expr argument to DataFrame.query.  Subsets data before comparison.
+            other_query (str) - The expr argument to DataFrame.query.  Subsets 'other' before comparison.
         """
 
         # Subset this ExampleSet if requested
@@ -910,7 +969,7 @@ Number of mismatched labels: {num_mismatched_labels}
         df = df.merge(o_df[['zone', 'dtime', label]], how="inner", on=['zone', 'dtime'])
         print(classification_report(y_true=df[label + "_y"], y_pred=df[label + "_x"]))
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'ExampleSet') -> bool:
         """Check if this ExampleSet is equivalent to the other."""
 
         # Short circuit check
@@ -947,21 +1006,19 @@ Number of mismatched labels: {num_mismatched_labels}
         return eq
 
     @staticmethod
-    def __Example_from_row(x):
+    def __Example_from_row(x: pd.DataFrame) -> Example:
         """Creates an Example object from a row of a standard ExampleSet DataFrame"""
         return Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf, x.label_source)
 
     @staticmethod
-    def __standardize_df_format(df):
+    def __standardize_df_format(df: pd.DataFrame) -> None:
         """Attempts to put a DataFrame in a 'standard' format.
 
         This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
         if not already present.  Columns are reordered.
 
-        Args:
-            df (pd.DataFrame) - The DataFrame to reformat
-
-        Returns: None
+        Arguments:
+            df: The DataFrame to reformat
         """
 
         # Seems like the datetime dtype doesn't want to stick
