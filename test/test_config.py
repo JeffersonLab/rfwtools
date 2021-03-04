@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from unittest import TestCase
 from rfwtools.config import Config
 import os
@@ -36,12 +38,20 @@ class TestConfig(TestCase):
         conf = Config()
         conf.debug = True
         conf.exclude_zones = ['1L07']
+        fmt = "%Y-%m-%d %H:%M:%S.%f"
+        t1 = datetime.strptime("2020-01-01 12:34:56.7", fmt)
+        t2 = datetime.strptime("2020-01-02 12:34:56.7", fmt)
+        t3 = datetime.strptime("2020-01-03 12:34:56.7", fmt)
+        t4 = None
+        times = [[t1, t2], [t3, t4]]
+        conf.exclude_times = times
 
         # Export config to yaml string
         string = conf.dump_yaml_string()
 
         # Change the values again to detect if load works
         conf.debug = False
+        conf.exclude_times = None
         conf.exclude_zones = ["2L22"]
 
         # Import config from yaml string
@@ -49,3 +59,4 @@ class TestConfig(TestCase):
 
         self.assertEqual(conf.debug, True)
         self.assertListEqual(conf.exclude_zones, ["1L07"])
+        self.assertListEqual(conf.exclude_times, times)

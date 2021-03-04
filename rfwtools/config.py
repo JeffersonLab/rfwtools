@@ -4,7 +4,6 @@ This module contains as single class, a Singleton, that manages the configuratio
 includes the definition of several resource locations, debug behavior, and filters on valid data.
 
 Basic Usage:
-
 ::
   from rfwtools.config import Config
   config = Config()
@@ -13,10 +12,30 @@ Basic Usage:
   # Or equivalently
 
   Config().output_dir = '/path/to/my/save/files/'
-"""
 
+Config File Example:
+
+Most values are straightforward.  exclude_times is a list of lists where null implies None.
+::
+
+    app_dir: /projects/rfw-stuff
+    data_dir: /projects/rfw-stuff/data/waveforms/data/rf
+    data_server: accweb.acc.jlab.org
+    debug: true
+    exclude_times:
+    - - 2020-01-01 12:34:56.700000
+      - 2020-01-02 12:34:56.700000
+    - - 2020-01-03 12:34:56.700000
+      - null
+    exclude_zones:
+    - 1L07
+    label_dir: /projects/rfw-stuff/data/labels
+    output_dir: /projects/rfw-stuff/processed-output
+    wfb_base_url: wfbrowser
+"""
+from datetime import datetime
 import os
-from typing import Any
+from typing import Any, List, Tuple
 
 import yaml
 
@@ -115,7 +134,41 @@ class Config:
         """
         cfg = yaml.safe_load(string)
         for key in cfg.keys():
+            if key == 'exclude_times':
+                try:
+                    Config.__validate_exclude_times(cfg[key])
+                except Exception as exc:
+                    print(f"Exception processing exclude_times.  Setting it to None.\n{exc}")
+                    Config.instance.__dict__[key] = None
             Config.instance.__dict__[key] = cfg[key]
+
+    @staticmethod
+    def __validate_exclude_times(exclude_times: List[Tuple[datetime, datetime]]) -> None:
+        """Validates the structure and types of exclude_times.
+
+        Arguments:
+            exclude_times: A list of tuples of datetime objects or None.
+
+        Raises:
+            ValueError: if
+        """
+        if exclude_times is None:
+            return None
+        e_times = list()
+        if type(exclude_times).__name__ != 'list' and type(exclude_times).__name__ != 'tuple':
+            raise ValueError("Received unexpected exclude_times format.")
+
+        for values in exclude_times:
+            if len(values) != 2:
+                raise ValueError("Range does not have two values")
+            if type(values).__name__ != 'list':
+                raise ValueError("Range is not a list.")
+
+            start, end = values
+            if start is not None and type(start).__name__ != 'datetime':
+                raise ValueError("start should be of type datetime or None")
+            if end is not None and type(end).__name__ != 'datetime':
+                raise ValueError("end should be of type datetime or None")
 
     @staticmethod
     def write_config_file(file: str) -> None:
