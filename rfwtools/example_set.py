@@ -44,6 +44,7 @@ es.display_summary_label_heatmap(title='2L22 7AM Summary',
 
 import datetime
 import warnings
+from typing import List, Tuple
 
 import pandas as pd
 import os
@@ -67,6 +68,15 @@ class ExampleSet:
     browser webservice.  It also includes many methods for visualizing and reporting.
 
     Attributes:
+        known_zones:
+            A list of strings identifying the minimum set of zone categories to be included in the categorical.  The
+            class version is the default set.  The instance version is the known to that instance.
+        known_cavity_labels:
+            A list of strings identifying the minimum set of cavity label categories to be included in the categorical.
+            The class version is the default set.  The instance version is the known to that instance.
+        known_fault_labels:
+            A list of strings identifying the minimum set of fault label categories to be included in the categorical.
+            The class version is the default set.  The instance version is the known to that instance.
 
     """
 
@@ -79,8 +89,18 @@ class ExampleSet:
     # Expected column names
     __columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'cavity_conf', 'fault_conf', 'example', 'label_source']
 
-    def __init__(self, known_zones=None, known_cavity_labels=None, known_fault_labels=None):
-        """Create an instance of an ExampleSet"""
+    def __init__(self, known_zones: List[str] = None, known_cavity_labels: List[str] = None,
+                 known_fault_labels: List[str] = None):
+        """Create an instance of an ExampleSet.  Optionally override the default levels for zones and labels.
+
+        Arguments:
+            known_zones:
+                A list of strings identifying the minimum set of zone categories to be included in the categorical.
+            known_cavity_labels:
+                A list of strings identifying the minimum set of cavity label categories to be included in the categorical.
+            known_fault_labels:
+                A list of strings identifying the minimum set of fault label categories to be included in the categorical
+        """
 
         # Setup the standard default values for zone and label options
         if known_zones is None:
@@ -115,25 +135,28 @@ class ExampleSet:
         # duplicates, mismatches, etc.
         self.label_file_dataframes = {}
 
-    def save_csv(self, filename, out_dir=None, sep=','):
-        """Write out the ExampleSet data as a CSV file relative to out_dir.
+    def save_csv(self, filename: str, out_dir: str = None, sep: str = ',') -> None:
+        """Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.
 
-        Args:
-            filename (str) - The filename to save.  Will be relative out_dir
-            out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
-            sep (str) - Delimiter string used by Pandas to parse given "csv" file
+        Arguments:
+            filename: The filename to save.  Will be relative out_dir
+            out_dir: The directory to save the file in.  Defaults to Config().output_dir
+            sep: Delimiter string used by Pandas to parse given "csv" file
         """
         if out_dir is None:
             out_dir = Config().output_dir
         self.__example_df.drop('example', axis=1).to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
 
-    def load_csv(self, filename, in_dir=None, sep=','):
+    def load_csv(self, filename: str, in_dir: str = None, sep: str = ',') -> None:
         """Read in a CSV file that has ExampleSet data.
 
-        Args:
-            filename (str) - The filename to save.  Will be relative out_dir
-            in_dir (str) - The directory to find the file in.  Defaults to Config().output_dir
-            sep (str) - Delimiter string used by Pandas to parse given "csv" file
+        Arguments:
+            filename: The filename to save.  Will be relative in_dir
+            in_dir: The directory to find the file in.  Defaults to Config().output_dir
+            sep: Delimiter string used by Pandas to parse given "csv" file
+
+        Raises:
+            ValueError: If the CSV file does not have the expected column names.
         """
         if in_dir is None:
             in_dir = Config().output_dir
@@ -154,16 +177,18 @@ class ExampleSet:
 
         self.__example_df = df
 
-    def update_example_set(self, df, keep_label_file_dataframes=False):
+    def update_example_set(self, df: pd.DataFrame, keep_label_file_dataframes: bool = False) -> None:
         """Replaces the contents of this ExampleSet with the supplied DataFrame.
-
 
         Note: A copy of df is used.
 
-        Args:
-            df (DataFrame) - A DataFrame formatted for ExampleSet that will replace the the contents of this ExampleSet.
-            keep_label_file_dataframes (bool) - Should the dictionary of label file DataFrames be kept.  If False, the
+        Arguments:
+            df: A DataFrame formatted for ExampleSet that will replace the the contents of this ExampleSet.
+            keep_label_file_dataframes: Should the dictionary of label file DataFrames be kept.  If False, the
                                          dictionary recreated.  If True, no action is taken.
+
+        Raises:
+            ValueError: If columns do not match
         """
 
         e_df_cols = sorted(self.__example_df.columns)
@@ -185,12 +210,27 @@ class ExampleSet:
 
         self.__example_df = df.copy()
 
-    def get_example_df(self):
-        """Returns the example set as a DataFrame"""
+    def get_example_df(self) -> pd.DataFrame:
+        """Returns the example set as a DataFrame (copy)
+
+        Returns:
+            A copy of the internal ExampleSet DataFrame
+        """
         return self.__example_df.copy()
 
-    def add_label_file_data(self, label_files=None, exclude_zones=None, exclude_times=None):
-        """Process and add label files' data to the ExampleSet's internal collection"""
+    def add_label_file_data(self, label_files: List[str] = None, exclude_zones: List[str] = None,
+                            exclude_times: List[Tuple[datetime.datetime, datetime.datetime]] = None) -> None:
+        """Process and add label files' data to the ExampleSet's internal collection.
+
+        Arguments:
+            label_files:
+                List of label files to process.  If None, all files in Config().label_dir are read.  Relative paths are
+                resolved relative to Config().label_dir.
+            exclude_zones:
+                List of zones to exclude.  Defaults to Config().exclude_zones.
+            exclude_times:
+                List of 2-tuples of datetime objects.  Each 2-tuple specifies a range to exclude.  None implie +/-Inf.
+        """
 
         # Use the defaults from the config file if None is given
         e_zones = exclude_zones if exclude_zones is not None else Config().exclude_zones
@@ -223,7 +263,7 @@ class ExampleSet:
 
         Note - should be used exclusive of label data since they will largely overlap
 
-        Args:
+        Arguments:
             server (str) - The server to query for the data.  If None, use the value in Config
             begin (datetime) - The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018
             end (datetime) - The latest time for which a fault should be included.  If None defaults to "now"
