@@ -1,7 +1,7 @@
-zone	dtime	cavity_label	fault_label	cavity_conf	fault_conf	label_source
-1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt
-1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt
-1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt
-1L24	2020-01-08 11:24:21.300	7	Quench_100ms			test1.txt
-1L24	2020-01-08 11:24:21.300	8	Quench_100ms			test1.txt
-1L25	2020-01-08 09:13:07.800	6	Microphonics			test2.txt
+zone	dtime	cavity_label	fault_label	cavity_conf	fault_conf	label_source	some_column
+1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt	a
+1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt	b
+1L25	2020-01-08 09:13:07.800	5	Microphonics			test1.txt	c
+1L24	2020-01-08 11:24:21.300	7	Quench_100ms			test1.txt	a
+1L24	2020-01-08 11:24:21.300	8	Quench_100ms			test1.txt	b
+1L25	2020-01-08 09:13:07.800	6	Microphonics			test2.txt	c

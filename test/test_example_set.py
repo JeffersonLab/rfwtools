@@ -170,6 +170,7 @@ Number of mismatched labels: 6
         es = ExampleSet()
 
         csv_file = "test-example_set.csv"
+        bad_csv_file = "test-example_set-bad.csv"
         tsv_file = "test-example_set.tsv"
 
         # Load the TSV file and save it to a tmp dir.  Make sure the files match, and that at least one field matches
@@ -193,6 +194,10 @@ Number of mismatched labels: 6
 
         # Clean up the tmp CSV file
         os.unlink(os.path.join(test.tmp_data_dir, csv_file))
+
+        # Try to load a "bad" file (missing dtime column)
+        with self.assertRaises(ValueError):
+            es.load_csv(bad_csv_file, in_dir=test.test_data_dir)
 
 
 if __name__ == '__main__':

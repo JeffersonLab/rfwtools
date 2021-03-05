@@ -1,0 +1,7 @@
+zone,cavity_label,fault_label,cavity_conf,fault_conf,label_source,some_column
+1L25,5,Microphonics,,,test1.txt,a
+1L25,5,Microphonics,,,test1.txt,b
+1L25,5,Microphonics,,,test1.txt,c
+1L24,7,Quench_100ms,,,test1.txt,a
+1L24,8,Quench_100ms,,,test1.txt,b
+1L25,6,Microphonics,,,test2.txt,c

@@ -174,8 +174,12 @@ class ExampleSet:
             # Allows for tricks with file-like objects
             df = pd.read_csv(filename, sep=sep)
 
-        if sorted(df.columns.to_list()) != sorted(ExampleSet.__columns[0:6] + ExampleSet.__columns[7:]):
-            raise ValueError("Cannot load CSV file.  Unexpected column format.")
+        for col in self.__columns:
+            if col == "example":
+                continue
+            if col not in df.columns.to_list():
+                raise ValueError("Cannot load CSV file.  Unexpected column format.")
+
 
         # Put the DataFrame into a standard structure - categories, column order, etc.
         ExampleSet.__standardize_df_format(df)
