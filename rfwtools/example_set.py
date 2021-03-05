@@ -102,9 +102,11 @@ class ExampleSet:
             known_zones:
                 A list of strings identifying the minimum set of zone categories to be included in the categorical.
             known_cavity_labels:
-                A list of strings identifying the minimum set of cavity label categories to be included in the categorical.
+                A list of strings identifying the minimum set of cavity label categories to be included in the
+                categorical.
             known_fault_labels:
-                A list of strings identifying the minimum set of fault label categories to be included in the categorical
+                A list of strings identifying the minimum set of fault label categories to be included in the
+                categorical.
         """
 
         # Setup the standard default values for zone and label options
@@ -1014,7 +1016,7 @@ Number of mismatched labels: {num_mismatched_labels}
     def __standardize_df_format(df: pd.DataFrame) -> None:
         """Attempts to put a DataFrame in a 'standard' format.
 
-        This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
+        This affects IN-PLACE variables that should be categorical, datetime, float, etc. and creates the example column
         if not already present.  Columns are reordered.
 
         Arguments:
