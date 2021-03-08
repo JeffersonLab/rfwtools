@@ -1,4 +1,22 @@
-"""The module manages the functionality"""
+"""The module encapsulates the functionality around computed features of an example set.
+
+Typically a FeatureSet is created by DataSet.produce_feature_set().  Once created the class provides some tools for
+easy dimensionality reduction and visualization.
+
+Basic Usage:
+::
+
+    from rfwtools.data_set import DataSet
+    from rfwtools.extractor.autoregressive import autoregressive_extractor
+
+    ds = DataSet(label_files=['my-sample-labels.txt'])
+    ds.produce_example_set()
+    ds.produce_feature_set(autoregressive_extractor)
+
+    fs = ds.feature_set
+    fs.do_pca_reduction(n_components=10)
+    fs.display_2d_scatterplot(query="zone=='1L25'", title="1L25 PCA subset")
+"""
 
 
 import os
@@ -13,7 +31,7 @@ from rfwtools.example_set import ExampleSet
 class FeatureSet(ExampleSet):
     """A class for managing common operations on a collection of labeled faults and associated features
 
-    This class is a light wrapper on a Pandas DataFrame.
+    This class is an extension on ExampleSet meant to handle additional analysis operations.
     """
 
     def __init__(self, df=None, filename=None, in_dir=None, sep=",", name="", metadata_columns=None):
@@ -73,6 +91,7 @@ class FeatureSet(ExampleSet):
         # modifying this!
         self.pca = None
 
+    # TODO Delete this comment block!
     # def save_csv(self, filename, out_dir=None, sep=','):
     #     """Write out the FeatureSet data as a CSV file relative to out_dir.
     #
@@ -116,6 +135,7 @@ class FeatureSet(ExampleSet):
 
     def update_feature_df(self, df):
         """Updates the feature_df and blanks other internal data derived from it"""
+        # TODO change this to self.update_example_df(df)
         self._example_df = df.copy()
         self.__pca_df = None
 
