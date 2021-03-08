@@ -1,4 +1,5 @@
 import datetime
+import math
 import unittest
 from unittest import TestCase
 
@@ -107,12 +108,14 @@ class TestDataSet(TestCase):
                                           categories=['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench',
                                                       'Quench_3ms', 'Quench_100ms', 'Microphonics', 'Controls Fault',
                                                       'Heat Riser Choke', 'Unknown']),
+            'cavity_conf': [math.nan, math.nan],
+            'fault_conf': [math.nan, math.nan],
             'label_source': ['test1.txt', 'test1.txt'],
             'second': [53, 0],
             "minute": [12, 13]
         })
         exp = FeatureSet(df=df)
-        pd._testing.assert_frame_equal(df, ds.feature_set.get_feature_df())
+        pd._testing.assert_frame_equal(df.sort_index(axis=1), ds.feature_set.get_example_df().sort_index(axis=1))
         self.assertEqual(exp, ds.feature_set)
 
         # Test with function key word arguments

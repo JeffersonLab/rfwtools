@@ -41,9 +41,36 @@ class TestExampleSet(TestCase):
     def tearDownClass(cls):
         Config().load_yaml_string(cls.old_config)
 
+    def test_has_required_columns(self):
+        es = ExampleSet()
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
+        es.remove_duplicates_and_mismatches()
+
+        # Since this was constructed it should have the right column names and dtypes
+        self.assertTrue(es.has_required_columns(es.get_example_df()))
+        self.assertTrue(es.has_required_columns(es.get_example_df(), dtypes=True))
+
+        # Test on an empty DataFrame with the right names, but wrong dtypes
+        df = pd.DataFrame({"zone": [], "dtime": [], "cavity_label": [], "cavity_conf": [], "fault_label": [],
+                           "fault_conf": [], "example": [], "label_source": []})
+        # Column names should pass, but dtypes check should fail
+        self.assertTrue(es.has_required_columns(df))
+        self.assertTrue(es.has_required_columns(df, dtypes=False))
+        self.assertFalse(es.has_required_columns(df, dtypes=True))
+
+        df = df.drop(columns=['example'])
+        self.assertTrue(es.has_required_columns(df))
+        self.assertTrue(es.has_required_columns(df, skip_example=True))
+        self.assertFalse(es.has_required_columns(df, skip_example=False))
+
+        # Update the required columns and it should fail the check
+        es._req_columns = ['something']
+        self.assertFalse(es.has_required_columns(es.get_example_df()))
+        self.assertFalse(es.has_required_columns(es.get_example_df(), dtypes=True))
+
     def test_update_example_set(self):
         es = ExampleSet()
-        es.add_label_file_data(label_files=('test1.txt', 'test2.txt'))
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
         es.remove_duplicates_and_mismatches()
 
         # Empty df should fail column names check
@@ -51,7 +78,7 @@ class TestExampleSet(TestCase):
         # Column names should pass, but dtypes check should fail
         self.assertRaises(ValueError, es.update_example_set, df=pd.DataFrame(
             {"zone": [], "dtime": [], "cavity_label": [], "cavity_conf": [], "fault_label": [], "fault_conf": [],
-             "label_source": []}))
+             "example": [], "label_source": []}))
 
         df = es.get_example_df()
         df.loc[1, "fault_conf"] = 0.73

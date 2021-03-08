@@ -199,6 +199,9 @@ class DataSet:
                                'dtime': [example.event_datetime],
                                'cavity_label': [example.cavity_label],
                                'fault_label': [example.fault_label],
+                               'cavity_conf': [example.cavity_conf],
+                               'fault_conf': [example.fault_conf],
+                               'example': [example],
                                'label_source': [example.label_source]})
             result = extraction_function(example, **kwargs)
 

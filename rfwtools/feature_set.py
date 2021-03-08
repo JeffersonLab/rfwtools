@@ -1,3 +1,6 @@
+"""The module manages the functionality"""
+
+
 import os
 import pandas as pd
 
@@ -28,18 +31,33 @@ class FeatureSet(ExampleSet):
                                           "cavity_label").  If None, a standard set is assumed.
         """
 
+        # Setup the Example
+        super().__init__()
+
         if metadata_columns is None:
-            self.metadata_columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'label_source']
+            # Use the required columns of the parent ExampleSet.  Since no extra required columns we can leave
+            # self._req_columns alone
+            self.metadata_columns = self.get_required_columns()
         else:
-            self.metadata_columns = metadata_columns
+            # Here we're assuming that all of the metadata columns should be required
+            self.metadata_columns = self.get_required_columns() + metadata_columns
+            self._req_columns = metadata_columns
 
         if df is not None:
-            for col in self.metadata_columns:
-                if col not in df.columns:
-                    raise ValueError(f"column {col} is missing from the supplied DataFrame")
+            # Make sure the DataFrame has the metadata columns.  The
+            if 'example' not in df.columns.to_list():
+                if not self.has_required_columns(df, dtypes=True, skip_example=True):
+                    raise ValueError("A column is missing from the supplied DataFrame or has wrong dtype")
+                df['example'] = df.apply(self._Example_from_row, axis=1, raw=False)
+            else:
+                for col in self.metadata_columns:
+                    if col not in df.columns:
+                        raise ValueError("A column is missing from the supplied DataFrame or has wrong dtype")
 
-            # The feature data, one example per row
-            self.__feature_df = df.copy()
+            # Make a standard column order.  All metadata columns first, followed by feature columns
+            df = df[self.metadata_columns + df.drop(columns=self.metadata_columns).columns.to_list()]
+
+            self.update_example_set(df)
 
         elif filename is not None:
             self.load_csv(filename=filename, in_dir=in_dir, sep=sep)
@@ -55,17 +73,17 @@ class FeatureSet(ExampleSet):
         # modifying this!
         self.pca = None
 
-    def save_csv(self, filename, out_dir=None, sep=','):
-        """Write out the FeatureSet data as a CSV file relative to out_dir.
-
-        Args:
-            filename (str) - The filename to save.  Will be relative out_dir
-            out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
-            sep (str) - Delimiter string used by Pandas to parse given "csv" file
-        """
-        if out_dir is None:
-            out_dir = Config().output_dir
-        self.__feature_df.to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
+    # def save_csv(self, filename, out_dir=None, sep=','):
+    #     """Write out the FeatureSet data as a CSV file relative to out_dir.
+    #
+    #     Args:
+    #         filename (str) - The filename to save.  Will be relative out_dir
+    #         out_dir (str) - The directory to save the file in.  Defaults to Config().output_dir
+    #         sep (str) - Delimiter string used by Pandas to parse given "csv" file
+    #     """
+    #     if out_dir is None:
+    #         out_dir = Config().output_dir
+    #     self._example_df.to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
 
     def load_csv(self, filename, in_dir=None, sep=',', metadata_columns=None):
         """Read in a CSV file that has FeatureSet data.  Relative to in_dir if filename is str.
@@ -76,34 +94,18 @@ class FeatureSet(ExampleSet):
             sep (str) - Delimiter string used by Pandas to parse given "csv" file
             metadata_columns (list) - A list of column names to treat as metadata.  This updates the FeatureSet's list.
         """
-        if in_dir is None:
-            in_dir = Config().output_dir
-        if type(filename).__name__ == 'str':
-            df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
-        else:
-            # Allows for tricks with file-like objects
-            df = pd.read_csv(filename, sep=sep)
-
+        
+        # Update the column info if indicated
         if metadata_columns is not None:
             self.metadata_columns = metadata_columns
+            self._req_columns = self.metadata_columns
 
-        # Test that we actually have a the columns we expect
-        try:
-            # If the columns don't exist, this will raise an exception
-            df[self.metadata_columns]
-        except KeyError as ex:
-            print(df[['']])
-            raise KeyError(f"File missing metadata columns -- {ex}")
-
-        # Make it a standard FeatureSet
-        FeatureSet.__standardize_df_format(df)
-
-        self.__feature_df = df
+        # Clear the dimensionality reduction attributes
         self.__pca_df = None
+        self.pca = None
 
-    def get_feature_df(self):
-        """Return a copy of the FeatureSet as a DataFrame."""
-        return self.__feature_df.copy()
+        # Load it into the parent's ExampleSet _example_df
+        super().load_csv(filename=filename, in_dir=in_dir, sep=sep)
 
     def get_pca_df(self):
         """Return a copy of the PCA reduction as a DataFrame.  Will be None if the reduction has not been done."""
@@ -114,7 +116,7 @@ class FeatureSet(ExampleSet):
 
     def update_feature_df(self, df):
         """Updates the feature_df and blanks other internal data derived from it"""
-        self.__feature_df = df.copy()
+        self._example_df = df.copy()
         self.__pca_df = None
 
     def do_pca_reduction(self, metadata_cols=None, report=True, n_components=3, **kwargs):
@@ -136,7 +138,7 @@ class FeatureSet(ExampleSet):
             metadata_cols = list(self.metadata_columns)
 
         # Do the PCA dimensionality reduction
-        self.__pca_df, self.pca = pca.do_pca_reduction(self.__feature_df, metadata_cols=metadata_cols,
+        self.__pca_df, self.pca = pca.do_pca_reduction(self._example_df, metadata_cols=metadata_cols,
                                                        n_components=n_components, **kwargs)
 
         # Print explained variance ratio if requested
@@ -202,13 +204,13 @@ class FeatureSet(ExampleSet):
             return False
 
         # Check the feature DataFrame
-        if not self.__feature_df.equals(other.__feature_df):
+        if not self._example_df.equals(other._example_df):
             return False
 
         return True
 
-    @staticmethod
-    def __standardize_df_format(df, zones=None, cavity_labels=None, fault_labels=None):
+    @classmethod
+    def __standardize_df_format(cls, df, zones=None, cavity_labels=None, fault_labels=None):
         """Attempts to put a DataFrame in a 'standard' format.
 
         This affects IN-PLACE variables that should categoricals, datetime, float, etc. and creates the example column
@@ -231,15 +233,15 @@ class FeatureSet(ExampleSet):
 
         # Figure out what categories to enforce
         if zones is None:
-            z = ExampleSet.known_zones
+            z = cls._known_zones
         else:
             z = zones
         if cavity_labels is None:
-            cl = ExampleSet.known_cavity_labels
+            cl = cls._known_cavity_labels
         else:
             cl = cavity_labels
         if fault_labels is None:
-            fl = ExampleSet.known_fault_labels
+            fl = cls._known_fault_labels
         else:
             fl = fault_labels
 

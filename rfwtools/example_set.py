@@ -45,7 +45,7 @@ Reporting and Visualization.  This assumes that you have created and saved an Ex
     es.display_summary_label_heatmap(title='2L22 7AM Summary',
                                  query = 'zone=="2L22" & dtime < "2020-03-10 08:00:00" & dtime > "2020-03-10 07:00:00"')
 """
-
+import sys
 from datetime import datetime
 import warnings
 from typing import List, Tuple
@@ -86,16 +86,17 @@ class ExampleSet:
     """
 
     #: The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.
-    known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
-    known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
-    known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
+    _known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
+    _known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
+    _known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
                             'Quench_100ms', 'Microphonics', 'Controls Fault', 'Heat Riser Choke', 'Unknown']
 
-    # Expected column names
-    __columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'cavity_conf', 'fault_conf', 'example', 'label_source']
+    # Expected column names - others may exist, but these are what are required no matter.
+    __mandatory_columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'cavity_conf', 'fault_conf', 'example',
+                     'label_source']
 
     def __init__(self, known_zones: List[str] = None, known_cavity_labels: List[str] = None,
-                 known_fault_labels: List[str] = None):
+                 known_fault_labels: List[str] = None, req_columns: List[str] = None):
         """Create an instance of an ExampleSet.  Optionally override the default levels for zones and labels.
 
         Arguments:
@@ -107,30 +108,38 @@ class ExampleSet:
             known_fault_labels:
                 A list of strings identifying the minimum set of fault label categories to be included in the
                 categorical.
+            req_columns:
+                A list of column names that are required to be in valid DataFrames used internally.  These are in
+                addition to the class defined list of "zone", "dtime", etc..
         """
+
+        # These columns are also required, but the list contents is variable based on use case.
+        self._req_columns = []
+        if req_columns is not None:
+            self._req_columns = req_columns
 
         # Setup the standard default values for zone and label options
         #: Instance's customized default list of known zones
-        self.known_zones = ExampleSet.known_zones
+        self._known_zones = ExampleSet._known_zones
         if known_zones is not None:
-            self.known_zones = known_zones
+            self._known_zones = known_zones
 
         #: Instance's customized default list of known cavity_labels
-        self.known_cavity_labels = ExampleSet.known_cavity_labels
+        self._known_cavity_labels = ExampleSet._known_cavity_labels
         if known_cavity_labels is not None:
-            self.known_cavity_labels = known_cavity_labels
+            self._known_cavity_labels = known_cavity_labels
 
         #: Instance's customized default list of known fault_labels
-        self.known_fault_labels = ExampleSet.known_fault_labels
+        self._known_fault_labels = ExampleSet._known_fault_labels
         if known_fault_labels is not None:
-            self.known_fault_labels = known_fault_labels
+            self._known_fault_labels = known_fault_labels
 
         #: ExampleSet DataFrame with proper dtypes
-        self.__example_df = pd.DataFrame(
-            {'zone': pd.Categorical([], categories=self.known_zones),
+        self._example_df = pd.DataFrame(
+            {'zone': pd.Categorical([], categories=self._known_zones),
              'dtime': pd.Series([], dtype='datetime64[ns]'),
-             'cavity_label': pd.Categorical([], categories=self.known_cavity_labels),
-             'fault_label': pd.Categorical([], categories=self.known_fault_labels),
+             'cavity_label': pd.Categorical([], categories=self._known_cavity_labels),
+             'fault_label': pd.Categorical([], categories=self._known_fault_labels),
              'cavity_conf': pd.Series([], dtype="float64"),
              'fault_conf': pd.Series([], dtype='float64'),
              'example': pd.Series([], dtype="object"),
@@ -143,6 +152,56 @@ class ExampleSet:
         #: A dictionary holding label file contents, keyed on file names
         self.label_file_dataframes = {}
 
+    def get_required_columns(self) -> List[str]:
+        """Generates the list of column names that must appear in a DataFrame for it to be a valid example_df.
+
+        Returns:
+            The list of column names
+        """
+        return ExampleSet.__mandatory_columns + self._req_columns
+
+    def has_required_columns(self, df: pd.DataFrame, dtypes: bool = False, skip_example: bool = True) -> bool:
+        """Check if the given DataFrame has the required columns.
+
+        Arguments:
+            df:
+                The DataFrame to check
+            dtypes:
+                Check for matching dtypes of "mandatory" columns.  Uses existing _example_df's dtypes.  Skips if
+                _examples_df is None.
+            skip_example:
+                If True, requires that the 'example' column name is present.  Otherwise it is not checked.
+
+        Returns:
+            True if all required column names are present.  False otherwise.
+        """
+        req_cols = self.get_required_columns()
+        man_cols = ExampleSet.__mandatory_columns.copy()
+
+        if skip_example:
+            man_cols.remove("example")
+            req_cols.remove("example")
+
+        # Check that the columns have the same names
+        for col in req_cols:
+            if col not in df.columns.to_list():
+                print(f"New DataFrame missing column '{col}'", file=sys.stderr)
+                return False
+
+        # Check that the columns have the same dtype
+        if dtypes and self._example_df is not None:
+            # Check that all of the columns have matching dtypes.  CategoricalDtypes match only if the have the same
+            # categories, not only if they are by categorical.  Here that's a problem since new categories may arise.
+            # Just check that the names of the dtypes match.
+            e_df_dtype_names = [str(x) for x in self._example_df[man_cols].dtypes]
+            df_dtype_names = [str(x) for x in df[man_cols].dtypes]
+            if not e_df_dtype_names == df_dtype_names:
+                print(f"New DataFrame has at least one wrong dtype.", file=sys.stderr)
+                return False
+
+        return True
+
+
     def save_csv(self, filename: str, out_dir: str = None, sep: str = ',') -> None:
         """Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.
 
@@ -153,7 +212,7 @@ class ExampleSet:
         """
         if out_dir is None:
             out_dir = Config().output_dir
-        self.__example_df.drop('example', axis=1).to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
+        self._example_df.drop('example', axis=1).to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
 
     def load_csv(self, filename: str, in_dir: str = None, sep: str = ',') -> None:
         """Read in a CSV file that has ExampleSet data.
@@ -174,20 +233,16 @@ class ExampleSet:
             # Allows for tricks with file-like objects
             df = pd.read_csv(filename, sep=sep)
 
-        for col in self.__columns:
-            if col == "example":
-                continue
-            if col not in df.columns.to_list():
-                raise ValueError("Cannot load CSV file.  Unexpected column format.")
-
+        if not self.has_required_columns(df):
+            raise ValueError("Cannot load CSV file.  Unexpected column format.")
 
         # Put the DataFrame into a standard structure - categories, column order, etc.
         ExampleSet.__standardize_df_format(df)
 
         # Add the example column
-        df['example'] = df.apply(ExampleSet.__Example_from_row, axis=1, raw=False)
+        df['example'] = df.apply(ExampleSet._Example_from_row, axis=1, raw=False)
 
-        self.__example_df = df
+        self._example_df = df
 
     def update_example_set(self, df: pd.DataFrame, keep_label_file_dataframes: bool = False) -> None:
         """Replaces the contents of this ExampleSet with the supplied DataFrame.
@@ -203,24 +258,13 @@ class ExampleSet:
             ValueError: If columns do not match
         """
 
-        e_df_cols = sorted(self.__example_df.columns)
-        df_cols = sorted(df.columns)
-        # Check that the have the same column names
-        if e_df_cols != df_cols:
-            raise ValueError(f"Columns do not match. {e_df_cols != df_cols}")
-        # Check that all of the columns have matching dtypes.  CategoricalDtypes match only if the have the same
-        # categories, not only if they are by categorical.  Here that's a problem since new categories may arise.  Just
-        # check that the names of the dtypes match.
-        e_df_dtype_names = [str(x) for x in self.__example_df[e_df_cols].dtypes]
-        df_dtype_names = [str(x) for x in df[df_cols].dtypes]
-
-        if not e_df_dtype_names == df_dtype_names:
-            raise ValueError(f"Column dtypes do not match. {e_df_dtype_names} != {df_dtype_names}")
+        if not self.has_required_columns(df, dtypes=True):
+            raise ValueError(f"New df does not have the required columns or column dtypes.")
 
         if not keep_label_file_dataframes:
             self.label_file_dataframes = {}
 
-        self.__example_df = df.copy()
+        self._example_df = df.copy()
 
     def get_example_df(self) -> pd.DataFrame:
         """Returns the example set as a DataFrame (copy)
@@ -228,7 +272,7 @@ class ExampleSet:
         Returns:
             A copy of the internal ExampleSet DataFrame
         """
-        return self.__example_df.copy()
+        return self._example_df.copy()
 
     def add_label_file_data(self, label_files: List[str] = None, exclude_zones: List[str] = None,
                             exclude_times: List[Tuple[datetime, datetime]] = None) -> None:
@@ -307,7 +351,7 @@ class ExampleSet:
 
         # Check to see if we have any duplicates and print them out
         num_total_events = self.count_events()
-        num_total_labels = len(self.__example_df)
+        num_total_labels = len(self._example_df)
         num_events_with_multiple_labels = self.count_duplicated_events()
         num_duplicate_labels = self.count_duplicated_labels()
         num_events_with_mismatched_labels = self.count_duplicated_events_with_mismatched_labels()
@@ -341,7 +385,7 @@ Number of mismatched labels: {num_mismatched_labels}
             report: Should information about what was removed be included?
         """
         # Split into event groups
-        gb = self.__example_df.groupby(['zone', 'dtime'])
+        gb = self._example_df.groupby(['zone', 'dtime'])
 
         # Keep only groups that that have exactly one unique cavity and fault label
         df = gb.filter(lambda x: x.cavity_label.nunique() == 1 and x.fault_label.nunique() == 1)
@@ -354,14 +398,14 @@ Number of mismatched labels: {num_mismatched_labels}
             print("\n")
 
         # Track the size so we can report if needed
-        orig_size = len(self.__example_df)
+        orig_size = len(self._example_df)
 
         # Replace the original example_df with this reduced set.
-        self.__example_df = df.drop_duplicates(["zone", "dtime"])
+        self._example_df = df.drop_duplicates(["zone", "dtime"])
 
         # Print out how many entries were removed as duplicates
         if report:
-            num_dupes = orig_size - len(self.__example_df)
+            num_dupes = orig_size - len(self._example_df)
             print(f"## Removed {num_dupes} entries from the ExampleSet for being duplicates ##")
 
     def purge_invalid_examples(self, validator: ExampleValidator, report: bool = True, progress: bool = True) -> None:
@@ -422,17 +466,17 @@ Number of mismatched labels: {num_mismatched_labels}
                 tqdm.pandas()
 
                 # Apply the validator to generate a bool column we can filter on
-                valid = self.__example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator)
+                valid = self._example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator)
         else:
             # Apply the validator to generate a bool column we can filter on
-            valid = self.__example_df.apply(func=__apply_validator, axis=1, _validator=validator)
+            valid = self._example_df.apply(func=__apply_validator, axis=1, _validator=validator)
 
         if report:
             print(out)
             print(f"\nPurging {count} invalid examples")
 
         # Keep only the events that are valid
-        self.__example_df = self.__example_df[valid]
+        self._example_df = self._example_df[valid]
 
     def _add_example_df(self, df: pd.DataFrame, allow_new_columns: bool = False) -> None:
         """Add a DataFrame of examples to the ExampleSet's internal collection.
@@ -448,21 +492,24 @@ Number of mismatched labels: {num_mismatched_labels}
             ValueError: If new columns are being added and allow_new_columns != True
         """
 
-        # Union the categories present in the existing examples with those presented in new examples
-        for col in [col for col in self.__example_df.columns if self.__example_df[col].dtype.name == 'category']:
-            uc = pd.api.types.union_categoricals([self.__example_df[col], df[col]])
-            self.__example_df[col] = pd.Categorical(self.__example_df[col], categories=uc.categories)
-            df[col] = pd.Categorical(df[col], categories=uc.categories)
-
         # Make sure we are adding similar data unless otherwise stated
         if not allow_new_columns:
-            if (len(df.columns.values.tolist()) != len(self.__example_df.columns.values.tolist())) and (
-                    sorted(df.columns.values.tolist()) != sorted(self.__example_df.columns.values.tolist())):
+            if (len(df.columns.values.tolist()) != len(self._example_df.columns.values.tolist())) and (
+                    sorted(df.columns.values.tolist()) != sorted(self._example_df.columns.values.tolist())):
                 raise ValueError(
                     "New DataFrame does not have same columns as example_df and allow_new_columns=False")
 
+        if not self.has_required_columns(df, dtypes=True):
+            raise ValueError("New DataFrame does not have required column dtypes.")
+
+        # Union the categories present in the existing examples with those presented in new examples
+        for col in [col for col in self._example_df.columns if self._example_df[col].dtype.name == 'category']:
+            uc = pd.api.types.union_categoricals([self._example_df[col], df[col]])
+            self._example_df[col] = pd.Categorical(self._example_df[col], categories=uc.categories)
+            df[col] = pd.Categorical(df[col], categories=uc.categories)
+
         # Add the new data to the bottom of the internal DataFrame, and add it to the dict of included label files
-        self.__example_df = pd.concat((self.__example_df, df), ignore_index=True)
+        self._example_df = pd.concat((self._example_df, df), ignore_index=True)
 
     @staticmethod
     def _create_dataframe_from_web_query(server: str = None, begin: datetime = None, end: datetime = None,
@@ -710,14 +757,14 @@ Number of mismatched labels: {num_mismatched_labels}
         Returns:
             the number of unique events (zone/datetime combinations
         """
-        return len(self.__example_df.drop_duplicates(subset=['zone', 'dtime']))
+        return len(self._example_df.drop_duplicates(subset=['zone', 'dtime']))
 
     def count_labels(self) -> int:
         """Counts the number of labels (rows in label files)
 
         Returns:
              the number of labels (rows in label files)"""
-        return len(self.__example_df)
+        return len(self._example_df)
 
     def get_duplicated_labels(self) -> pd.DataFrame:
         """"Identify the fault events that appear multiple times in the ExampleSet.
@@ -725,7 +772,7 @@ Number of mismatched labels: {num_mismatched_labels}
         Returns:
             A DataFrame containing labels for events that appear multiple times"""
         # Split on event.  observed=True only includes categorical levels that are seen and improves performance
-        gb = self.__example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
+        gb = self._example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
 
         # Keep event groups that have > 1 rows.  Return length of the resulting DataFrame
         return gb.filter(lambda x: len(x) > 1)
@@ -759,7 +806,7 @@ Number of mismatched labels: {num_mismatched_labels}
         Returns:
             DataFrame of the events that appear exactly once in the ExampleSet"""
         # Split on event.  observed=True only includes categorical levels that are seen and improves performance
-        gb = self.__example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
+        gb = self._example_df.groupby(["zone", "dtime"], as_index=False, observed=True)
 
         # Keep event groups that have exactly one row.
         return gb.filter(lambda x: len(x) == 1)
@@ -785,7 +832,7 @@ Number of mismatched labels: {num_mismatched_labels}
         Returns:
              A DataFrame containing the events that have mismatched labels"""
         # Split on events.
-        gb = self.__example_df.groupby(['zone', 'dtime'], as_index=False, observed=True)
+        gb = self._example_df.groupby(['zone', 'dtime'], as_index=False, observed=True)
 
         # Keep event groups that have more than one unique fault or cavity label. Return the length of resulting
         # DataFrame.
@@ -830,7 +877,7 @@ Number of mismatched labels: {num_mismatched_labels}
             query: The expr argument to DataFrame.query.  Subsets data before plot
             kwargs: Other named parameters are passed to swarm_timeline method
         """
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
         if query is not None:
             df = df.query(query)
         swarm_timeline(df, **kwargs)
@@ -842,7 +889,7 @@ Number of mismatched labels: {num_mismatched_labels}
             title: The title of the plot
             query: The expr argument to DataFrame.query.  Subsets data before plot
         """
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
         if query is not None:
             df = df.query(query)
         heatmap.heatmap_cavity_vs_fault_label_counts(data=df, title=title)
@@ -856,9 +903,9 @@ Number of mismatched labels: {num_mismatched_labels}
         """
 
         if zones is None:
-            zones = self.__example_df.zone.cat.categories
+            zones = self._example_df.zone.cat.categories
 
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
         if query is not None:
             df = df.query(query)
 
@@ -873,7 +920,7 @@ Number of mismatched labels: {num_mismatched_labels}
             query: The expr argument to DataFrame.query.  Subsets data before plot
         """
 
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
 
         # Query/subset the data
         if query is not None:
@@ -893,7 +940,7 @@ Number of mismatched labels: {num_mismatched_labels}
         else:
             if title is None:
                 title = f"{color_by} Count by Day of Week"
-            df[color_by] = self.__example_df[color_by]
+            df[color_by] = self._example_df[color_by]
 
             # Get the counts by the color_by column
             count_df = df.groupby(['day', color_by])['day'].count().unstack(color_by).loc[day_names, :]
@@ -920,7 +967,7 @@ Number of mismatched labels: {num_mismatched_labels}
             query: The expr argument to DataFrame.query.  Subsets data before plot
         """
 
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
         if query is not None:
             df = df.query(query)
 
@@ -963,7 +1010,7 @@ Number of mismatched labels: {num_mismatched_labels}
         """
 
         # Subset this ExampleSet if requested
-        df = self.__example_df.copy()
+        df = self._example_df.copy()
         if query is not None:
             df = df.query(query)
 
@@ -988,9 +1035,9 @@ Number of mismatched labels: {num_mismatched_labels}
 
         eq = True
         # Check the example DataFrame - first consider None case
-        if self.__example_df is None and other.get_example_df() is not None:
+        if self._example_df is None and other.get_example_df() is not None:
             eq = False
-        elif not self.__example_df.equals(other.get_example_df()):
+        elif not self._example_df.equals(other.get_example_df()):
             eq = False
         # Check the dict of label file dataframes - first consider None case
         elif self.label_file_dataframes is None and other.label_file_dataframes is not None:
@@ -1012,7 +1059,7 @@ Number of mismatched labels: {num_mismatched_labels}
         return eq
 
     @staticmethod
-    def __Example_from_row(x: pd.DataFrame) -> Example:
+    def _Example_from_row(x: pd.DataFrame) -> Example:
         """Creates an Example object from a row of a standard ExampleSet DataFrame"""
         return Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf, x.label_source)
 
@@ -1040,13 +1087,13 @@ Number of mismatched labels: {num_mismatched_labels}
 
         # Construct the Example objects based on row values if needed
         if 'example' not in df.columns.to_list():
-            df['example'] = df.apply(ExampleSet.__Example_from_row, axis=1, raw=False)
+            df['example'] = df.apply(ExampleSet._Example_from_row, axis=1, raw=False)
 
         # Ensure a consistent set of category levels and their order.
         master = {
-            'zone': ExampleSet.known_zones,
-            'fault_label': ExampleSet.known_fault_labels,
-            'cavity_label': ExampleSet.known_cavity_labels
+            'zone': ExampleSet._known_zones,
+            'fault_label': ExampleSet._known_fault_labels,
+            'cavity_label': ExampleSet._known_cavity_labels
         }
 
         # Add any missing levels and the make sure they are in a predictable order
