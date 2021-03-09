@@ -1,25 +1,62 @@
+"""This module provides autogressive feature extraction tools.
+
+Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can't externally.
+
+Basic Usage Example:
+::
+
+    from rfwtools.data_set import DataSet
+    from rfwtools.extractor.autoregressive import autoregressive_extractor
+
+    # Setup a DataSet object and get some example data to work with
+    ds = DataSet()
+    ds.load_example_set_csv("my_example_set.csv")
+
+    # Run on one example with defaults
+    autoregressive_extractor(ds.example_set.loc[0, 'example])
+    # Run on one example with only 2 signals being processed
+    autoregressive_extractor(ds.example_set.loc[0, 'example], signals=['1_GMES', '1_PMES'])
+    # Run on one example, but only include values before the fault on set.
+    autoregressive_extractor(ds.example_set.loc[0, 'example], query="Time < 0")
+
+    # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.
+    ds.produce_feature_set(autoregressive_extractor, query="Time < 0")
+
+"""
+from typing import List, Optional
+
 import pandas as pd
 import numpy as np
 from statsmodels.tsa.ar_model import AutoReg
 from sklearn import preprocessing
 from rfwtools.utils import get_signal_names
 from .utils import get_example_data
+from ..example import Example
 
 
-def autoregressive_extractor(ex, normalize=True, max_lag=5, signals=None, query=None):
+def autoregressive_extractor(ex: Example, normalize: bool = True, max_lag: int = 5, signals: List[str] = None,
+                             query: str = None) -> pd.DataFrame:
     """Uses statsmodels to generate autoregressive model of each waveform.  AR coefficients are returned as features.
 
     This function handles loading and unloading the Example's data.
 
     Note: these features have historically been used for both cavity and fault type model training.
 
-    Args:
-        ex (Example) - The example for which we are generating features
-        normalize (bool) - Should each waveform be normalized prior to autoregressive model fitting
-        max_lag (int) - The number of AR parameters to fit (plus one for a bias/constant term)
-        signals (list) - The list of signals to model (e.g. ["1_GMES", ...].  If None a default (1-8, GMES, CASK, CRFP,
-                         DETA2) set is used.
-        query (str) - Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. "Time <= 0".
+    Arguments:
+        ex:
+            The example for which we are generating features
+        normalize:
+            Should each waveform be normalized prior to autoregressive model fitting
+        max_lag:
+            The number of AR parameters to fit (plus one for a bias/constant term)
+        signals:
+            The list of signals to model (e.g. ["1_GMES", ...].  If None a default (1-8, GMES, CASK, CRFP, DETA2) set is
+             used.
+        query:
+            Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. "Time <= 0".
+
+    Returns:
+        A DataFrame with a single row containing the feature set for the give example.
     """
 
     # Get the data from the Example
@@ -28,8 +65,8 @@ def autoregressive_extractor(ex, normalize=True, max_lag=5, signals=None, query=
     # List of signals for feature extraction
     sel_col = signals
     if signals is None:
-        sel_col = get_signal_names(cavities=('1', '2', '3', '4', '5', '6', '7', '8'),
-                                   waveforms=("GMES", "GASK", "CRFP", "DETA2"))
+        sel_col = get_signal_names(cavities=['1', '2', '3', '4', '5', '6', '7', '8'],
+                                   waveforms=["GMES", "GASK", "CRFP", "DETA2"])
 
     # We only need to create this once.  Every time we "fit_transform" we update the values.
     signal_scaler = None
@@ -63,7 +100,8 @@ def autoregressive_extractor(ex, normalize=True, max_lag=5, signals=None, query=
     return feature_df
 
 
-def autoregressive_extractor_faulted_cavity(ex, normalize=True, max_lag=5, waveforms=None, query=None):
+def autoregressive_extractor_faulted_cavity(ex: Example, normalize: bool = True, max_lag: int = 5,
+                                            waveforms: List[str] = None, query: str = None) -> Optional[pd.DataFrame]:
     """Generates AR features for waveforms of the cavity labeled as faulted.
 
     This function handles loading and unloading the Example's data.  No data after the fault is considered.  Returns
@@ -72,15 +110,22 @@ def autoregressive_extractor_faulted_cavity(ex, normalize=True, max_lag=5, wavef
     Note: these features have historically been used for visualizations as they are faster to computer and have a lower
           dimensionality.
 
-    Args:
-        ex (Example) - The example for which we are generating features
-        normalize (bool) - Should each waveform be normalized prior to autoregressive model fitting
-        max_lag (int) - The number of AR parameters to fit (plus one for a bias/constant term)
-        waveforms (list) - The list of waveforms to model (e.g. ["GMES", ...].  If None a default (GMES, CASK, CRFP,
-                         DETA2) set is used.  Note: the faulted cavity (cavity_label) is the only cavity used.
-        query (str) - Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. "Time <= 0".
+    Arguments:
+        ex:
+            The example for which we are generating features
+        normalize:
+            Should each waveform be normalized prior to autoregressive model fitting
+        max_lag:
+            The number of AR parameters to fit (plus one for a bias/constant term)
+        waveforms:
+            The list of waveforms to model (e.g. ["GMES", ...].  If None a default (GMES, CASK, CRFP, DETA2) set is
+            used.  Note: the faulted cavity (cavity_label) is the only cavity used.
+        query:
+            Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. "Time <= 0".
 
-    Returns: (DataFrame
+    Returns:
+        A DataFrame with a single row containing the feature set for the give example.  None is returned if cavity_label
+        is '0' as no single responsible cavity is identified.
     """
 
     if ex.cavity_label == "0":
@@ -90,7 +135,7 @@ def autoregressive_extractor_faulted_cavity(ex, normalize=True, max_lag=5, wavef
     event_df = get_example_data(ex, query)
 
     # List of signals for feature extraction
-    sel_col = get_signal_names(cavities=ex.cavity_label, waveforms=("GMES", "GASK", "CRFP", "DETA2"))
+    sel_col = get_signal_names(cavities=ex.cavity_label, waveforms=["GMES", "GASK", "CRFP", "DETA2"])
     if waveforms is not None:
         sel_col = get_signal_names(cavities=ex.cavity_label, waveforms=waveforms)
 
@@ -126,14 +171,16 @@ def autoregressive_extractor_faulted_cavity(ex, normalize=True, max_lag=5, wavef
     return feature_df
 
 
-def __process_signal(signal, max_lag, scaler=None):
+def __process_signal(signal: np.array, max_lag: int, scaler: preprocessing.StandardScaler = None) -> np.ndarray:
     """Internal function for calculating AR features of a single signal
 
-    Args:
-        signal (np.array) - The values of the signal to be fitted by AR coefficients
-        max_lag (int) - The number of AR parameters to fit (plus one for a bias/constant term)
-        scaler (sklearn.StandardScaler) - Scaler used to standardized the signal.  If None, no scaling is performed.
+    Arguments:
+        signal: The values of the signal to be fitted by AR coefficients
+        max_lag: The number of AR parameters to fit (plus one for a bias/constant term)
+        scaler: Scaler used to standardized the signal.  If None, no scaling is performed.
 
+    Returns:
+        A ndarray of the fitted autoregression coefficients.
     """
 
     # if the signal is constant values, features are zeros
