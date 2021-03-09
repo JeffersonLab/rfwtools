@@ -1,3 +1,5 @@
+"""This module contains any network specific code.  Currently defines single class for accessing system trust store."""
+
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.ssl_ import create_urllib3_context
 
