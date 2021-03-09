@@ -27,7 +27,7 @@ __myquery_url__ = "https://myaweb.acc.jlab.org/myquery"
 def get_json(url: str) -> dict:
     """Simple function for making an HTTP GET request that should return a valid JSON content-type.
 
-    This method creates a custom SSLContextAdapter that has access to the system's trusts CA certificates.
+    This method creates a custom SSLContextAdapter that has access to the system's trusted CA certificates.
 
     Arguments:
         url: The URL on which to perform the HTTP GET
