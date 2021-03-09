@@ -1,21 +1,28 @@
+"""This module provides a light wrapper on sci-kit learn's PCA related methods."""
+from typing import List, Tuple, Union
+
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
 
-def do_pca_reduction(feature_df, metadata_cols, n_components=3, standardize=True, **kwargs):
+def do_pca_reduction(feature_df: pd.DataFrame, metadata_cols: List[str], n_components: int = 3,
+                     standardize: bool = True, **kwargs) -> Union[Tuple[Union[pd.DataFrame, pd.Series], None],
+                                                                  Tuple[Union[pd.DataFrame, pd.Series], PCA]]:
     """Performs PCA on subset of columns of feature_df and maintains some example info in results.
 
-    Args:
-        feature_df (DataFrame) - DataFrame containing example information and feature data.
-        metadata_cols (list(str)) - The column names of feature_df that contain the metadata of the events (labels,
+    Arguments:
+        feature_df: DataFrame containing example information and feature data.
+        metadata_cols: The column names of feature_df that contain the metadata of the events (labels,
                                     etc.).  All columns not listed in event_cols are used in PCA analysis.
-        n_components (int) - The number of primary components to return
-        standardize (bool) - Should the features be standardized (i.e. (x-mean)/stdev)?
-        kwargs (dict) - A dictionary of keyword parameter name/values to be passed to sklearn.decomposition.PCA
+        n_components: The number of primary components to return
+        standardize: Should the features be standardized (i.e. (x-mean)/stddev)?
+        kwargs: A dictionary of keyword parameter name/values to be passed to sklearn.decomposition.PCA
 
-    Returns: (DataFrame) - A DataFrame containing the PCA output (pc1, pc2, ..., pcN) and specified event_cols.  One
-                           row per event.
+    Returns:
+        A tuple of a DataFrame and the PCA model object after fit_transform has been called.  The DataFrame contains
+        the PCA output (pc1, pc2, ..., pcN) and specified metadata_cols.  No data will be in the pc columns should
+        n_components > len(feature_df).  If no PCA object can be fit, then None will be returned.
     """
 
     # Pull out the metadata portion
@@ -24,7 +31,7 @@ def do_pca_reduction(feature_df, metadata_cols, n_components=3, standardize=True
     # Figure out if we have enough data to even try it.  If not return a DataFrame with pc1,... columns as NaNs
     columns = ["pc" + str(i) for i in range(1, n_components + 1)]
     if len(feature_df) < n_components:
-        return pd.concat([y, pd.DataFrame(data=None, columns=columns)], axis=1)
+        return pd.concat([y, pd.DataFrame(data=None, columns=columns)], axis=1), None
 
     # Get the feature columns only
     x = feature_df.drop(metadata_cols, axis=1).copy().reset_index(drop=True)
