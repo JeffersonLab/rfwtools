@@ -1,21 +1,27 @@
+"""This module contains general utility functions that may be used throughout the package."""
+
 import datetime
 import json
 import urllib
+from typing import List
+
 import requests
 
 from rfwtools.network import SSLContextAdapter
 
 
-def get_signal_names(cavities, waveforms):
+def get_signal_names(cavities: List[str], waveforms: List[str]) -> List[str]:
     """Creates a list of signal names by joining each combination of the two lists with _
 
     Args:
-        cavities (list(str)) - A list of strings that represent cavity numbers, e.g. '1' or '7'.  These are the cavities
-                               for which signals will be included.
-        waveforms (list(str)) - A list of waveform suffixes (e.g., "GMES" or "CRRP") for the waveforms to be included
-                                in the output.
+        cavities:
+            A list of strings that represent cavity numbers, e.g. '1' or '7'.  These are the cavities for which signals
+            will be included.
+        waveforms:
+            A list of waveform suffixes (e.g., "GMES" or "CRRP") for the waveforms to be included in the output.
 
-    Return list(str) - The list containing all of the combinations of the supplied cavities and waveforms
+    Return:
+        The list containing all of the combinations of the supplied cavities and waveforms
     """
     signals = []
     for cav in cavities:
@@ -24,8 +30,18 @@ def get_signal_names(cavities, waveforms):
     return signals
 
 
-def get_events_from_web(data_server="accweb.acc.jlab.org", begin="2018-01-01 00:00:00", end=None):
-    """Downloads a a list of events from the waveforms web server which includes only their metadata."""
+def get_events_from_web(data_server: str = "accweb.acc.jlab.org", begin: str = "2018-01-01 00:00:00",
+                        end: str = None) -> dict:
+    """Downloads a a list of events from the waveforms web server which includes only their metadata.
+
+    Arguments:
+        data_server: The hostname of the service running the waveform browser.
+        begin: A string formatted "%Y-%m-%d %H:%M:%S" that marks the beginning of the requested range.
+        end: A string formatted "%Y-%m-%d %H:%M:%S" that marks the end of the requested range.
+
+    Returns:
+        The JSON response converted to Python data structures.  Outer structure is expected to be a dictionary.
+    """
     if end is None:
         end = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
