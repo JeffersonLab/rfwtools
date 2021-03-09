@@ -36,7 +36,8 @@ def get_events_from_web(data_server: str = "accweb.acc.jlab.org", begin: str = "
 
     Arguments:
         data_server: The hostname of the service running the waveform browser.
-        begin: A string formatted "%Y-%m-%d %H:%M:%S" that marks the beginning of the requested range.
+        begin: A string formatted "%Y-%m-%d %H:%M:%S" that marks the beginning of the requested range.  Defaults to a
+            date well before the first harvester files were captured.
         end: A string formatted "%Y-%m-%d %H:%M:%S" that marks the end of the requested range.
 
     Returns:
