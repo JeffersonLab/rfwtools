@@ -1,6 +1,7 @@
 """This module provides autogressive feature extraction tools.
 
-Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can't externally.
+Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can't be run
+externally.
 
 Basic Usage Example:
 ::
