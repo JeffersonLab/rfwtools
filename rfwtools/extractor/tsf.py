@@ -1,4 +1,4 @@
-"""This module provides tsfesh-based time series statistical feature extraction tools.
+"""This module provides tsfresh-based time series statistical feature extraction tools.
 
 Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can't be run
 externally.
@@ -38,7 +38,7 @@ from ..utils import get_signal_names
 
 def tsfresh_extractor(example: Example, signals: List[str] = None, query: str = None,
                       impute_function: Union[callable, None] = impute, disable_progress_bar: bool = True,
-                      n_jobs: int = 0, default_fc_parameters: dict = EfficientFCParameters(), **kwargs) -> pd.DataFrame:
+                      n_jobs: int = 0, default_fc_parameters: dict = None, **kwargs) -> pd.DataFrame:
     """Use tsfresh to extract features specified.
 
     This is a thin wrapper over tsfresh.feature_extraction.extraction.extract_features.  See that method for more
@@ -59,7 +59,7 @@ def tsfresh_extractor(example: Example, signals: List[str] = None, query: str = 
         n_jobs:
             The number of jobs should be run concurrently.  Defaults to zero, which disables parallelization.
         default_fc_parameters:
-            mapping of feature calculator names to parameters.  See
+            mapping of feature calculator names to parameters.  If None, defaults to EfficientFCParameters().  See
             tsfresh.feature_extraction.extraction.extract_features for more details.
         **kwargs:
             All other key word arguments are passed directly to tsfresh.extract_features
@@ -76,6 +76,10 @@ def tsfresh_extractor(example: Example, signals: List[str] = None, query: str = 
     if signals is None:
         sel_col = get_signal_names(cavities=['1', '2', '3', '4', '5', '6', '7', '8'],
                                    waveforms=["GMES", "GASK", "CRFP", "DETA2"])
+
+    # Set the default feature parameters
+    if default_fc_parameters is None:
+        default_fc_parameters = EfficientFCParameters()
 
     # Get the data that matches the request
     event_df = event_df[["Time"] + sel_col]
@@ -99,7 +103,7 @@ def tsfresh_extractor(example: Example, signals: List[str] = None, query: str = 
 
 def tsfresh_extractor_faulted_cavity(example: Example, waveforms: List[str] = None, query: str = None,
                                      impute_function: Union[callable, None] = impute, disable_progress_bar: bool = True,
-                                     n_jobs: int = 0, default_fc_parameters: dict = EfficientFCParameters(),
+                                     n_jobs: int = 0, default_fc_parameters: dict = None,
                                      **kwargs) -> Union[pd.DataFrame, None]:
     """Use tsfresh to extract features for only the cavity that faulted.  Returns None if cavity_label=='0'.
 
@@ -120,7 +124,7 @@ def tsfresh_extractor_faulted_cavity(example: Example, waveforms: List[str] = No
         n_jobs:
             The number of jobs should be run concurrently.  Defaults to zero, which disables parallelization.
         default_fc_parameters:
-            mapping of feature calculator names to parameters.  See
+            mapping of feature calculator names to parameters.  If None, defaults to EfficientFCParameters().  See
             tsfresh.feature_extraction.extraction.extract_features for more details.
         **kwargs:
             All other key word arguments are passed directly to tsfresh.extract_features
@@ -139,6 +143,10 @@ def tsfresh_extractor_faulted_cavity(example: Example, waveforms: List[str] = No
     sel_col = get_signal_names(cavities=example.cavity_label, waveforms=["GMES", "GASK", "CRFP", "DETA2"])
     if waveforms is not None:
         sel_col = get_signal_names(cavities=example.cavity_label, waveforms=waveforms)
+
+    # Set the default feature parameters
+    if default_fc_parameters is None:
+        default_fc_parameters = EfficientFCParameters()
 
     # Get the requested columns for the cavity that faulted.  Then drop the cavity id from the column name so features
     # for all examples will have same column names.
