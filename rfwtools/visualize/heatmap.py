@@ -1,5 +1,9 @@
+"""The module provides some customized heatmap visualizations for fault data."""
+
 import copy
 import math
+from typing import List
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,8 +11,16 @@ import datetime
 import seaborn as sns
 
 
-def heatmap_cavity_vs_fault_label_counts(data, title=None, vmin=None, vmax=None, margins=False):
-    """Generates a heat map plot of counts of cavity/fault label pairs"""
+def heatmap_cavity_vs_fault_label_counts(data: pd.DataFrame, title: str = None, vmin: float = None, vmax: float = None,
+                                         margins: bool = False) -> None:
+    """Displays a heat map plot of counts of cavity/fault label pairs
+
+    Arguments:
+        data: The DataFrame to use.  Should conform to ExampleSet standards.
+        title: The chart title
+        vmin, vmax: seaborn.heatmap parameters.  Values to anchor the colormap.  If None, drawn from data
+        margins: pd.pivot_table parameter.  Should row and column sums be included.
+    """
     # Create a pivot table DataFrame that is a matrix with values that are counts with cavity/fault labels as
     # columns/rows.  values=dtime here is an arbitrary choice of something to count.
     hm_df = pd.pivot_table(data=data, values='dtime', columns='cavity_label', margins=margins, index='fault_label',
@@ -35,14 +47,17 @@ def heatmap_cavity_vs_fault_label_counts(data, title=None, vmin=None, vmax=None,
     plt.show()
 
 
-def show_fault_cavity_count_by_zone(data, zones, dt_breaks=None):
+def show_fault_cavity_count_by_zone(data: pd.DataFrame, zones: List[str], dt_breaks: List[datetime] = None) -> None:
     """Creates a set of grids of heat maps (one per zone) which shows the count of fault/cavity combinations.
 
-    Args:
-        data (DataFrame) - DataFrame containing fault information.  Required columns are 'fault_label', 'cavity_label',
-                            'zone', (all category dtype), and 'dtime' of type datetime
-        zones (list) - A list of strings of the zones to show in the heat map grid
-        dt_breaks (list(datetime)) - A list of datetime objects to use a break points in a series of produced plots
+    Arguments:
+        data:
+            DataFrame containing fault information.  Required columns are 'fault_label', 'cavity_label', 'zone',
+            (all category dtype), and 'dtime' of type datetime
+        zones:
+            A list of strings of the zones to show in the heat map grid
+        dt_breaks:
+            A list of datetime objects to use a break points in a series of produced plots
     """
 
     if dt_breaks is None:
@@ -76,7 +91,9 @@ def show_fault_cavity_count_by_zone(data, zones, dt_breaks=None):
             _show_fault_cavity_count_by_zone(data=dat, zones=zones, title=title)
 
 
-def _show_fault_cavity_count_by_zone(data, zones, title=None, nrows=1, ncols=None, vmin=None, vmax=None):
+def _show_fault_cavity_count_by_zone(data: pd.DataFrame, zones: List[str], title: str = None, nrows: int = 1,
+                                     ncols: int = None, vmin: float = None, vmax: float = None):
+    """Internal method for splitting up ExampleSet style DataFrame data into per zone subsets and displaying heatmaps"""
     # Figure out a dimension of the multiplot
     if ncols is None:
         ncols = math.ceil(len(zones) / nrows)
