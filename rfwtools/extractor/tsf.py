@@ -7,7 +7,7 @@ Basic Usage Example:
 ::
 
     from rfwtools.data_set import DataSet
-    from rfwtools.extractor.tsfesh import tsfresh_extractor
+    from rfwtools.extractor.tsf import tsfresh_extractor
 
     # Setup a DataSet object and get some example data to work with
     ds = DataSet()
