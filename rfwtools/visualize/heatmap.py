@@ -7,7 +7,7 @@ from typing import List
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import datetime
+from datetime import datetime
 import seaborn as sns
 
 
@@ -77,10 +77,10 @@ def show_fault_cavity_count_by_zone(data: pd.DataFrame, zones: List[str], dt_bre
         for i in range(0, len(dt_breaks)):
             curr = dt_breaks[i]
             if prev is None:
-                prev = datetime.datetime.strptime("1970-01-01", "%Y-%m-%d")
+                prev = datetime.strptime("1970-01-01", "%Y-%m-%d")
             dt_ranges.append((prev, curr))
             prev = curr
-        dt_ranges.append((prev, datetime.datetime.now()))
+        dt_ranges.append((prev, datetime.now()))
 
         for start, end in dt_ranges:
             dat = data[start < data['dtime']]
