@@ -1,19 +1,24 @@
+"""This module provides customized scatterplot visualizations."""
+from typing import Tuple
+
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import rfwtools.visualize as viz
 
 
-def scatterplot(data, x, y, title=None, figsize=None, drop_categories=True, **kwargs):
+def scatterplot(data: pd.DataFrame, x: str, y: str, title: str = None, figsize: Tuple[float, float] = None,
+                drop_categories: bool = True, **kwargs) -> None:
     """Creates/displays a single standard scatterplot.  Has extended marker set by default and external legend.
 
-    Args:
-        data (DataFrame) - A pandas DataFrame containing the data used in the scatter plot
-        x (str) - The column name of df that holds the x values of the scatterplot
-        y (ste) - The column name of df that holds the y values of the scatterplot
-        title (str) - Title applied to plot (if not None)
-        figsize (2-tuple(float)): The two dimensions of the size of the figure.  Passed to plt.figure.
-        drop_categories (bool): Should unused categories be dropped from the hue and style columns (if categories)
-        **kwargs (dict) - All remaining named parameters are passed to seaborn.scatterplot
+    Arguments:
+        data: A pandas DataFrame containing the data used in the scatter plot
+        x: The column name of df that holds the x values of the scatterplot
+        y: The column name of df that holds the y values of the scatterplot
+        title: Title applied to plot (if not None)
+        figsize: The two dimensions of the size of the figure.  Passed to plt.figure.
+        drop_categories: Should unused categories be dropped from the hue and style columns (if categories)
+        **kwargs: All remaining named parameters are passed to seaborn.scatterplot
     """
 
     # Create a figure and draw the plot
