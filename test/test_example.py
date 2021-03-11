@@ -182,8 +182,8 @@ class TestExample(TestCase):
 
         t_min = wex.event_df.Time.min()
         t_max = wex.event_df.Time.max()
-        self.assertAlmostEqual(start, t_min, 1)
-        self.assertAlmostEqual(end, t_max, 1)
+        self.assertAlmostEqual(0, t_min, 1)
+        self.assertAlmostEqual(end-start, t_max, 1)
 
         # Check that we got some data
         self.assertTrue(len(wex.event_df) > 10, "wex.event_df is unexpectedly small")
