@@ -72,7 +72,7 @@ class ExampleType(Enum):
 class Factory:
     """A class for producing a variety of types of IExample objects"""
 
-    def __init__(self, e_type: ExampleType, **kwargs):
+    def __init__(self, e_type: ExampleType = None, **kwargs):
         """Construct a factory for creating Example objects with a default type.
 
         All additional keyword arguments will be passed to the Example type constructor.
