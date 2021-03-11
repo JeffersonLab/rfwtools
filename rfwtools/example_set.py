@@ -59,7 +59,7 @@ from tqdm import tqdm
 
 from rfwtools import utils
 from rfwtools.config import Config
-from rfwtools.example import Example
+from rfwtools.example import ExampleType, Factory, IExample
 from rfwtools.example_validator import ExampleValidator
 from rfwtools.timestamp import is_datetime_in_range, TimestampMapper
 from rfwtools.visualize.timeline import swarm_timeline
@@ -89,17 +89,22 @@ class ExampleSet:
     _known_zones = ['0L04', '1L07', '1L22', '1L23', '1L24', '1L25', '1L26', '2L22', '2L23', '2L24', '2L25', '2L26']
     _known_cavity_labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8']
     _known_fault_labels = ['Single Cav Turn off', 'Multi Cav turn off', 'E_Quench', 'Quench_3ms',
-                            'Quench_100ms', 'Microphonics', 'Controls Fault', 'Heat Riser Choke', 'Unknown']
+                           'Quench_100ms', 'Microphonics', 'Controls Fault', 'Heat Riser Choke', 'Unknown']
 
     # Expected column names - others may exist, but these are what are required no matter.
     __mandatory_columns = ['zone', 'dtime', 'cavity_label', 'fault_label', 'cavity_conf', 'fault_conf', 'example',
-                     'label_source']
+                           'label_source']
 
-    def __init__(self, known_zones: List[str] = None, known_cavity_labels: List[str] = None,
+    def __init__(self, e_type: ExampleType = ExampleType.EXAMPLE, example_kwargs: dict = {},
+                 known_zones: List[str] = None, known_cavity_labels: List[str] = None,
                  known_fault_labels: List[str] = None, req_columns: List[str] = None):
         """Create an instance of an ExampleSet.  Optionally override the default levels for zones and labels.
 
         Arguments:
+            e_type:
+                The type of example that should be created within this ExampleSet
+            example_kwargs:
+                A dictionary of keyword arguments that will be passed to every IExample object constructed.
             known_zones:
                 A list of strings identifying the minimum set of zone categories to be included in the categorical.
             known_cavity_labels:
@@ -112,6 +117,10 @@ class ExampleSet:
                 A list of column names that are required to be in valid DataFrames used internally.  These are in
                 addition to the class defined list of "zone", "dtime", etc..
         """
+        # For constructing examples.
+        self.e_type = e_type
+        self.example_kwargs = example_kwargs
+        self.example_factory = Factory(e_type=e_type, **example_kwargs)
 
         # These columns are also required, but the list contents is variable based on use case.
         self._req_columns = []
@@ -201,7 +210,6 @@ class ExampleSet:
 
         return True
 
-
     def save_csv(self, filename: str, out_dir: str = None, sep: str = ',') -> None:
         """Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.
 
@@ -237,10 +245,10 @@ class ExampleSet:
             raise ValueError("Cannot load CSV file.  Unexpected column format.")
 
         # Put the DataFrame into a standard structure - categories, column order, etc.
-        ExampleSet.__standardize_df_format(df)
+        self.__standardize_df_format(df)
 
         # Add the example column
-        df['example'] = df.apply(ExampleSet._Example_from_row, axis=1, raw=False)
+        df['example'] = df.apply(self._Example_from_row, axis=1, raw=False)
 
         self._example_df = df
 
@@ -306,7 +314,8 @@ class ExampleSet:
                 label_file = os.path.join(Config().label_dir, label_file)
 
             # Process the label file into a DataFrame
-            df = ExampleSet._create_dataframe_from_label_file(label_file, e_zones, e_times)
+            df = self._create_dataframe_from_label_file(filepath=label_file, exclude_zones=e_zones,
+                                                              exclude_times=e_times)
 
             # Stash the label file DataFrame into a dictionary in case we needed it later
             self.label_file_dataframes[label_file] = df.copy()
@@ -337,7 +346,7 @@ class ExampleSet:
             end = datetime.now()
 
         # Get the data from the web service
-        df = ExampleSet._create_dataframe_from_web_query(server=server, begin=begin, end=end, models=models)
+        df = self._create_dataframe_from_web_query(server=server, begin=begin, end=end, models=models)
 
         # Add it to the existing ExampleSet
         self._add_example_df(df)
@@ -511,8 +520,7 @@ Number of mismatched labels: {num_mismatched_labels}
         # Add the new data to the bottom of the internal DataFrame, and add it to the dict of included label files
         self._example_df = pd.concat((self._example_df, df), ignore_index=True)
 
-    @staticmethod
-    def _create_dataframe_from_web_query(server: str = None, begin: datetime = None, end: datetime = None,
+    def _create_dataframe_from_web_query(self, server: str = None, begin: datetime = None, end: datetime = None,
                                          models: List[str] = None) -> pd.DataFrame:
         """This creates a ExampleSet consistent DataFrame based on the responses of the web query.  Labeled faults only.
 
@@ -614,14 +622,13 @@ Number of mismatched labels: {num_mismatched_labels}
             df = df.append(event, ignore_index=True)
 
         # Operates in place on DataFrame
-        ExampleSet.__standardize_df_format(df)
+        self.__standardize_df_format(df)
 
         return df
 
-    @staticmethod
-    def _create_dataframe_from_label_file(filepath: str, exclude_zones: List[str] = None,
+    def _create_dataframe_from_label_file(self, filepath: str, exclude_zones: List[str] = None,
                                           exclude_times: List[List[datetime]] = None) -> pd.DataFrame:
-        """This parses the DataSet's specified label files and saves the constructed Examples.
+        """This parses the DataSet's specified label files and saves the constructed IExamples.
 
         Arguments:
             filepath:
@@ -741,7 +748,7 @@ Number of mismatched labels: {num_mismatched_labels}
              'label_source': l_sources})
 
         # Update the DataFrame to have a standard format (column dtypes, order, etc.)  Should add example column.
-        ExampleSet.__standardize_df_format(df)
+        self.__standardize_df_format(df)
 
         return df
 
@@ -811,7 +818,7 @@ Number of mismatched labels: {num_mismatched_labels}
         # Keep event groups that have exactly one row.
         return gb.filter(lambda x: len(x) == 1)
 
-    def count_unduplicated_events(self) -> pd.DataFrame:
+    def count_unduplicated_events(self) -> int:
         """Count the number of events that appear exactly once.
 
         Returns:
@@ -1058,13 +1065,13 @@ Number of mismatched labels: {num_mismatched_labels}
 
         return eq
 
-    @staticmethod
-    def _Example_from_row(x: pd.DataFrame) -> Example:
+    def _Example_from_row(self, x: pd.DataFrame) -> IExample:
         """Creates an Example object from a row of a standard ExampleSet DataFrame"""
-        return Example(x.zone, x.dtime, x.cavity_label, x.fault_label, x.cavity_conf, x.fault_conf, x.label_source)
+        return self.example_factory.get_example(zone=x.zone, dt=x.dtime, cavity_label=x.cavity_label,
+                                                fault_label=x.fault_label, cavity_conf=x.cavity_conf,
+                                                fault_conf=x.fault_conf, label_source=x.label_source)
 
-    @staticmethod
-    def __standardize_df_format(df: pd.DataFrame) -> None:
+    def __standardize_df_format(self, df: pd.DataFrame) -> None:
         """Attempts to put a DataFrame in a 'standard' format.
 
         This affects IN-PLACE variables that should be categorical, datetime, float, etc. and creates the example column
@@ -1087,7 +1094,7 @@ Number of mismatched labels: {num_mismatched_labels}
 
         # Construct the Example objects based on row values if needed
         if 'example' not in df.columns.to_list():
-            df['example'] = df.apply(ExampleSet._Example_from_row, axis=1, raw=False)
+            df['example'] = df.apply(self._Example_from_row, axis=1, raw=False)
 
         # Ensure a consistent set of category levels and their order.
         master = {

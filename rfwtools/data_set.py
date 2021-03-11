@@ -26,6 +26,7 @@ import pandas as pd
 
 from typing import List, Optional
 
+from rfwtools.example import ExampleType
 from rfwtools.example_validator import ExampleValidator
 from rfwtools.example_set import ExampleSet
 from rfwtools.config import Config
@@ -53,7 +54,8 @@ class DataSet:
 
     """
 
-    def __init__(self, label_files: List[str] = None, example_validator: ExampleValidator = ExampleValidator()):
+    def __init__(self, label_files: List[str] = None, example_validator: ExampleValidator = ExampleValidator(),
+                 e_type: ExampleType = ExampleType.EXAMPLE, example_kwargs: dict = {}):
         """Create a DataSet instance that will collect events based on the provided label files and configured filters.
 
         Some filters such as excluded zones or excluded times are set in the Config objects.
@@ -63,6 +65,8 @@ class DataSet:
             label_files (list(str)) - Filenames of the label files to parse.  None means use all Config().label_dir
             example_validator (ExampleValidator) - Used to check if individual Examples from label files are valid.  No
                                                    validation performed if None
+            e_type: The type of IExample objects that will be created.  Defaults to ExampleType.EXAMPLE.
+            example_kwargs:  A dictionary of keyword arguments that will be passed to the e_type constructor
         """
 
         self.label_files = label_files
@@ -76,7 +80,7 @@ class DataSet:
 
         # A ExampleSet object - contains logic for managing a cohesive set of labeled fault events (i.e., examples)
         # This will hold the labels processed from label files unless otherwise modified
-        self.example_set = ExampleSet()
+        self.example_set = ExampleSet(e_type=e_type, **example_kwargs)
 
         # An ExampleSet for holding the corresponding results from our in service models.
         self.example_set_model = ExampleSet()
@@ -87,7 +91,7 @@ class DataSet:
         self.example_set will contain the resulting ExampleSet.
         self.example_set_model will contain the ExampleSet corresponding to the production model's results
 
-        Args:
+        Arguments:
             report: Whether a report detailing issues with the label file contents should be printed
             progress: Should a progress bar be displayed during validation
             get_model_data: Should the model results be queried and stored in example_set_model
