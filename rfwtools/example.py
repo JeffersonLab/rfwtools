@@ -1,4 +1,4 @@
-"""A package for managing the data associated with a single Example.
+"""A package for managing the data associated with a single fault event.
 
 The has a single class that manages basic data access for an individual fault event Example.  If the data is not found
 in the specified location, then it will attempt to download the data and create the appropriate directory structure.
@@ -21,6 +21,7 @@ compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
 
 import math
 import tarfile
+from enum import Enum
 from typing import Tuple, Dict, List
 
 import requests
@@ -37,7 +38,88 @@ from rfwtools.network import SSLContextAdapter
 from rfwtools.config import Config
 
 
-class Example:
+class IExample:
+    """Abstract class that defines the basic interface for an Example.
+
+    This only defines methods and properties related to data access.
+    """
+
+    def __init__(self, data_dir=None):
+        """Construct an instance of the Example class."""
+
+        # Will eventually hold the waveform data from the event
+        self.event_df = None
+        self.data_dir = data_dir
+
+    def load_data(self):
+        """This method should do everything necessary to create an example_df DataFrame at a minimum.
+
+        Subclasses should use this method as the interface for loading all data associated with the fault event.
+        """
+        raise NotImplementedError("This method has not been implement by child class")
+
+    def unload_data(self):
+        """This method should do everything necessary to free up memory used in load_data."""
+        raise NotImplementedError("This method has not been implement by child class")
+
+
+class ExampleType(Enum):
+    """The types of supported IExample types"""
+    EXAMPLE = 1
+    WINDOWED_EXAMPLE = 2
+
+
+class Factory:
+    """A class for producing a variety of types of IExample objects"""
+
+    def __init__(self, e_type: ExampleType, **kwargs):
+        """Construct a factory for creating Example objects with a default type.
+
+        All additional keyword arguments will be passed to the Example type constructor.
+
+        Arguments:
+            e_type:
+                The default type of IExample object that will be created.
+            **kwargs:
+                All additional keyword arguments will be passed to the responsible constructor on every get_example()
+                call.
+        """
+        self.e_type = e_type
+        self.example_kwargs = kwargs
+
+    def get_example(self, e_type: ExampleType = None, **kwargs) -> IExample:
+        """Get an IExample object.
+
+        Arguments:
+            e_type:
+                The type of IExample object to create.  If None, defaults to the e_type given at construction.
+            **kwargs:
+                All additional keyword arguments will be passed to the responsible constructor on every get_example()
+                call.
+
+        Raises:
+              ValueError: When no e_type is available or if an unsupported e_type is specified.
+        """
+        t = None
+        if e_type is not None:
+            t = e_type
+        else:
+            t = self.e_type
+
+        if t is None:
+            raise ValueError("No e_type specified at construction or get_example.")
+
+        if t == ExampleType.EXAMPLE:
+            ex = Example(**kwargs, **self.example_kwargs)
+        elif t == ExampleType.WINDOWED_EXAMPLE:
+            ex = WindowedExample(**kwargs, **self.example_kwargs)
+        else:
+            raise ValueError(f"Unsupported ExampleType {e_type}")
+
+        return ex
+
+
+class Example(IExample):
     """A class representing a (SME) labeled fault event.  Manages data access and can download missing data.
 
     Harvester fault data typically occupies ~10 MB of memory/disk space, and collections of these events often number in
@@ -67,6 +149,8 @@ class Example:
     def __init__(self, zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir=None):
         """Construct an instance of the Example class."""
 
+        super().__init__(data_dir=data_dir)
+
         # Expert/model provided labels
         self.cavity_label = cavity_label
         self.fault_label = fault_label
@@ -77,10 +161,6 @@ class Example:
         # Zone and timestamp info for the example event
         self.event_datetime = dt
         self.event_zone = zone
-
-        # Will eventually hold the waveform data from the event
-        self.event_df = None
-        self.data_dir = data_dir
 
     def load_data(self, verbose: bool = False) -> None:
         """Top-level method for loading data associated with Example instance.
@@ -393,7 +473,8 @@ class Example:
         for i in range(1, 9):
             cav = base + str(i)
             cav_columns = ['Time'] + [col for col in event_df.columns.values if cav in col]
-            out_file = os.path.join(self.get_event_path(compressed=False), "{}WFSharv.{}_{}.txt".format(cav, date, time))
+            out_file = os.path.join(self.get_event_path(compressed=False),
+                                    "{}WFSharv.{}_{}.txt".format(cav, date, time))
             if not os.path.exists(out_file):
                 event_df[cav_columns].to_csv(out_file, index=False, sep='\t')
 
@@ -422,7 +503,7 @@ class Example:
         if compressed:
             return os.path.exists(self.get_event_path(compressed=True))
         else:
-            return os.path.exists(self.get_event_path(compressed=False)) and\
+            return os.path.exists(self.get_event_path(compressed=False)) and \
                    len(os.listdir(self.get_event_path(compressed=False))) > 0
 
     def has_matching_labels(self, example: 'Example') -> bool:
@@ -565,3 +646,46 @@ class Example:
     def __str__(self) -> str:
         """Returns a short string representing this Example - only zone and datetime."""
         return f"<{self.event_zone} {self.event_datetime}>"
+
+
+class WindowedExample(Example):
+    """An extension of Example class that allows the caller to specify only a time-window of event_df be returned.
+
+    This window is based on the relative values in the Time column.  The standard time range is approximately
+    [-1500, 100], but this is variable depending on control system settings.  An Exception is raised at load time if the
+    specified time range is not a strict subset of the Examples Time column.
+    """
+
+    def __init__(self, zone: str, dt: datetime, cavity_label: str, fault_label: str, cavity_conf: float,
+                 fault_conf: float, label_source: str, start: float, end: float, data_dir: str = None):
+        """Construct an instance th will only store the required window upon a load_data() call.
+
+        Arguments:
+            start: The start of the time window.
+            end: The end of the time window.
+        """
+        super().__init__(zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir)
+
+        if not start < end:
+            raise ValueError(f"start ({start}) must be less than end ({end}).")
+
+        self.start = start
+        self.end = end
+
+    def load_data(self, verbose: bool = False) -> None:
+        """Load the fault event data and retain only the defined time window.
+
+        Arguments:
+            verbose: Should extra information be printed during operation
+
+        Raises:
+            RuntimeError: If the specified window of data is not available.
+        """
+        super().load_data(verbose)
+        t_min = self.event_df.Time.min()
+        t_max = self.event_df.Time.max()
+
+        if not (self.start >= t_min and self.end <= t_max):
+            raise RuntimeError(f"Requested window of [{self.start}, {self.end}], but event data is [{t_min}, {t_max}]")
+
+        self.event_df = self.event_df.query(f"Time >= {self.start} & Time <= {self.end}")
