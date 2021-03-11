@@ -1,17 +1,19 @@
 import datetime
+import math
 import os
 import unittest
 
 import pandas as pd
 import test
 from unittest import TestCase
-from rfwtools.example import Example
+from rfwtools.example import Example, WindowedExample, Factory, ExampleType
 from rfwtools.config import Config
 
+# A known good example available via the web service
 zone = '1L22'
 ts_fmt = "%m/%d/%Y, %H:%M:%S"
 dt = datetime.datetime.strptime("02/24/2019, 04:22:01", ts_fmt)
-cav_label = 4
+cav_label = "4"
 f_label = "Heat_Riser_Choke"
 
 # Prime the pump on the timestamp map.
@@ -106,7 +108,8 @@ class TestExample(TestCase):
                                      label_source="test",
                                      data_dir=os.path.join(test.test_data_dir, "compressed-example"))
         compress_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=True), compressed=True)
-        uncompressed_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=False), compressed=False)
+        uncompressed_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=False),
+                                                   compressed=False)
 
         # assert_frame_equal will raise if there is a problem and print out an error message
         pd._testing.assert_frame_equal(exp_df, compress_res)
@@ -166,6 +169,66 @@ class TestExample(TestCase):
 
         # Delete the cached data to put everything back to normal
         e.remove_event_df_from_disk()
+
+    def test_windowed_example(self):
+        start = -100
+        end = 100
+        wex = WindowedExample(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=math.nan,
+                              fault_conf=math.nan, label_source="test", start=start, end=end)
+        wex.load_data()
+
+        # Check that we got something after load
+        self.assertIsNotNone(wex.event_df)
+
+        t_min = wex.event_df.Time.min()
+        t_max = wex.event_df.Time.max()
+        self.assertAlmostEqual(start, t_min, 1)
+        self.assertAlmostEqual(end, t_max, 1)
+
+        # Check that we got some data
+        self.assertTrue(len(wex.event_df) > 10, "wex.event_df is unexpectedly small")
+
+        # Check that unloading works
+        wex.unload_data()
+        self.assertIsNone(wex.event_df, "unload_data failed to clear event_df")
+
+        # Check that load_data() raises if it can't provide the window you're looking for.
+        wex = WindowedExample(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=math.nan,
+                              fault_conf=math.nan, label_source="test", start=1000, end=2000)
+        with self.assertRaises(RuntimeError):
+            wex.load_data()
+
+    def test_factory(self):
+        # Test out no defaults
+        f = Factory()
+        ex = f.get_example(e_type=ExampleType.EXAMPLE, zone="1L24",
+                           dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
+                           cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test")
+
+        wex = f.get_example(e_type=ExampleType.WINDOWED_EXAMPLE, zone="1L24",
+                            dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
+                            cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
+                            start=-105, end=-5)
+
+        self.assertEqual(type(ex).__name__, "Example")
+        self.assertEqual(type(wex).__name__, "WindowedExample")
+
+        # Test out with defaults
+        f = Factory(e_type=ExampleType.EXAMPLE)
+        ex = f.get_example(zone="1L24", dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
+                           cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test")
+
+        f = Factory(e_type=ExampleType.WINDOWED_EXAMPLE, start=-105, end=-5)
+        wex = f.get_example(zone="1L24", dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
+                            cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test")
+
+        self.assertEqual(type(ex).__name__, "Example")
+        self.assertEqual(type(wex).__name__, "WindowedExample")
+
+        # Check that not supplying an e_type raises a ValueError
+        with self.assertRaises(ValueError):
+            f = Factory()
+            f.get_example()
 
     def check_data_on_disk(self, e):
         """Check that the event_df capture files were save to disk"""
