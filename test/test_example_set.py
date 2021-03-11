@@ -8,7 +8,7 @@ import pandas as pd
 
 from rfwtools.example_validator import ExampleValidator
 from rfwtools.example_set import ExampleSet
-from rfwtools.example import Example
+from rfwtools.example import Example, ExampleType, WindowedExample
 import test
 from rfwtools.config import Config
 
@@ -97,14 +97,14 @@ class TestExampleSet(TestCase):
     def test_process_label_files_with_excludes(self):
         excludes = ['0L04', '1L23']
         es = ExampleSet()
-        es.add_label_file_data(label_files=('test1.txt', 'test2.txt'), exclude_zones=excludes)
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'], exclude_zones=excludes)
         for z in es.get_example_df()["zone"]:
             for zone in excludes:
                 self.assertFalse(z == zone, "exclude: {}  event: {}\n".format(zone, z))
 
     def test_add_label_file_data(self):
         es = ExampleSet()
-        es.add_label_file_data(label_files=('test1.txt', 'test2.txt'))
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
 
         self.assertEqual(5, es.count_events())
         self.assertEqual(10, es.count_labels())
@@ -136,9 +136,16 @@ Number of mismatched labels: 6
 """
         self.assertEqual(exp_report, es.get_label_file_report())
 
+        # Do a simple test with a different IExample subclass
+        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'end': -400})
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
+        self.assertTrue(isinstance(es.get_example_df().loc[0, 'example'], WindowedExample),
+                        "Is not instance of WindowedExample")
+
+
     def test_remove_duplicate_and_mismatches(self):
         es = ExampleSet()
-        es.add_label_file_data(label_files=('test1.txt', 'test2.txt'))
+        es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
 
         # Make sure we have duplicates, etc. at this point
         self.assertTrue(es.count_duplicated_events() > 0, "Checking that duplicates DO exist")
@@ -173,7 +180,7 @@ Number of mismatched labels: 6
         es = ExampleSet()
 
         # This is using the larger label file
-        es.add_label_file_data(label_files=('test3.txt',))
+        es.add_label_file_data(label_files=['test3.txt'])
         es.remove_duplicates_and_mismatches()
         es.purge_invalid_examples(TestValidator(), progress=False, report=False)
 
@@ -191,6 +198,14 @@ Number of mismatched labels: 6
                                 end=datetime.strptime("2020-03-24", "%Y-%m-%d"))
 
         self.assertEqual(14, len(es.get_example_df()))
+
+        # Now try it with another type of IExample object - WindowedExample
+        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'end': -400})
+        es.add_web_service_data(begin=datetime.strptime("2020-03-23", "%Y-%m-%d"),
+                                end=datetime.strptime("2020-03-24", "%Y-%m-%d"))
+        self.assertEqual(14, len(es.get_example_df()))
+        self.assertTrue(isinstance(es.get_example_df().loc[0, 'example'], WindowedExample),
+                        "Is not instance of WindowedExample")
 
     def test_load_save_csv(self):
         # Test that we can load and save CSV files.
