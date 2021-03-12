@@ -69,6 +69,8 @@ from rfwtools.visualize import heatmap
 class ExampleSet:
     """A class for managing a collection of examples, including metadata about the collection of examples.
 
+    Each ExampleSet supports having only one type of IExample object, and each only supports one set of kwargs.
+
     This class has methods for building collections of examples from our standard label files or from the waveform
     browser webservice.  It also includes many methods for visualizing and reporting.
 
@@ -195,6 +197,14 @@ class ExampleSet:
         for col in req_cols:
             if col not in df.columns.to_list():
                 print(f"New DataFrame missing column '{col}'", file=sys.stderr)
+                return False
+
+        # Now that we know the df has an example column.  Check that the examples have the same type as defined for this
+        # ExampleSet.
+        if not skip_example:
+            df_e_type = df.example[0].get_example_type()
+            if self.e_type != df_e_type:
+                print(f"New DataFrame different ExampleType '{df_e_type}' from '{self.e_type}", file=sys.stderr)
                 return False
 
         # Check that the columns have the same dtype
