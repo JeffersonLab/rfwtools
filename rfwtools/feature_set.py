@@ -155,7 +155,11 @@ class FeatureSet(ExampleSet):
             self._req_columns = []
 
             # Make sure we don't have duplicate column names
-            self.metadata_columns = [x for x in (self.get_required_columns() + metadata_columns)]
+            m_uniq = []
+            for col in (self.get_required_columns() + metadata_columns):
+                if col not in m_uniq:
+                    m_uniq.append(col)
+            self.metadata_columns = m_uniq
 
             self._req_columns = metadata_columns
 
@@ -172,7 +176,7 @@ class FeatureSet(ExampleSet):
         else:
             return self.__pca_df.copy()
 
-    def update_example_df(self, df: pd.DataFrame, metadata_cols: List[str] = None) -> None:
+    def update_example_set(self, df: pd.DataFrame, metadata_cols: List[str] = None) -> None:
         """Update the _example_df and blanks other internal data derived from it.
 
         Arguments:

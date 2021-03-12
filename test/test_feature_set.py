@@ -142,6 +142,19 @@ class TestFeatureSet(TestCase):
         # Clean up the tmp CSV file
         os.unlink(os.path.join(test.tmp_data_dir, csv_file))
 
+    def test_update_example_set(self):
+        tsv_file = "test-feature_set.tsv"
+        fs = FeatureSet()
+        fs.load_csv(tsv_file, in_dir=test.test_data_dir, sep='\t')
+
+        # Add one column and include all of the "mandatory" columns in there.  They should still only show up once.
+        m_cols = fs.metadata_columns + ['junk']
+        df = fs.get_example_df()
+        df['junk'] = ['junker'] * len(df)
+        fs.update_example_set(df, metadata_cols=m_cols)
+
+        self.assertListEqual(fs.metadata_columns, m_cols)
+
 
 if __name__ == '__main__':
     unittest.main()
