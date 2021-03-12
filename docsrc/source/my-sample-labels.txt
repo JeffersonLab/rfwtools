@@ -1,0 +1,11 @@
+zone	cavity	cav#	fault	time
+1L25	4	44	Microphonics	2020/03/10 01:08:41
+2L24	5	77	Controls Fault	2020/03/10 01:42:03
+1L25	5	45	Microphonics	2020/03/10 02:50:07
+2L26	8	96	E_Quench	2020/03/10 02:58:13
+1L25	5	45	Microphonics	2020/03/10 04:55:21
+1L22	4	20	Quench_3ms	2020/03/10 05:06:13
+1L25	5	45	Microphonics	2020/03/10 07:35:32
+2L22	0	57	Multi Cav turn off	2020/03/10 07:59:49
+2L23	0	65	Multi Cav turn off	2020/03/10 07:59:56
+2L24	0	73	Multi Cav turn off	2020/03/10 08:00:03
