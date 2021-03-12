@@ -22,3 +22,5 @@
 
 # Volatile test data
 /test/test-data/tmp/
+/docsrc/build/
+/docsrc/source/_autosummary/
