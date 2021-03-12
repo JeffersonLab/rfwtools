@@ -1,6 +1,6 @@
 from unittest import TestCase
-from rfwtools.example_validator import ExampleValidator
-from rfwtools.example import Example
+from rfwtools.example_validator import ExampleValidator, WindowedExampleValidator
+from rfwtools.example import Example, WindowedExample
 from datetime import datetime
 
 import os
@@ -29,7 +29,7 @@ class TestExampleValidator(TestCase):
                                data_dir=os.path.join(data_dir, "bad-cavity-mode"))
 
     # Examples of the normal data file we will be working with
-    good_example = Example(zone="1L25", dt=datetime.strptime("2018_10_05 044555.3", ts_fmt), cavity_label=None,
+    good_example = Example(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
                            fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                            data_dir=os.path.join(data_dir, "good-example"))
     good_meta_example = Example(zone="1L25", dt=datetime.strptime("2018_10_05 044555.3", ts_fmt), cavity_label=None,
@@ -107,7 +107,7 @@ class TestExampleValidator(TestCase):
         # This should work
         ev = ExampleValidator()
         ev.set_example(TestExampleValidator.good_example)
-        ev.validate_waveform_times(step_size=0.05, delta_max=0.0011)
+        ev.validate_waveform_times(step_size=0.2, delta_max=0.012)
 
         # This should work
         ev.set_example(TestExampleValidator.good_meta_example)
@@ -131,3 +131,16 @@ class TestExampleValidator(TestCase):
         # The time for this should have at least one bad control mode and will raise and exception
         ev.set_example(TestExampleValidator.bad_mode_example)
         self.assertRaises(ValueError, ev.validate_cavity_modes)
+
+    def test_validate_data(self):
+        # Test overall validation of Examples
+        ev = ExampleValidator()
+        ev.set_example(TestExampleValidator.good_example)
+        ev.validate_data()
+
+        ex = WindowedExample(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
+                             fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
+                             data_dir=os.path.join(data_dir, "good-example"), start=-200, end=50)
+        wev = WindowedExampleValidator()
+        wev.set_example(ex)
+        wev.validate_data()
