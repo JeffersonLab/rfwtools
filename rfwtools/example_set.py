@@ -530,7 +530,7 @@ Number of mismatched labels: {num_mismatched_labels}
         # Add the new data to the bottom of the internal DataFrame, and add it to the dict of included label files
         self._example_df = pd.concat((self._example_df, df), ignore_index=True)
 
-    def _create_dataframe_from_web_query(self, server: str = None, begin: datetime = None, end: datetime = None,
+    def _create_dataframe_from_web_query(self, begin: datetime, end: datetime, server: str = None,
                                          models: List[str] = None) -> pd.DataFrame:
         """This creates a ExampleSet consistent DataFrame based on the responses of the web query.  Labeled faults only.
 
