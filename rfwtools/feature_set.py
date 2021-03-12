@@ -137,14 +137,26 @@ class FeatureSet(ExampleSet):
         super().load_csv(filename=filename, in_dir=in_dir, sep=sep)
 
     def _update_metadata_columns(self, metadata_columns: List[str]) -> None:
-        """This updates the metadata columns and alters other related data structures."""
+        """This updates the metadata columns and alters other related data structures.
+
+        self.metadata_columns always include ExampleSet._mandatory_columns.  Does deduplication should you include those
+        as well.
+
+        Arguments:
+            metadata_columns: A list of metadata columns.
+        """
         if metadata_columns is None:
             # Use the required columns of the parent ExampleSet.  Since no extra required columns we can leave
             # self._req_columns alone
             self.metadata_columns = self.get_required_columns()
         else:
             # Here we're assuming that all of the metadata columns should be required
-            self.metadata_columns = self.get_required_columns() + metadata_columns
+            # This would have the old metadata columns in it, and it is returned by get_required_columns().
+            self._req_columns = []
+
+            # Make sure we don't have duplicate column names
+            self.metadata_columns = [x for x in (self.get_required_columns() + metadata_columns)]
+
             self._req_columns = metadata_columns
 
     def get_pca_df(self) -> pd.DataFrame:
@@ -160,16 +172,22 @@ class FeatureSet(ExampleSet):
         else:
             return self.__pca_df.copy()
 
-    def update_example_df(self, df: pd.DataFrame) -> None:
+    def update_example_df(self, df: pd.DataFrame, metadata_cols: List[str] = None) -> None:
         """Update the _example_df and blanks other internal data derived from it.
 
         Arguments:
             df:
                 A DataFrame containing an example per row with additional feature information.  Must be valid for this
                 FeatureSet.
+            metadata_cols:
+                A new list of metadata columns for df
         """
+        if metadata_cols is not None:
+            self._update_metadata_columns(metadata_columns=metadata_cols)
+
         super().update_example_set(df)
         self.__pca_df = None
+        self.pca = None
 
     def do_pca_reduction(self, metadata_cols: List[str] = None, report: bool = True, n_components: float = 3,
                          **kwargs) -> None:
