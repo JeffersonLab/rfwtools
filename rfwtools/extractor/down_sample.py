@@ -1,4 +1,4 @@
-"""This module provides downsampling-based feature extraction tools.
+"""This module provides down sampling-based feature extraction tools.
 
 Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can't be run
 externally.
