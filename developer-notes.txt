@@ -14,7 +14,7 @@ pip3 install -r requirements_dev.txt
 # Now you can build wheels and source distributions, run unit tests, and upload to the test PyPI or PyPI.  One thing
 # I like to do is create a project in a different directory and then install this package in editable mode.  Instead
 # of actually installing it, pip creates a symlink back to your package directory and your source changes are reflected
-# in the downstream project without reinstalling.
+# in the downstream project without reinstalling.  You do have to re-import packages or restart your interpreter though.
 mkdir /some/other/my_project
 cd /some/other/my_project
 python -m venv venv
@@ -34,13 +34,20 @@ python3 -m unittest
 # To build distributions.  You may need to remove directory content if rebuilding
 python setup.py sdist bdist_wheel
 
-# To upload to the test PyPI repo.
+# To upload to the test PyPI repo.  You may need to add the --cert /etc/pki/tls/cert.pem option for SSL problems.
 edit setup.cfg with latest info
 twine upload --repository testpypi dist/*
 
 # To upload to the production PyPI repo
 edit setup.cfg with latest info
 twine upload --repository pypi dist/*
+
+# The distribution package is called rfwtools_jlab, but the import package root is rfwtools
+# To install from production PyPI
+pip install rfwtools_jlab
+
+# To install from Test PyPI
+pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ rfwtools_jlab
 
 ## Some other comments
 requirements.txt are the versions that were used from within my IDE and with my IDE unit test runner.  This is the set
