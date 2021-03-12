@@ -21,6 +21,8 @@ import logging
 import multiprocessing
 import os
 import pickle
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -121,8 +123,14 @@ class DataSet:
                 self.example_set_model = ExampleSet()
 
             # Query the web service for the corresponding date range of fault events and generate an ExampleSet
-            dt = self.example_set.get_example_df()['dtime']
-            self.example_set_model.add_web_service_data(begin=dt.min(), end=dt.max())
+            if len(self.example_set.get_example_df()) != 0:
+                # Go get the data from the webservice
+                try:
+                    dt = self.example_set.get_example_df()['dtime']
+                    self.example_set_model.add_web_service_data(begin=dt.min(), end=dt.max())
+                except Exception as exc:
+                    print("Error downloading model data.", file=sys.stderr)
+                    print(exc, file=sys.stderr)
 
     def get_example_array(self) -> np.ndarray:
         """Convenience function for getting an array containing the Example objects held in self.example_set
