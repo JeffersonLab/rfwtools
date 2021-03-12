@@ -1,0 +1,28 @@
+﻿rfwtools.timestamp.TimestampMapper
+==================================
+
+.. currentmodule:: rfwtools.timestamp
+
+.. autoclass:: TimestampMapper
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TimestampMapper.__init__
+      ~TimestampMapper.get_full_timestamp
+      ~TimestampMapper.save_mapper
+      ~TimestampMapper.update_timestamp_map
+   
+   
+
+   
+   
+   

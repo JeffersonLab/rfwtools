@@ -1,0 +1,52 @@
+﻿rfwtools.example\_set.ExampleSet
+================================
+
+.. currentmodule:: rfwtools.example_set
+
+.. autoclass:: ExampleSet
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ExampleSet.__init__
+      ~ExampleSet.add_label_file_data
+      ~ExampleSet.add_web_service_data
+      ~ExampleSet.count_duplicated_events
+      ~ExampleSet.count_duplicated_events_with_mismatched_labels
+      ~ExampleSet.count_duplicated_labels
+      ~ExampleSet.count_events
+      ~ExampleSet.count_labels
+      ~ExampleSet.count_mismatched_labels
+      ~ExampleSet.count_unduplicated_events
+      ~ExampleSet.display_examples_by_weekday_barplot
+      ~ExampleSet.display_frequency_barplot
+      ~ExampleSet.display_summary_label_heatmap
+      ~ExampleSet.display_timeline
+      ~ExampleSet.display_zone_label_heatmap
+      ~ExampleSet.get_classification_report
+      ~ExampleSet.get_duplicated_labels
+      ~ExampleSet.get_events_with_mismatched_labels
+      ~ExampleSet.get_example_df
+      ~ExampleSet.get_label_file_report
+      ~ExampleSet.get_required_columns
+      ~ExampleSet.get_unduplicated_events
+      ~ExampleSet.has_required_columns
+      ~ExampleSet.load_csv
+      ~ExampleSet.purge_invalid_examples
+      ~ExampleSet.remove_duplicates_and_mismatches
+      ~ExampleSet.save_csv
+      ~ExampleSet.update_example_set
+   
+   
+
+   
+   
+   

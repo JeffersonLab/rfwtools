@@ -1,0 +1,31 @@
+rfwtools.example\_set
+=====================
+
+.. automodule:: rfwtools.example_set
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      ExampleSet
+   
+   
+
+   
+   
+   
+
+
+

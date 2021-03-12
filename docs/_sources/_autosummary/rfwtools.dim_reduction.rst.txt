@@ -1,0 +1,33 @@
+rfwtools.dim\_reduction
+=======================
+
+.. automodule:: rfwtools.dim_reduction
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst
+   :recursive:
+
+   rfwtools.dim_reduction.pca
+   rfwtools.dim_reduction.tsne
+

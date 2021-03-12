@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rfwtools.extractor.autoregressive &mdash; rfwtools 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> rfwtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/rfwtools.html">rfwtools</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rfwtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>rfwtools.extractor.autoregressive</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rfwtools.extractor.autoregressive</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides autogressive feature extraction tools.</span>
+
+<span class="sd">Typically, these will be used by DataSet.produce_feature_set().  However there is no reason why these can&#39;t be run</span>
+<span class="sd">externally.</span>
+
+<span class="sd">Basic Usage Example:</span>
+<span class="sd">::</span>
+
+<span class="sd">    from rfwtools.data_set import DataSet</span>
+<span class="sd">    from rfwtools.extractor.autoregressive import autoregressive_extractor</span>
+
+<span class="sd">    # Setup a DataSet object and get some example data to work with</span>
+<span class="sd">    ds = DataSet()</span>
+<span class="sd">    ds.load_example_set_csv(&quot;my_example_set.csv&quot;)</span>
+
+<span class="sd">    # Run on one example with defaults</span>
+<span class="sd">    autoregressive_extractor(ds.example_set.loc[0, &#39;example])</span>
+<span class="sd">    # Run on one example with only 2 signals being processed</span>
+<span class="sd">    autoregressive_extractor(ds.example_set.loc[0, &#39;example], signals=[&#39;1_GMES&#39;, &#39;1_PMES&#39;])</span>
+<span class="sd">    # Run on one example, but only include values before the fault on set.</span>
+<span class="sd">    autoregressive_extractor(ds.example_set.loc[0, &#39;example], query=&quot;Time &lt; 0&quot;)</span>
+
+<span class="sd">    # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.</span>
+<span class="sd">    ds.produce_feature_set(autoregressive_extractor, query=&quot;Time &lt; 0&quot;)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.ar_model</span> <span class="kn">import</span> <span class="n">AutoReg</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span>
+<span class="kn">from</span> <span class="nn">rfwtools.utils</span> <span class="kn">import</span> <span class="n">get_signal_names</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_example_data</span>
+<span class="kn">from</span> <span class="nn">..example</span> <span class="kn">import</span> <span class="n">Example</span>
+
+
+<div class="viewcode-block" id="autoregressive_extractor"><a class="viewcode-back" href="../../../_autosummary/rfwtools.extractor.autoregressive.autoregressive_extractor.html#rfwtools.extractor.autoregressive.autoregressive_extractor">[docs]</a><span class="k">def</span> <span class="nf">autoregressive_extractor</span><span class="p">(</span><span class="n">ex</span><span class="p">:</span> <span class="n">Example</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">signals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Uses statsmodels to generate autoregressive model of each waveform.  AR coefficients are returned as features.</span>
+
+<span class="sd">    This function handles loading and unloading the Example&#39;s data.</span>
+
+<span class="sd">    Note: these features have historically been used for both cavity and fault type model training.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        ex:</span>
+<span class="sd">            The example for which we are generating features</span>
+<span class="sd">        normalize:</span>
+<span class="sd">            Should each waveform be normalized prior to autoregressive model fitting</span>
+<span class="sd">        max_lag:</span>
+<span class="sd">            The number of AR parameters to fit (plus one for a bias/constant term)</span>
+<span class="sd">        signals:</span>
+<span class="sd">            The list of signals to model (e.g. [&quot;1_GMES&quot;, ...].  If None a default (1-8, GMES, CASK, CRFP, DETA2) set is</span>
+<span class="sd">             used.</span>
+<span class="sd">        query:</span>
+<span class="sd">            Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. &quot;Time &lt;= 0&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A DataFrame with a single row containing the feature set for the give example.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get the data from the Example</span>
+    <span class="n">event_df</span> <span class="o">=</span> <span class="n">get_example_data</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># List of signals for feature extraction</span>
+    <span class="n">sel_col</span> <span class="o">=</span> <span class="n">signals</span>
+    <span class="k">if</span> <span class="n">signals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sel_col</span> <span class="o">=</span> <span class="n">get_signal_names</span><span class="p">(</span><span class="n">cavities</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="s1">&#39;6&#39;</span><span class="p">,</span> <span class="s1">&#39;7&#39;</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">],</span>
+                                   <span class="n">waveforms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GMES&quot;</span><span class="p">,</span> <span class="s2">&quot;GASK&quot;</span><span class="p">,</span> <span class="s2">&quot;CRFP&quot;</span><span class="p">,</span> <span class="s2">&quot;DETA2&quot;</span><span class="p">])</span>
+
+    <span class="c1"># We only need to create this once.  Every time we &quot;fit_transform&quot; we update the values.</span>
+    <span class="n">signal_scaler</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">signal_scaler</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_std</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Feature extraction</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">coefficients</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">colName</span> <span class="ow">in</span> <span class="n">sel_col</span><span class="p">:</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">event_df</span><span class="p">[</span><span class="n">colName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="c1"># Process the signal</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">__process_signal</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">max_lag</span><span class="o">=</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="n">signal_scaler</span><span class="p">)</span>
+
+        <span class="c1"># Accumulate parameters from each signal to obtain the feature vector.</span>
+        <span class="k">if</span> <span class="n">coefficients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">parameters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Collect feature names</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="n">colName</span> <span class="o">+</span> <span class="s1">&#39;_AR_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># transform to make the df a column vector</span>
+    <span class="n">feature_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># Add feature names as df column names</span>
+    <span class="n">feature_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">feature_names</span>
+
+    <span class="k">return</span> <span class="n">feature_df</span></div>
+
+
+<div class="viewcode-block" id="autoregressive_extractor_faulted_cavity"><a class="viewcode-back" href="../../../_autosummary/rfwtools.extractor.autoregressive.autoregressive_extractor_faulted_cavity.html#rfwtools.extractor.autoregressive.autoregressive_extractor_faulted_cavity">[docs]</a><span class="k">def</span> <span class="nf">autoregressive_extractor_faulted_cavity</span><span class="p">(</span><span class="n">ex</span><span class="p">:</span> <span class="n">Example</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                                            <span class="n">waveforms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Generates AR features for waveforms of the cavity labeled as faulted.</span>
+
+<span class="sd">    This function handles loading and unloading the Example&#39;s data.  No data after the fault is considered.  Returns</span>
+<span class="sd">    None if cavity_label is &#39;0&#39; (Multi Cav tur off) since only a single cavity is to be considered.</span>
+
+<span class="sd">    Note: these features have historically been used for visualizations as they are faster to computer and have a lower</span>
+<span class="sd">          dimensionality.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        ex:</span>
+<span class="sd">            The example for which we are generating features</span>
+<span class="sd">        normalize:</span>
+<span class="sd">            Should each waveform be normalized prior to autoregressive model fitting</span>
+<span class="sd">        max_lag:</span>
+<span class="sd">            The number of AR parameters to fit (plus one for a bias/constant term)</span>
+<span class="sd">        waveforms:</span>
+<span class="sd">            The list of waveforms to model (e.g. [&quot;GMES&quot;, ...].  If None a default (GMES, CASK, CRFP, DETA2) set is</span>
+<span class="sd">            used.  Note: the faulted cavity (cavity_label) is the only cavity used.</span>
+<span class="sd">        query:</span>
+<span class="sd">            Argument passed to the ex.event_df to filter data prior to feature extraction, e.g. &quot;Time &lt;= 0&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A DataFrame with a single row containing the feature set for the give example.  None is returned if cavity_label</span>
+<span class="sd">        is &#39;0&#39; as no single responsible cavity is identified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">ex</span><span class="o">.</span><span class="n">cavity_label</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Get the data from the Example</span>
+    <span class="n">event_df</span> <span class="o">=</span> <span class="n">get_example_data</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+    <span class="c1"># List of signals for feature extraction</span>
+    <span class="n">sel_col</span> <span class="o">=</span> <span class="n">get_signal_names</span><span class="p">(</span><span class="n">cavities</span><span class="o">=</span><span class="n">ex</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GMES&quot;</span><span class="p">,</span> <span class="s2">&quot;GASK&quot;</span><span class="p">,</span> <span class="s2">&quot;CRFP&quot;</span><span class="p">,</span> <span class="s2">&quot;DETA2&quot;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">waveforms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sel_col</span> <span class="o">=</span> <span class="n">get_signal_names</span><span class="p">(</span><span class="n">cavities</span><span class="o">=</span><span class="n">ex</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">,</span> <span class="n">waveforms</span><span class="o">=</span><span class="n">waveforms</span><span class="p">)</span>
+
+    <span class="c1"># We only need to create this once.  Every time we &quot;fit_transform&quot; we update the values.</span>
+    <span class="n">signal_scaler</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">signal_scaler</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_std</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Feature extraction</span>
+    <span class="n">feature_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">coefficients</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">colName</span> <span class="ow">in</span> <span class="n">sel_col</span><span class="p">:</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">event_df</span><span class="p">[</span><span class="n">colName</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+        <span class="c1"># Process the signal to get the AR coefficients</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">__process_signal</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">max_lag</span><span class="o">=</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">scaler</span><span class="o">=</span><span class="n">signal_scaler</span><span class="p">)</span>
+
+        <span class="c1"># Accumulate parameters from each signal to obtain the feature vector.</span>
+        <span class="k">if</span> <span class="n">coefficients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">parameters</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Collect feature names - Make sure to strip of the cavity label since this has only the cavity that faulted</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="n">feature_names</span> <span class="o">+</span> <span class="p">[</span><span class="n">colName</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="o">+</span> <span class="s1">&#39;_AR_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+
+    <span class="c1"># transform to make the df a column vector</span>
+    <span class="n">feature_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">coefficients</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># Add feature names as df column names</span>
+    <span class="n">feature_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">feature_names</span>
+
+    <span class="k">return</span> <span class="n">feature_df</span></div>
+
+
+<span class="k">def</span> <span class="nf">__process_signal</span><span class="p">(</span><span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">max_lag</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">scaler</span><span class="p">:</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Internal function for calculating AR features of a single signal</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        signal: The values of the signal to be fitted by AR coefficients</span>
+<span class="sd">        max_lag: The number of AR parameters to fit (plus one for a bias/constant term)</span>
+<span class="sd">        scaler: Scaler used to standardized the signal.  If None, no scaling is performed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A ndarray of the fitted autoregression coefficients.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># if the signal is constant values, features are zeros</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+
+        <span class="c1"># AR model fitting - using old_names=True to suppress warning about future deprecation of kwargs for AutoReg</span>
+        <span class="c1"># after v0.12</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">AutoReg</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="n">max_lag</span><span class="p">,</span> <span class="n">trend</span><span class="o">=</span><span class="s1">&#39;ct&#39;</span><span class="p">,</span> <span class="n">old_names</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">model_fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+        <span class="c1"># If AR model fits the signal with less than maxLag + 1 parameters, pad the rest with zeros</span>
+        <span class="c1"># If AR model uses more than maxLag + 1, choose the first maxLag + 1 parameters as features</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">model_fit</span><span class="o">.</span><span class="n">params</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">model_fit</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">model_fit</span><span class="o">.</span><span class="n">params</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">model_fit</span><span class="o">.</span><span class="n">params</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">model_fit</span><span class="o">.</span><span class="n">params</span><span class="p">[:</span> <span class="n">max_lag</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">model_fit</span><span class="o">.</span><span class="n">params</span>
+
+    <span class="k">return</span> <span class="n">parameters</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adam Carpenter.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

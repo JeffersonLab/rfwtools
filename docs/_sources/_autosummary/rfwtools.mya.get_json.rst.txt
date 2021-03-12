@@ -1,0 +1,6 @@
+rfwtools.mya.get\_json
+======================
+
+.. currentmodule:: rfwtools.mya
+
+.. autofunction:: get_json

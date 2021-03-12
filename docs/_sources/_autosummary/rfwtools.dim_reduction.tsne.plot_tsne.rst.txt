@@ -1,0 +1,6 @@
+rfwtools.dim\_reduction.tsne.plot\_tsne
+=======================================
+
+.. currentmodule:: rfwtools.dim_reduction.tsne
+
+.. autofunction:: plot_tsne

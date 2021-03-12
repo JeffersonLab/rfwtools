@@ -1,0 +1,6 @@
+rfwtools.visualize.heatmap.show\_fault\_cavity\_count\_by\_zone
+===============================================================
+
+.. currentmodule:: rfwtools.visualize.heatmap
+
+.. autofunction:: show_fault_cavity_count_by_zone

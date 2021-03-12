@@ -1,0 +1,38 @@
+﻿rfwtools.data\_set.DataSet
+==========================
+
+.. currentmodule:: rfwtools.data_set
+
+.. autoclass:: DataSet
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DataSet.__init__
+      ~DataSet.get_example_array
+      ~DataSet.load
+      ~DataSet.load_example_set
+      ~DataSet.load_example_set_csv
+      ~DataSet.load_feature_set
+      ~DataSet.load_feature_set_csv
+      ~DataSet.produce_example_set
+      ~DataSet.produce_feature_set
+      ~DataSet.save
+      ~DataSet.save_example_set
+      ~DataSet.save_example_set_csv
+      ~DataSet.save_feature_set
+      ~DataSet.save_feature_set_csv
+   
+   
+
+   
+   
+   

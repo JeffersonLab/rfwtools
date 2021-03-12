@@ -1,0 +1,6 @@
+rfwtools.visualize.timeline.swarm\_timeline
+===========================================
+
+.. currentmodule:: rfwtools.visualize.timeline
+
+.. autofunction:: swarm_timeline

@@ -1,0 +1,6 @@
+rfwtools.dim\_reduction.pca.do\_pca\_reduction
+==============================================
+
+.. currentmodule:: rfwtools.dim_reduction.pca
+
+.. autofunction:: do_pca_reduction

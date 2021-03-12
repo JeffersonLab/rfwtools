@@ -1,0 +1,6 @@
+rfwtools.visualize.scatterplot.scatterplot
+==========================================
+
+.. currentmodule:: rfwtools.visualize.scatterplot
+
+.. autofunction:: scatterplot

@@ -1,0 +1,6 @@
+rfwtools.extractor.utils.get\_example\_data
+===========================================
+
+.. currentmodule:: rfwtools.extractor.utils
+
+.. autofunction:: get_example_data

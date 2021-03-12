@@ -1,0 +1,35 @@
+﻿rfwtools.network.SSLContextAdapter
+==================================
+
+.. currentmodule:: rfwtools.network
+
+.. autoclass:: SSLContextAdapter
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~SSLContextAdapter.__init__
+      ~SSLContextAdapter.add_headers
+      ~SSLContextAdapter.build_response
+      ~SSLContextAdapter.cert_verify
+      ~SSLContextAdapter.close
+      ~SSLContextAdapter.get_connection
+      ~SSLContextAdapter.init_poolmanager
+      ~SSLContextAdapter.proxy_headers
+      ~SSLContextAdapter.proxy_manager_for
+      ~SSLContextAdapter.request_url
+      ~SSLContextAdapter.send
+   
+   
+
+   
+   
+   

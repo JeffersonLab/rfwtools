@@ -1,0 +1,6 @@
+rfwtools.extractor.tsf.tsfresh\_extractor\_faulted\_cavity
+==========================================================
+
+.. currentmodule:: rfwtools.extractor.tsf
+
+.. autofunction:: tsfresh_extractor_faulted_cavity

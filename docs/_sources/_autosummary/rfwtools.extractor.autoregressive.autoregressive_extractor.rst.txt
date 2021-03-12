@@ -1,0 +1,6 @@
+rfwtools.extractor.autoregressive.autoregressive\_extractor
+===========================================================
+
+.. currentmodule:: rfwtools.extractor.autoregressive
+
+.. autofunction:: autoregressive_extractor

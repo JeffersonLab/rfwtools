@@ -1,0 +1,6 @@
+rfwtools.timestamp.is\_datetime\_in\_range
+==========================================
+
+.. currentmodule:: rfwtools.timestamp
+
+.. autofunction:: is_datetime_in_range

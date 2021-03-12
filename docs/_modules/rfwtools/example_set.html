@@ -1,0 +1,1327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rfwtools.example_set &mdash; rfwtools 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rfwtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/rfwtools.html">rfwtools</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rfwtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rfwtools.example_set</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rfwtools.example_set</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This package is for managing a collection of Examples.</span>
+
+<span class="sd">ExampleSet objects are typically created by a DataSet, but may be created directly.</span>
+
+<span class="sd">Basic Usage Examples:</span>
+
+<span class="sd">Start by saving this data in my-sample-labels.txt in the Config().label_dir directory (defaults to ./data/labels/).</span>
+<span class="sd">**THESE FIELDS SHOULD BE TAB SEPARATED.  DOCUMENTATION SYSTEM INSISTS ON CONVERTING THEM TO SPACES.  PLEASE FIX IF YOU</span>
+<span class="sd">TRY THIS EXAMPLE ON YOUR OWN**</span>
+<span class="sd">::</span>
+
+<span class="sd">    zone	cavity	cav#	fault	time</span>
+<span class="sd">    1L25	4	44	Microphonics	2020/03/10 01:08:41</span>
+<span class="sd">    2L24	5	77	Controls Fault	2020/03/10 01:42:03</span>
+<span class="sd">    1L25	5	45	Microphonics	2020/03/10 02:50:07</span>
+<span class="sd">    2L26	8	96	E_Quench	2020/03/10 02:58:13</span>
+<span class="sd">    1L25	5	45	Microphonics	2020/03/10 04:55:21</span>
+<span class="sd">    1L22	4	20	Quench_3ms	2020/03/10 05:06:13</span>
+<span class="sd">    1L25	5	45	Microphonics	2020/03/10 07:35:32</span>
+<span class="sd">    2L22	0	57	Multi Cav turn off	2020/03/10 07:59:49</span>
+<span class="sd">    2L23	0	65	Multi Cav turn off	2020/03/10 07:59:56</span>
+<span class="sd">    2L24	0	73	Multi Cav turn off	2020/03/10 08:00:03</span>
+
+<span class="sd">Creating from scratch.  This assumes you have label files in Config().label_dir, and will save a CSV file to</span>
+<span class="sd">Config().output_dir (defaults to ./processed-output/)</span>
+<span class="sd">::</span>
+
+<span class="sd">    from rfwtools.example_set import ExampleSet</span>
+<span class="sd">    from rfwtools.example_validator import ExampleValidator</span>
+<span class="sd">    es = ExampleSet()</span>
+<span class="sd">    es.add_label_file_data(label_files=[&#39;my-sample-labels.txt&#39;])</span>
+<span class="sd">    es.get_label_file_report()</span>
+<span class="sd">    es.remove_duplicates_and_mismatches()</span>
+<span class="sd">    es.purge_invalid_examples(ExampleValidator())</span>
+<span class="sd">    es.save_csv(&quot;my_example_set.csv&quot;)</span>
+
+<span class="sd">Reporting and Visualization.  This assumes that you have created and saved an ExampleSet as in the example above.</span>
+<span class="sd">::</span>
+
+<span class="sd">    from rfwtools.example_set import ExampleSet</span>
+<span class="sd">    es = ExampleSet()</span>
+<span class="sd">    es.load_csv(&quot;my_example_set.csv&quot;)</span>
+<span class="sd">    es.display_frequency_barplot(x=&#39;zone&#39;, color_by=&#39;cavity_label&#39;)</span>
+<span class="sd">    es.display_zone_label_heatmap(zones=[&#39;1L22&#39;, &#39;1L23&#39;, &#39;1L24&#39;, &#39;1L25&#39;, &#39;1L26&#39;])</span>
+<span class="sd">    es.display_summary_label_heatmap(title=&#39;2L22 7AM Summary&#39;,</span>
+<span class="sd">                                 query = &#39;zone==&quot;2L22&quot; &amp; dtime &lt; &quot;2020-03-10 08:00:00&quot; &amp; dtime &gt; &quot;2020-03-10 07:00:00&quot;&#39;)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">classification_report</span>
+<span class="kn">import</span> <span class="nn">tzlocal</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">rfwtools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">rfwtools.config</span> <span class="kn">import</span> <span class="n">Config</span>
+<span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">ExampleType</span><span class="p">,</span> <span class="n">Factory</span><span class="p">,</span> <span class="n">IExample</span>
+<span class="kn">from</span> <span class="nn">rfwtools.example_validator</span> <span class="kn">import</span> <span class="n">ExampleValidator</span>
+<span class="kn">from</span> <span class="nn">rfwtools.timestamp</span> <span class="kn">import</span> <span class="n">is_datetime_in_range</span><span class="p">,</span> <span class="n">TimestampMapper</span>
+<span class="kn">from</span> <span class="nn">rfwtools.visualize.timeline</span> <span class="kn">import</span> <span class="n">swarm_timeline</span>
+<span class="kn">from</span> <span class="nn">rfwtools.visualize</span> <span class="kn">import</span> <span class="n">heatmap</span>
+
+
+<div class="viewcode-block" id="ExampleSet"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet">[docs]</a><span class="k">class</span> <span class="nc">ExampleSet</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class for managing a collection of examples, including metadata about the collection of examples.</span>
+
+<span class="sd">    Each ExampleSet supports having only one type of IExample object, and each only supports one set of kwargs.</span>
+
+<span class="sd">    This class has methods for building collections of examples from our standard label files or from the waveform</span>
+<span class="sd">    browser webservice.  It also includes many methods for visualizing and reporting.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        known_zones:</span>
+<span class="sd">            A list of strings identifying the minimum set of zone categories to be included in the categorical.  The</span>
+<span class="sd">            class version is the default set.  The instance version is the known to that instance.</span>
+<span class="sd">        known_cavity_labels:</span>
+<span class="sd">            A list of strings identifying the minimum set of cavity label categories to be included in the categorical.</span>
+<span class="sd">            The class version is the default set.  The instance version is the known to that instance.</span>
+<span class="sd">        known_fault_labels:</span>
+<span class="sd">            A list of strings identifying the minimum set of fault label categories to be included in the categorical.</span>
+<span class="sd">            The class version is the default set.  The instance version is the known to that instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: The expected fault levels as of Dec 2020.  New faults may appear over time, but this is a baseline.</span>
+    <span class="n">_known_zones</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0L04&#39;</span><span class="p">,</span> <span class="s1">&#39;1L07&#39;</span><span class="p">,</span> <span class="s1">&#39;1L22&#39;</span><span class="p">,</span> <span class="s1">&#39;1L23&#39;</span><span class="p">,</span> <span class="s1">&#39;1L24&#39;</span><span class="p">,</span> <span class="s1">&#39;1L25&#39;</span><span class="p">,</span> <span class="s1">&#39;1L26&#39;</span><span class="p">,</span> <span class="s1">&#39;2L22&#39;</span><span class="p">,</span> <span class="s1">&#39;2L23&#39;</span><span class="p">,</span> <span class="s1">&#39;2L24&#39;</span><span class="p">,</span> <span class="s1">&#39;2L25&#39;</span><span class="p">,</span> <span class="s1">&#39;2L26&#39;</span><span class="p">]</span>
+    <span class="n">_known_cavity_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span><span class="p">,</span> <span class="s1">&#39;4&#39;</span><span class="p">,</span> <span class="s1">&#39;5&#39;</span><span class="p">,</span> <span class="s1">&#39;6&#39;</span><span class="p">,</span> <span class="s1">&#39;7&#39;</span><span class="p">,</span> <span class="s1">&#39;8&#39;</span><span class="p">]</span>
+    <span class="n">_known_fault_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Single Cav Turn off&#39;</span><span class="p">,</span> <span class="s1">&#39;Multi Cav turn off&#39;</span><span class="p">,</span> <span class="s1">&#39;E_Quench&#39;</span><span class="p">,</span> <span class="s1">&#39;Quench_3ms&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;Quench_100ms&#39;</span><span class="p">,</span> <span class="s1">&#39;Microphonics&#39;</span><span class="p">,</span> <span class="s1">&#39;Controls Fault&#39;</span><span class="p">,</span> <span class="s1">&#39;Heat Riser Choke&#39;</span><span class="p">,</span> <span class="s1">&#39;Unknown&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Expected column names - others may exist, but these are what are required no matter.</span>
+    <span class="n">__mandatory_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">,</span> <span class="s1">&#39;cavity_label&#39;</span><span class="p">,</span> <span class="s1">&#39;fault_label&#39;</span><span class="p">,</span> <span class="s1">&#39;cavity_conf&#39;</span><span class="p">,</span> <span class="s1">&#39;fault_conf&#39;</span><span class="p">,</span> <span class="s1">&#39;example&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;label_source&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ExampleSet.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_type</span><span class="p">:</span> <span class="n">ExampleType</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">EXAMPLE</span><span class="p">,</span> <span class="n">example_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="n">known_zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">known_cavity_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">known_fault_labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">req_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance of an ExampleSet.  Optionally override the default levels for zones and labels.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            e_type:</span>
+<span class="sd">                The type of example that should be created within this ExampleSet</span>
+<span class="sd">            example_kwargs:</span>
+<span class="sd">                A dictionary of keyword arguments that will be passed to every IExample object constructed.</span>
+<span class="sd">            known_zones:</span>
+<span class="sd">                A list of strings identifying the minimum set of zone categories to be included in the categorical.</span>
+<span class="sd">            known_cavity_labels:</span>
+<span class="sd">                A list of strings identifying the minimum set of cavity label categories to be included in the</span>
+<span class="sd">                categorical.</span>
+<span class="sd">            known_fault_labels:</span>
+<span class="sd">                A list of strings identifying the minimum set of fault label categories to be included in the</span>
+<span class="sd">                categorical.</span>
+<span class="sd">            req_columns:</span>
+<span class="sd">                A list of column names that are required to be in valid DataFrames used internally.  These are in</span>
+<span class="sd">                addition to the class defined list of &quot;zone&quot;, &quot;dtime&quot;, etc..</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># For constructing examples.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">e_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_kwargs</span> <span class="o">=</span> <span class="n">example_kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_factory</span> <span class="o">=</span> <span class="n">Factory</span><span class="p">(</span><span class="n">e_type</span><span class="o">=</span><span class="n">e_type</span><span class="p">,</span> <span class="o">**</span><span class="n">example_kwargs</span><span class="p">)</span>
+
+        <span class="c1"># These columns are also required, but the list contents is variable based on use case.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_req_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">req_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_req_columns</span> <span class="o">=</span> <span class="n">req_columns</span>
+
+        <span class="c1"># Setup the standard default values for zone and label options</span>
+        <span class="c1">#: Instance&#39;s customized default list of known zones</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_known_zones</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_zones</span>
+        <span class="k">if</span> <span class="n">known_zones</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_known_zones</span> <span class="o">=</span> <span class="n">known_zones</span>
+
+        <span class="c1">#: Instance&#39;s customized default list of known cavity_labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_known_cavity_labels</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_cavity_labels</span>
+        <span class="k">if</span> <span class="n">known_cavity_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_known_cavity_labels</span> <span class="o">=</span> <span class="n">known_cavity_labels</span>
+
+        <span class="c1">#: Instance&#39;s customized default list of known fault_labels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_known_fault_labels</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_fault_labels</span>
+        <span class="k">if</span> <span class="n">known_fault_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_known_fault_labels</span> <span class="o">=</span> <span class="n">known_fault_labels</span>
+
+        <span class="c1">#: ExampleSet DataFrame with proper dtypes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;zone&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([],</span> <span class="n">categories</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_known_zones</span><span class="p">),</span>
+             <span class="s1">&#39;dtime&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">),</span>
+             <span class="s1">&#39;cavity_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([],</span> <span class="n">categories</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_known_cavity_labels</span><span class="p">),</span>
+             <span class="s1">&#39;fault_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([],</span> <span class="n">categories</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_known_fault_labels</span><span class="p">),</span>
+             <span class="s1">&#39;cavity_conf&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float64&quot;</span><span class="p">),</span>
+             <span class="s1">&#39;fault_conf&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">),</span>
+             <span class="s1">&#39;example&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">),</span>
+             <span class="s1">&#39;label_source&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+             <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create a hash for holding on to the label file data.  This will preserve the original data after cleaning for</span>
+        <span class="c1"># duplicates, mismatches, etc.</span>
+        <span class="c1">#: A dictionary holding label file contents, keyed on file names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_required_columns"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_required_columns">[docs]</a>    <span class="k">def</span> <span class="nf">get_required_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Generates the list of column names that must appear in a DataFrame for it to be a valid example_df.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The list of column names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">__mandatory_columns</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_req_columns</span></div>
+
+<div class="viewcode-block" id="ExampleSet.has_required_columns"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.has_required_columns">[docs]</a>    <span class="k">def</span> <span class="nf">has_required_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">skip_example</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if the given DataFrame has the required columns.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            df:</span>
+<span class="sd">                The DataFrame to check</span>
+<span class="sd">            dtypes:</span>
+<span class="sd">                Check for matching dtypes of &quot;mandatory&quot; columns.  Uses existing _example_df&#39;s dtypes.  Skips if</span>
+<span class="sd">                _examples_df is None.</span>
+<span class="sd">            skip_example:</span>
+<span class="sd">                If True, requires that the &#39;example&#39; column name is present.  Otherwise it is not checked.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if all required column names are present.  False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_required_columns</span><span class="p">()</span>
+        <span class="n">man_cols</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">__mandatory_columns</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">skip_example</span><span class="p">:</span>
+            <span class="n">man_cols</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+            <span class="n">req_cols</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;example&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check that the columns have the same names</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">req_cols</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame missing column &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Now that we know the df has an example column.  Check that the examples have the same type as defined for this</span>
+        <span class="c1"># ExampleSet.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_example</span><span class="p">:</span>
+            <span class="n">df_e_type</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">example</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_example_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">!=</span> <span class="n">df_e_type</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame different ExampleType &#39;</span><span class="si">{</span><span class="n">df_e_type</span><span class="si">}</span><span class="s2">&#39; from &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">e_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check that the columns have the same dtype</span>
+        <span class="k">if</span> <span class="n">dtypes</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Check that all of the columns have matching dtypes.  CategoricalDtypes match only if the have the same</span>
+            <span class="c1"># categories, not only if they are by categorical.  Here that&#39;s a problem since new categories may arise.</span>
+            <span class="c1"># Just check that the names of the dtypes match.</span>
+            <span class="n">e_df_dtype_names</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">man_cols</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span><span class="p">]</span>
+            <span class="n">df_dtype_names</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">man_cols</span><span class="p">]</span><span class="o">.</span><span class="n">dtypes</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">e_df_dtype_names</span> <span class="o">==</span> <span class="n">df_dtype_names</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame has at least one wrong dtype.&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ExampleSet.save_csv"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.save_csv">[docs]</a>    <span class="k">def</span> <span class="nf">save_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            filename: The filename to save.  Will be relative out_dir</span>
+<span class="sd">            out_dir: The directory to save the file in.  Defaults to Config().output_dir</span>
+<span class="sd">            sep: Delimiter string used by Pandas to parse given &quot;csv&quot; file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out_dir</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">output_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;example&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.load_csv"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.load_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">in_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Read in a CSV file that has ExampleSet data.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            filename: The filename to save.  Will be relative in_dir</span>
+<span class="sd">            in_dir: The directory to find the file in.  Defaults to Config().output_dir</span>
+<span class="sd">            sep: Delimiter string used by Pandas to parse given &quot;csv&quot; file</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the CSV file does not have the expected column names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">in_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">in_dir</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">output_dir</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">in_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Allows for tricks with file-like objects</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_required_columns</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot load CSV file.  Unexpected column format.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Put the DataFrame into a standard structure - categories, column order, etc.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__standardize_df_format</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="c1"># Add the example column</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;example&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Example_from_row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">df</span></div>
+
+<div class="viewcode-block" id="ExampleSet.update_example_set"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.update_example_set">[docs]</a>    <span class="k">def</span> <span class="nf">update_example_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">keep_label_file_dataframes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Replaces the contents of this ExampleSet with the supplied DataFrame.</span>
+
+<span class="sd">        Note: A copy of df is used.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            df: A DataFrame formatted for ExampleSet that will replace the the contents of this ExampleSet.</span>
+<span class="sd">            keep_label_file_dataframes: Should the dictionary of label file DataFrames be kept.  If False, the</span>
+<span class="sd">                                         dictionary recreated.  If True, no action is taken.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If columns do not match</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_required_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New df does not have the required columns or column dtypes.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_label_file_dataframes</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_example_df"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_example_df">[docs]</a>    <span class="k">def</span> <span class="nf">get_example_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the example set as a DataFrame (copy)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A copy of the internal ExampleSet DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleSet.add_label_file_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.add_label_file_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_label_file_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">exclude_zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">exclude_times</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Process and add label files&#39; data to the ExampleSet&#39;s internal collection.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            label_files:</span>
+<span class="sd">                List of label files to process.  If None, all files in Config().label_dir are read.  Relative paths are</span>
+<span class="sd">                resolved relative to Config().label_dir.</span>
+<span class="sd">            exclude_zones:</span>
+<span class="sd">                List of zones to exclude.  Defaults to Config().exclude_zones.</span>
+<span class="sd">            exclude_times:</span>
+<span class="sd">                List of 2-tuples of datetime objects.  Each 2-tuple specifies a range to exclude.  None implie +/-Inf.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use the defaults from the config file if None is given</span>
+        <span class="n">e_zones</span> <span class="o">=</span> <span class="n">exclude_zones</span> <span class="k">if</span> <span class="n">exclude_zones</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">exclude_zones</span>
+        <span class="n">e_times</span> <span class="o">=</span> <span class="n">exclude_times</span> <span class="k">if</span> <span class="n">exclude_times</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">exclude_times</span>
+        <span class="n">l_files</span> <span class="o">=</span> <span class="n">label_files</span>
+        <span class="k">if</span> <span class="n">l_files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Only want to process regular files, not directories, etc.</span>
+            <span class="n">l_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">label_dir</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">label_dir</span><span class="p">,</span> <span class="n">f</span><span class="p">))]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No label files specified or discovered in default label_dir &#39;</span><span class="si">{</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">label_dir</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Iterate through the supplied label files.  Non-absolute paths will be assumed to be relative to the configured</span>
+        <span class="c1"># label directory</span>
+        <span class="k">for</span> <span class="n">label_file</span> <span class="ow">in</span> <span class="n">l_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">label_file</span><span class="p">):</span>
+                <span class="n">label_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">label_dir</span><span class="p">,</span> <span class="n">label_file</span><span class="p">)</span>
+
+            <span class="c1"># Process the label file into a DataFrame</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataframe_from_label_file</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">label_file</span><span class="p">,</span> <span class="n">exclude_zones</span><span class="o">=</span><span class="n">e_zones</span><span class="p">,</span>
+                                                              <span class="n">exclude_times</span><span class="o">=</span><span class="n">e_times</span><span class="p">)</span>
+
+            <span class="c1"># Stash the label file DataFrame into a dictionary in case we needed it later</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="p">[</span><span class="n">label_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1"># Add the DataFrame to the internal collection</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_example_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.add_web_service_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.add_web_service_data">[docs]</a>    <span class="k">def</span> <span class="nf">add_web_service_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add web service data (faults labeled by in-service model) to the ExampleSet.</span>
+
+<span class="sd">        Note: Should be used exclusive of label data since they will largely overlap</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            server: The server to query for the data.  If None, use the value in Config</span>
+<span class="sd">            begin: The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018</span>
+<span class="sd">            end: The latest time for which a fault should be included.  If None defaults to &quot;now&quot;</span>
+<span class="sd">            models: A list of model names that should be included in the results.  None means include all</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">server</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">server</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">data_server</span>
+
+        <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="mi">2018</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">day</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Get the data from the web service</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dataframe_from_web_query</span><span class="p">(</span><span class="n">server</span><span class="o">=</span><span class="n">server</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">models</span><span class="o">=</span><span class="n">models</span><span class="p">)</span>
+
+        <span class="c1"># Add it to the existing ExampleSet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_example_df</span><span class="p">(</span><span class="n">df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_label_file_report"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_label_file_report">[docs]</a>    <span class="k">def</span> <span class="nf">get_label_file_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Generate a string containing a report on the processed label files</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A formatted string containing the report.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Check to see if we have any duplicates and print them out</span>
+        <span class="n">num_total_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_events</span><span class="p">()</span>
+        <span class="n">num_total_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">)</span>
+        <span class="n">num_events_with_multiple_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_duplicated_events</span><span class="p">()</span>
+        <span class="n">num_duplicate_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_duplicated_labels</span><span class="p">()</span>
+        <span class="n">num_events_with_mismatched_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_duplicated_events_with_mismatched_labels</span><span class="p">()</span>
+        <span class="n">num_mismatched_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_mismatched_labels</span><span class="p">()</span>
+        <span class="n">mismatched_output</span> <span class="o">=</span> <span class="s2">&quot;None Found&quot;</span>
+        <span class="k">if</span> <span class="n">num_events_with_mismatched_labels</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mismatched_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events_with_mismatched_labels</span><span class="p">()</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;#### Summary ####</span>
+<span class="s2">Note: event == unique zone/timestamp, label == row in label_file</span>
+
+<span class="s2">Number of events: </span><span class="si">{</span><span class="n">num_total_events</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">Number of labels: </span><span class="si">{</span><span class="n">num_total_labels</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">Number of events with multiple labels: </span><span class="si">{</span><span class="n">num_events_with_multiple_labels</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">Number of duplicate labels: </span><span class="si">{</span><span class="n">num_duplicate_labels</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">Number of &#39;extra&#39; labels: </span><span class="si">{</span><span class="n">num_duplicate_labels</span> <span class="o">-</span> <span class="n">num_events_with_multiple_labels</span><span class="si">}</span><span class="s2"></span>
+
+<span class="s2">Number of events with mismatched labels: </span><span class="si">{</span><span class="n">num_events_with_mismatched_labels</span><span class="si">}</span><span class="s2"></span>
+<span class="s2">Number of mismatched labels: </span><span class="si">{</span><span class="n">num_mismatched_labels</span><span class="si">}</span><span class="s2"></span>
+
+<span class="s2">#### Events With Mismatched Labels ####</span>
+<span class="si">{</span><span class="n">mismatched_output</span><span class="si">}</span><span class="s2"> </span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="ExampleSet.remove_duplicates_and_mismatches"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.remove_duplicates_and_mismatches">[docs]</a>    <span class="k">def</span> <span class="nf">remove_duplicates_and_mismatches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes duplicate example entries and removes all instances of examples that have mismatched labels.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            report: Should information about what was removed be included?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Split into event groups</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">])</span>
+
+        <span class="c1"># Keep only groups that that have exactly one unique cavity and fault label</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cavity_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">fault_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Print out the entries that were removed</span>
+        <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+            <span class="n">tmp_df</span> <span class="o">=</span> <span class="n">gb</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">cavity_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">fault_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;## Removing the following </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> entries from the ExampleSet as label mismatches ##&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">tmp_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;zone&quot;</span><span class="p">,</span> <span class="s2">&quot;dtime&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Track the size so we can report if needed</span>
+        <span class="n">orig_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">)</span>
+
+        <span class="c1"># Replace the original example_df with this reduced set.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s2">&quot;zone&quot;</span><span class="p">,</span> <span class="s2">&quot;dtime&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Print out how many entries were removed as duplicates</span>
+        <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+            <span class="n">num_dupes</span> <span class="o">=</span> <span class="n">orig_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;## Removed </span><span class="si">{</span><span class="n">num_dupes</span><span class="si">}</span><span class="s2"> entries from the ExampleSet for being duplicates ##&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.purge_invalid_examples"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.purge_invalid_examples">[docs]</a>    <span class="k">def</span> <span class="nf">purge_invalid_examples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">:</span> <span class="n">ExampleValidator</span><span class="p">,</span> <span class="n">report</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Removes all examples from the ExampleSet that do not pass validation</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            validator: A object that follows the ExampleValidator interface.</span>
+<span class="sd">            report: Should information about what is purged be printed?</span>
+<span class="sd">            progress: Should a progress bar be displayed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Variable for report output</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">## Validation Results ##</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Count of how many examples were removed</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Private function that allows for easy reporting</span>
+        <span class="k">def</span> <span class="nf">__apply_validator</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">_validator</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Applies the validator function in the context of DataFrame apply method.  Updates out, count from parent</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                row (DataFrame) - A DataFrame row containing the example to be validated.  Should contain an Example</span>
+<span class="sd">                                  under a column named &#39;example&#39;</span>
+<span class="sd">                _validator (ExampleValidator) - Object doing the validation</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                (bool) - True if example passed validation,  Otherwise, False.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="c1"># Allow this function to modify out and count from the parent function</span>
+            <span class="k">nonlocal</span> <span class="n">out</span>
+            <span class="k">nonlocal</span> <span class="n">count</span>
+
+            <span class="n">_validator</span><span class="o">.</span><span class="n">set_example</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">example</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_validator</span><span class="o">.</span><span class="n">validate_data</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Invalid event - </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">example</span><span class="si">}</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">msg</span>
+
+                <span class="c1"># If we&#39;re debugging, we probably don&#39;t want to wait until the end to see what happened.</span>
+                <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># tqdm provides a progress bar and the pd.DataFrame.progress_apply method.  This registers a new instance with</span>
+        <span class="c1"># pandas</span>
+        <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="c1"># tqdm/pandas generate a Future warning about the Panel class.  Suppress that since I can&#39;t do anything</span>
+            <span class="c1"># about it.  Will fix if it breaks.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;## Validating Examples ##&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The Panel class is removed from pandas.&quot;</span><span class="p">)</span>
+                <span class="n">tqdm</span><span class="o">.</span><span class="n">pandas</span><span class="p">()</span>
+
+                <span class="c1"># Apply the validator to generate a bool column we can filter on</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">progress_apply</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">__apply_validator</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_validator</span><span class="o">=</span><span class="n">validator</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Apply the validator to generate a bool column we can filter on</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">__apply_validator</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">_validator</span><span class="o">=</span><span class="n">validator</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Purging </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> invalid examples&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Keep only the events that are valid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">valid</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_add_example_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">allow_new_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Add a DataFrame of examples to the ExampleSet&#39;s internal collection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df:</span>
+<span class="sd">                A dataframe of examples to be added to the existing examples</span>
+<span class="sd">            allow_new_columns:</span>
+<span class="sd">                An exception will be raised if df has any columns that do not map to existing attributes in the existing</span>
+<span class="sd">                collection (e.g., you would be adding new columns to an existing DataFrame)</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If new columns are being added and allow_new_columns != True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make sure we are adding similar data unless otherwise stated</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_new_columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()))</span> <span class="ow">and</span> <span class="p">(</span>
+                    <span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;New DataFrame does not have same columns as example_df and allow_new_columns=False&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_required_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">dtypes</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;New DataFrame does not have required column dtypes.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Union the categories present in the existing examples with those presented in new examples</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;category&#39;</span><span class="p">]:</span>
+            <span class="n">uc</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">union_categoricals</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">categories</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">categories</span><span class="o">=</span><span class="n">uc</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+
+        <span class="c1"># Add the new data to the bottom of the internal DataFrame, and add it to the dict of included label files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">,</span> <span class="n">df</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_create_dataframe_from_web_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                         <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This creates a ExampleSet consistent DataFrame based on the responses of the web query.  Labeled faults only.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            server: The server to query for the data.  If None, use the value in Config</span>
+<span class="sd">            begin: The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018</span>
+<span class="sd">            end: The latest time for which a fault should be included.  If None defaults to &quot;now&quot;</span>
+<span class="sd">            models: A list of model names that are to be included.  All other results are excluded.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The ExampleSet consistent DataFrame containing the web query response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make the web query and get results</span>
+        <span class="n">web_fmt</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span>
+        <span class="n">web_events</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_events_from_web</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="n">begin</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">web_fmt</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">web_fmt</span><span class="p">))</span>
+
+        <span class="c1"># Parse the web query.  The web service returns fault events with a UTC timestamp.  We convert it to the</span>
+        <span class="c1"># localtime zone for simplicity and compatibility with the (untimezoned) label files.  Assumption here is</span>
+        <span class="c1"># that we are running this code in the same timezone as CEBAF is in.</span>
+        <span class="c1"># TODO - Is there a better way to handle this?  The label files not being TZ&#39;ed throw a wrench in the works.</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">%z&quot;</span>
+        <span class="n">event_list</span> <span class="o">=</span> <span class="n">web_events</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span>
+        <span class="n">extracted_events</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">event_list</span><span class="p">:</span>
+            <span class="c1"># Get a timezone aware datetime object of UTC timestamp (manually add GMT offset string) then convert it</span>
+            <span class="c1"># to local time</span>
+            <span class="n">dt_local</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;datetime_utc&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;-00:00&quot;</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span>
+                <span class="n">tzlocal</span><span class="o">.</span><span class="n">get_localzone</span><span class="p">())</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
+
+            <span class="c1"># Read in label info</span>
+            <span class="n">f_label</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">c_label</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">f_conf</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">c_conf</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">l_source</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Skip any fault events that were not labeled</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]:</span>
+
+                    <span class="c1"># Check that this was labeled by one of the models we requested</span>
+                    <span class="k">if</span> <span class="n">models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;model-name&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">models</span><span class="p">:</span>
+                            <span class="k">continue</span>
+
+                    <span class="c1"># Process the model source</span>
+                    <span class="k">if</span> <span class="n">l_source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">l_source</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;model-name&#39;</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">l_source</span> <span class="o">!=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;model-name&#39;</span><span class="p">]:</span>
+                        <span class="c1"># Make the source a combo with cavity model first</span>
+                        <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cavity&quot;</span><span class="p">:</span>
+                            <span class="n">l_source</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;model-name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">l_source</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;fault-type&quot;</span><span class="p">:</span>
+                            <span class="n">l_source</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">l_source</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">label</span><span class="p">[</span><span class="s1">&#39;model-name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipping </span><span class="si">{</span><span class="n">zone</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">dt_local</span><span class="si">}</span><span class="s2"> because of unrecognized label name&quot;</span><span class="p">)</span>
+                            <span class="k">continue</span>
+
+                    <span class="c1"># The operator facing models may present slightly processed label names.  Here we convert back to</span>
+                    <span class="c1"># names used in the label files.  I guess this is a potential error point should future models</span>
+                    <span class="c1"># use these names in a different way.  Not sure what to do about it here though.</span>
+                    <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cavity&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;multiple&#39;</span><span class="p">:</span>
+                            <span class="n">c_label</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">c_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                        <span class="n">c_conf</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;fault-type&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Multi Cav Turn off&#39;</span><span class="p">:</span>
+                            <span class="n">f_label</span> <span class="o">=</span> <span class="s2">&quot;Multi Cav turn off&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">f_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                        <span class="n">f_conf</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span>
+
+            <span class="c1"># We only want labeled data</span>
+            <span class="k">if</span> <span class="n">f_label</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">c_label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Accumulate the events into a list of dictionaries.  Each dictionary is one event</span>
+            <span class="n">extracted_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;zone&#39;</span><span class="p">:</span> <span class="n">zone</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">:</span> <span class="n">dt_local</span><span class="p">,</span> <span class="s1">&#39;fault_label&#39;</span><span class="p">:</span> <span class="n">f_label</span><span class="p">,</span> <span class="s1">&#39;cavity_label&#39;</span><span class="p">:</span> <span class="n">c_label</span><span class="p">,</span>
+                 <span class="s1">&#39;fault_conf&#39;</span><span class="p">:</span> <span class="n">f_conf</span><span class="p">,</span> <span class="s1">&#39;cavity_conf&#39;</span><span class="p">:</span> <span class="n">c_conf</span><span class="p">,</span> <span class="s1">&#39;label_source&#39;</span><span class="p">:</span> <span class="n">l_source</span><span class="p">})</span>
+
+        <span class="c1"># Construct an empty DataFrame</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+            <span class="s1">&#39;zone&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([]),</span>
+            <span class="s1">&#39;dtime&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;fault_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([]),</span>
+            <span class="s1">&#39;cavity_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([]),</span>
+            <span class="s1">&#39;cavity_conf&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;fault_conf&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;label_source&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Append the fault events to the DataFrame</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">extracted_events</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Operates in place on DataFrame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__standardize_df_format</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="k">def</span> <span class="nf">_create_dataframe_from_label_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">exclude_zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                          <span class="n">exclude_times</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This parses the DataSet&#39;s specified label files and saves the constructed IExamples.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            filepath:</span>
+<span class="sd">                Location of the label file</span>
+<span class="sd">            exclude_zones:</span>
+<span class="sd">                List of zones to exclude.  Defaults to Config().exclude_zones.</span>
+<span class="sd">            exclude_times:</span>
+<span class="sd">                List of 2-tuples of datetime objects.  Each 2-tuple specifies a range to exclude.  None implie +/-Inf.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A DataFrame of the Examlpes listed in the label file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># This is the header we expect in all files - tab separated</span>
+        <span class="n">exp_header</span> <span class="o">=</span> <span class="s2">&quot;zone	cavity	cav#	fault	time</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Work through the file and build a dictionary keyed on events</span>
+        <span class="c1"># with an array of labels found for each event.  We&#39;ll print out summary information,</span>
+        <span class="c1"># and then print label files for each &quot;good&quot; event</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File not found - </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">zones</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">dts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">c_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">f_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">c_confs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">f_confs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">l_sources</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Read each file line by line and create a new TSV file for each</span>
+        <span class="c1"># labeled example we encounter</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+            <span class="c1"># Toss the header line by reading another one in loop - ignore any trailing whitespace</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">line</span>
+
+            <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping header: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">header</span> <span class="o">!=</span> <span class="n">exp_header</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Unexpected header: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+            <span class="c1"># Keep track of how many lines were skipped due to some error</span>
+            <span class="n">skip_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># Process each line.  At this point we are expected labeled examples or comments</span>
+            <span class="k">while</span> <span class="n">line</span><span class="p">:</span>
+
+                <span class="c1"># Strip off leading and trailing whitespace</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+
+                <span class="c1"># Check special cases</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found last line.&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Skipping: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Process the label fields</span>
+                <span class="n">fields</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">zone</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">cavity_label</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">fault_label</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+                <span class="c1"># Label files don&#39;t provide confidence levels</span>
+                <span class="n">cavity_conf</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">fault_conf</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">tsm</span> <span class="o">=</span> <span class="n">TimestampMapper</span><span class="p">()</span>
+                    <span class="n">ts</span> <span class="o">=</span> <span class="n">tsm</span><span class="o">.</span><span class="n">get_full_timestamp</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="s2">&quot;%Y/%m/</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">))</span>
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="n">skip_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error processing line &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Check if the zone should be excluded</span>
+                <span class="k">if</span> <span class="n">exclude_zones</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">zone</span> <span class="ow">in</span> <span class="n">exclude_zones</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># check if the label should be excluded because of the timestamp</span>
+                <span class="k">if</span> <span class="n">is_datetime_in_range</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">exclude_times</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Add entries to all of the lists for this example.</span>
+                <span class="n">zones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
+                <span class="n">dts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+                <span class="n">c_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cavity_label</span><span class="p">)</span>
+                <span class="n">f_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fault_label</span><span class="p">)</span>
+                <span class="n">c_confs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cavity_conf</span><span class="p">)</span>
+                <span class="n">f_confs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fault_conf</span><span class="p">)</span>
+                <span class="n">l_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filepath</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processed: </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipped </span><span class="si">{</span><span class="n">skip_count</span><span class="si">}</span><span class="s2"> events from </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> due to processing issues&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Construct a DataFrame for the new data</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">{</span><span class="s1">&#39;zone&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">zones</span><span class="p">),</span>
+             <span class="s1">&#39;dtime&#39;</span><span class="p">:</span> <span class="n">dts</span><span class="p">,</span>
+             <span class="s1">&#39;cavity_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">c_labels</span><span class="p">),</span>
+             <span class="s1">&#39;fault_label&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">f_labels</span><span class="p">),</span>
+             <span class="s1">&#39;cavity_conf&#39;</span><span class="p">:</span> <span class="n">c_confs</span><span class="p">,</span>
+             <span class="s1">&#39;fault_conf&#39;</span><span class="p">:</span> <span class="n">f_confs</span><span class="p">,</span>
+             <span class="s1">&#39;label_source&#39;</span><span class="p">:</span> <span class="n">l_sources</span><span class="p">})</span>
+
+        <span class="c1"># Update the DataFrame to have a standard format (column dtypes, order, etc.)  Should add example column.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__standardize_df_format</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">df</span>
+
+    <span class="c1">#### Reporting-related methods ####</span>
+<div class="viewcode-block" id="ExampleSet.count_events"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_events">[docs]</a>    <span class="k">def</span> <span class="nf">count_events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of unique events (zone/datetime combinations</span>
+
+<span class="sd">        This would count as two since two unique zone/datetime pairs appeared</span>
+<span class="sd">        4240  2L25 2020-09-21 06:53:16.500            5             E_Quench</span>
+<span class="sd">        4241  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+<span class="sd">        4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the number of unique events (zone/datetime combinations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_labels">[docs]</a>    <span class="k">def</span> <span class="nf">count_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Counts the number of labels (rows in label files)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             the number of labels (rows in label files)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_duplicated_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_duplicated_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_duplicated_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Identify the fault events that appear multiple times in the ExampleSet.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A DataFrame containing labels for events that appear multiple times&quot;&quot;&quot;</span>
+        <span class="c1"># Split on event.  observed=True only includes categorical levels that are seen and improves performance</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;zone&quot;</span><span class="p">,</span> <span class="s2">&quot;dtime&quot;</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Keep event groups that have &gt; 1 rows.  Return length of the resulting DataFrame</span>
+        <span class="k">return</span> <span class="n">gb</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_duplicated_events"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_duplicated_events">[docs]</a>    <span class="k">def</span> <span class="nf">count_duplicated_events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of events that appear multiple times, i.e., were labeled more than once.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the number of events that appear multiple times, i.e., were labeled more than once.</span>
+
+<span class="sd">        This would count as one since only one event appeared that did occur multiple times</span>
+<span class="sd">        4240  2L25 2020-09-21 06:53:16.500            5             E_Quench</span>
+<span class="sd">        4241  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+<span class="sd">        4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get the duplicated labels, then remove duplicate zone/timestamp pairs</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_duplicated_labels</span><span class="p">()</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s2">&quot;zone&quot;</span><span class="p">,</span> <span class="s2">&quot;dtime&quot;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_duplicated_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_duplicated_labels">[docs]</a>    <span class="k">def</span> <span class="nf">count_duplicated_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of labeling occurrences for events that appear multiple times.</span>
+
+<span class="sd">        This is basically the number of rows in the label files that are not for unique fault events.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             The number of labeling occurrences for events that appear multiple times&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_duplicated_labels</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_unduplicated_events"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_unduplicated_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_unduplicated_events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Identify the fault events that appear exactly once in the ExampleSet.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataFrame of the events that appear exactly once in the ExampleSet&quot;&quot;&quot;</span>
+        <span class="c1"># Split on event.  observed=True only includes categorical levels that are seen and improves performance</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;zone&quot;</span><span class="p">,</span> <span class="s2">&quot;dtime&quot;</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Keep event groups that have exactly one row.</span>
+        <span class="k">return</span> <span class="n">gb</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_unduplicated_events"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_unduplicated_events">[docs]</a>    <span class="k">def</span> <span class="nf">count_unduplicated_events</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of events that appear exactly once.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             The number of events that appear exactly once.</span>
+
+<span class="sd">        This would count as one since only one event appeared that did not occur multiple times</span>
+<span class="sd">        4240  2L25 2020-09-21 06:53:16.500            5             E_Quench</span>
+<span class="sd">        4241  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+<span class="sd">        4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#  Return the length of resulting DataFrame</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_unduplicated_events</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_events_with_mismatched_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_events_with_mismatched_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_events_with_mismatched_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Identify fault events that appear multiple times with different labels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             A DataFrame containing the events that have mismatched labels&quot;&quot;&quot;</span>
+        <span class="c1"># Split on events.</span>
+        <span class="n">gb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">],</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Keep event groups that have more than one unique fault or cavity label. Return the length of resulting</span>
+        <span class="c1"># DataFrame.</span>
+        <span class="k">return</span> <span class="n">gb</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cavity_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">fault_label</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_duplicated_events_with_mismatched_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_duplicated_events_with_mismatched_labels">[docs]</a>    <span class="k">def</span> <span class="nf">count_duplicated_events_with_mismatched_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of events that appear multiple times with different labels.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The number of events that appear multiple times with different labels</span>
+
+<span class="sd">        This would count as one since one event appeared that had mismatched labels</span>
+<span class="sd">        4240  2L26 2020-09-21 06:53:16.500            5             E_Quench</span>
+<span class="sd">        4241  2L26 2020-09-21 06:53:16.500            6             E_Quench</span>
+<span class="sd">        4242  2L26 2020-09-21 06:53:16.500            6             E_Quench</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get events that have mismatched labels</span>
+        <span class="n">mismatch_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_events_with_mismatched_labels</span><span class="p">()</span>
+
+        <span class="c1"># Drop duplicates so that we have the event count, not the count of mismatched occurrences.  Return the length</span>
+        <span class="c1"># of resulting DataFrame</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">mismatch_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="ExampleSet.count_mismatched_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.count_mismatched_labels">[docs]</a>    <span class="k">def</span> <span class="nf">count_mismatched_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Count the number of times an event with mismatched labels appears in the ExampleSet.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The number of times an event with mismatched labels appears in the ExampleSet.</span>
+
+<span class="sd">        This would count as three mismatched labels since one event with mismatched labels appeared three times</span>
+<span class="sd">        4240  2L26 2020-09-21 06:53:16.500            5             E_Quench</span>
+<span class="sd">        4241  2L26 2020-09-21 06:53:16.500            6             E_Quench</span>
+<span class="sd">        4242  2L26 2020-09-21 06:53:16.500            6             E_Quench</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_events_with_mismatched_labels</span><span class="p">())</span></div>
+
+    <span class="c1">#### Visualization Methods ####</span>
+<div class="viewcode-block" id="ExampleSet.display_timeline"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.display_timeline">[docs]</a>    <span class="k">def</span> <span class="nf">display_timeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Display a timeline of examples as a swarmplot</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            query: The expr argument to DataFrame.query.  Subsets data before plot</span>
+<span class="sd">            kwargs: Other named parameters are passed to swarm_timeline method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">swarm_timeline</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.display_summary_label_heatmap"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.display_summary_label_heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">display_summary_label_heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Label Summary&quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Display a heatmap of fault vs cavity labels for all examples in this object</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            title: The title of the plot</span>
+<span class="sd">            query: The expr argument to DataFrame.query.  Subsets data before plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">heatmap</span><span class="o">.</span><span class="n">heatmap_cavity_vs_fault_label_counts</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.display_zone_label_heatmap"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.display_zone_label_heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">display_zone_label_heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zones</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Display a heatmap of fault vs cavity labels for all examples in this object for each unique zone category</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            zones: A list of the zones to display.</span>
+<span class="sd">            query: The expr argument to DataFrame.query.  Subsets data before plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">zones</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">zones</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">zone</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="n">heatmap</span><span class="o">.</span><span class="n">show_fault_cavity_count_by_zone</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">zones</span><span class="o">=</span><span class="n">zones</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleSet.display_examples_by_weekday_barplot"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.display_examples_by_weekday_barplot">[docs]</a>    <span class="k">def</span> <span class="nf">display_examples_by_weekday_barplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Show example counts by the day of the week as a stacked barplot</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            color_by: The DataFrame column on which the bars will be split/colored.</span>
+<span class="sd">            title: The title to put on the plot.  A reasonable default will be generated if None.</span>
+<span class="sd">            query: The expr argument to DataFrame.query.  Subsets data before plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Query/subset the data</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="c1"># Get the day names</span>
+        <span class="n">day_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Sunday&quot;</span><span class="p">,</span> <span class="s2">&quot;Monday&quot;</span><span class="p">,</span> <span class="s2">&quot;Tuesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Wednesday&quot;</span><span class="p">,</span> <span class="s2">&quot;Thursday&quot;</span><span class="p">,</span> <span class="s2">&quot;Friday&quot;</span><span class="p">,</span> <span class="s2">&quot;Saturday&quot;</span><span class="p">]</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">day_name</span><span class="p">()</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">],</span> <span class="n">categories</span><span class="o">=</span><span class="n">day_names</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">color_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Example Count by Day of Week&quot;</span>
+
+            <span class="c1"># Get the counts by day</span>
+            <span class="n">count_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;day&#39;</span><span class="p">])[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">color_by</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">day_names</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">color_by</span><span class="si">}</span><span class="s2"> Count by Day of Week&quot;</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">color_by</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">[</span><span class="n">color_by</span><span class="p">]</span>
+
+            <span class="c1"># Get the counts by the color_by column</span>
+            <span class="n">count_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;day&#39;</span><span class="p">,</span> <span class="n">color_by</span><span class="p">])[</span><span class="s1">&#39;day&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">color_by</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">day_names</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># Create the plot</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">count_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="c1"># Format the legend</span>
+        <span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">handles</span><span class="p">),</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Display it</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleSet.display_frequency_barplot"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.display_frequency_barplot">[docs]</a>    <span class="k">def</span> <span class="nf">display_frequency_barplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Display the example count against one or two different factors, as a (stacked) bar chart.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            x: The column name for which each bar will appear.  Should probably be categorical.</span>
+<span class="sd">            color_by: The column name by which each bar will be split and colored (for a stacked bar plot).  If</span>
+<span class="sd">                              None, then a simple bar plot will be displayed.</span>
+<span class="sd">            title: The title to put on the chart.  If None, a reasonable default will be generated.</span>
+<span class="sd">            query: The expr argument to DataFrame.query.  Subsets data before plot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="c1"># Set a reasonable default</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dtime&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;dtime&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">(</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="k">if</span> <span class="n">color_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Simple chart if no factor to color by</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Get the counts</span>
+            <span class="n">count_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">color_by</span><span class="p">])[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+            <span class="c1"># Create the plot</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">count_df</span><span class="o">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">color_by</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">stacked</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+
+            <span class="c1"># Format the legend</span>
+            <span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">handles</span><span class="p">),</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Display it</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleSet.get_classification_report"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet.get_classification_report">[docs]</a>    <span class="k">def</span> <span class="nf">get_classification_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;ExampleSet&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cavity_label&quot;</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                  <span class="n">other_query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This prints a classification report of this ExampleSet&#39;s cavity labels considering other as ground truth.</span>
+
+<span class="sd">        Only examples from other for which there is an example in this ExampleSet are considered</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            other (ExampleSet): An ExampleSet that contains cavity labels considered the ground truth.</span>
+<span class="sd">            label (str): The column name of containing the label values to compare.</span>
+<span class="sd">            query (str) - The expr argument to DataFrame.query.  Subsets data before comparison.</span>
+<span class="sd">            other_query (str) - The expr argument to DataFrame.query.  Subsets &#39;other&#39; before comparison.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Subset this ExampleSet if requested</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="c1"># Subset the other ExampleSet if requested</span>
+        <span class="n">o_df</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">get_example_df</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">other_query</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">o_df</span> <span class="o">=</span> <span class="n">o_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">o_df</span><span class="p">[[</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;zone&#39;</span><span class="p">,</span> <span class="s1">&#39;dtime&#39;</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">label</span> <span class="o">+</span> <span class="s2">&quot;_y&quot;</span><span class="p">],</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="n">label</span> <span class="o">+</span> <span class="s2">&quot;_x&quot;</span><span class="p">]))</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;ExampleSet&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if this ExampleSet is equivalent to the other.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Short circuit check</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">is</span> <span class="n">other</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Short circuit check</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">eq</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># Check the example DataFrame - first consider None case</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">get_example_df</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">get_example_df</span><span class="p">()):</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Check the dict of label file dataframes - first consider None case</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Now check that the contents/lengths are the same</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">equals</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">label_file_dataframes</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
+                    <span class="n">eq</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">eq</span>
+
+    <span class="k">def</span> <span class="nf">_Example_from_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IExample</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates an Example object from a row of a standard ExampleSet DataFrame&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">example_factory</span><span class="o">.</span><span class="n">get_example</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">dtime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">,</span>
+                                                <span class="n">fault_label</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">fault_label</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">cavity_conf</span><span class="p">,</span>
+                                                <span class="n">fault_conf</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">fault_conf</span><span class="p">,</span> <span class="n">label_source</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">label_source</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__standardize_df_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Attempts to put a DataFrame in a &#39;standard&#39; format.</span>
+
+<span class="sd">        This affects IN-PLACE variables that should be categorical, datetime, float, etc. and creates the example column</span>
+<span class="sd">        if not already present.  Columns are reordered.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            df: The DataFrame to reformat</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Seems like the datetime dtype doesn&#39;t want to stick</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;dtime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;datetime64[ns]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Update the dtypes so that we get categories, etc. where it makes sense</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;zone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;zone&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fault_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;fault_label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cavity_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cavity_label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;str&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cavity_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cavity_label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">fault_conf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fault_conf</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">cavity_conf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">cavity_conf</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Construct the Example objects based on row values if needed</span>
+        <span class="k">if</span> <span class="s1">&#39;example&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">():</span>
+            <span class="n">df</span><span class="p">[</span><span class="s1">&#39;example&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Example_from_row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Ensure a consistent set of category levels and their order.</span>
+        <span class="n">master</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;zone&#39;</span><span class="p">:</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_zones</span><span class="p">,</span>
+            <span class="s1">&#39;fault_label&#39;</span><span class="p">:</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_fault_labels</span><span class="p">,</span>
+            <span class="s1">&#39;cavity_label&#39;</span><span class="p">:</span> <span class="n">ExampleSet</span><span class="o">.</span><span class="n">_known_cavity_labels</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Add any missing levels and the make sure they are in a predictable order</span>
+        <span class="k">for</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">master</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">master</span><span class="p">[</span><span class="n">factor</span><span class="p">]:</span>
+                <span class="c1"># Add the category if it is not present</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">add_categories</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Enforce a known ordering</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">reorder_categories</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">factor</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adam Carpenter.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

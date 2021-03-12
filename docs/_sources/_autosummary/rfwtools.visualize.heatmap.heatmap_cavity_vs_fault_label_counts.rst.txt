@@ -1,0 +1,6 @@
+rfwtools.visualize.heatmap.heatmap\_cavity\_vs\_fault\_label\_counts
+====================================================================
+
+.. currentmodule:: rfwtools.visualize.heatmap
+
+.. autofunction:: heatmap_cavity_vs_fault_label_counts

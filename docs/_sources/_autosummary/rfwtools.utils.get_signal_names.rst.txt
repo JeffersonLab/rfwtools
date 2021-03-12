@@ -1,0 +1,6 @@
+rfwtools.utils.get\_signal\_names
+=================================
+
+.. currentmodule:: rfwtools.utils
+
+.. autofunction:: get_signal_names

@@ -1,0 +1,6 @@
+rfwtools.extractor.tsf.tsfresh\_extractor
+=========================================
+
+.. currentmodule:: rfwtools.extractor.tsf
+
+.. autofunction:: tsfresh_extractor

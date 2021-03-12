@@ -1,0 +1,30 @@
+rfwtools.dim\_reduction.pca
+===========================
+
+.. automodule:: rfwtools.dim_reduction.pca
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      do_pca_reduction
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

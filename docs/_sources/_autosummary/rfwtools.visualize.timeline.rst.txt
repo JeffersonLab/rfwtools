@@ -1,0 +1,30 @@
+rfwtools.visualize.timeline
+===========================
+
+.. automodule:: rfwtools.visualize.timeline
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      swarm_timeline
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rfwtools.example_validator &mdash; rfwtools 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> rfwtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/rfwtools.html">rfwtools</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rfwtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rfwtools.example_validator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rfwtools.example_validator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This package manages the validation of Examples.  While much data is collected, some data is unsuitable for analysis.</span>
+
+<span class="sd">An ExampleValidator object is responsible for investigating an Example object and determining if it suitable for</span>
+<span class="sd">analysis.  ExampleValidator should be subclassed as needed to support the individual requirements of different analytical approaches.</span>
+
+<span class="sd">Typically you won&#39;t use these directly, and instead pass it to the ExapmleSet.purge_invalid_examples() method.</span>
+<span class="sd">Basic Usage Example:</span>
+<span class="sd">::</span>
+
+<span class="sd">    import math</span>
+<span class="sd">    from datetime import datetime</span>
+<span class="sd">    from rfwtools.example import Example</span>
+<span class="sd">    from rfwtools.example_validator import ExampleValidator</span>
+
+<span class="sd">    # Make an example to validate</span>
+<span class="sd">    ex = Example(zone=&#39;1L25&#39;,</span>
+<span class="sd">                 dtime=datetime.strptime(&quot;2020-03-10 01:08:41.2&quot;, &quot;%Y-%m-%d %H:%M:%S.%f),</span>
+<span class="sd">                 cavity_label=&quot;4&quot;,</span>
+<span class="sd">                 fault_label=&quot;Microphonics&quot;,</span>
+<span class="sd">                 cavity_conf=math.nan,</span>
+<span class="sd">                 fault_conf=math.nan,</span>
+<span class="sd">                 label_source=&#39;my_label_file.txt&#39;</span>
+<span class="sd">                )</span>
+
+<span class="sd">    # Setup the validator</span>
+<span class="sd">    ev = ExampleValidator()</span>
+<span class="sd">    ev.set_example(ex)</span>
+
+<span class="sd">    # If anything is wrong with the example, the validator will raise an exception.  The exception clause is</span>
+<span class="sd">    # intentionally broad to capture the bevy of problems that could be encountered.</span>
+<span class="sd">    try:</span>
+<span class="sd">        ev.validate_data()</span>
+<span class="sd">    except Exception as exc:</span>
+<span class="sd">        print(f&quot;Invalid event - {ex}\\n  {exc}\\n&quot;)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">rfwtools</span> <span class="kn">import</span> <span class="n">mya</span>
+<span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">Example</span><span class="p">,</span> <span class="n">WindowedExample</span>
+
+
+<div class="viewcode-block" id="ExampleValidator"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator">[docs]</a><span class="k">class</span> <span class="nc">ExampleValidator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class provides functionality for checking that an individual example meets the criteria for validity.</span>
+
+<span class="sd">    Some checks are very basic, e.g., do we have all of the necessary data from the fault event.  Others are a bit more</span>
+<span class="sd">    nuanced, e.g., was the cavity in the proper RF mode. See validate_data and other validation methods for details.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This class loads capture file data at set_example, but defers any exceptions from that process until</span>
+<span class="sd">        validate_data() is called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ExampleValidator.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create an instance for validating Example.&quot;&quot;&quot;</span>
+        <span class="c1">#: (datetime): The datetime of the fault.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: (str): The zone where the fault occurred</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: (pd.DataFrame): The DataFrame of waveform signals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: (dict of str:str): The raw capture file content (typically produced by the harvester daemon)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_cf_content</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: (Exception): The exception generated by example_load() in set_example() or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df_exception</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.set_example"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.set_example">[docs]</a>    <span class="k">def</span> <span class="nf">set_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">:</span> <span class="n">Example</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set internal information about the example to validate.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            example: The example that is to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_cf_content</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">get_capture_file_contents</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">event_datetime</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">event_zone</span>
+
+        <span class="c1"># Need to load the data and make an internal copy for later use.  Save the exception and raise it at the</span>
+        <span class="c1"># validate_data() call.  That is where problems with the Example are expected to be raised.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">example</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">example</span><span class="o">.</span><span class="n">unload_data</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df_exception</span> <span class="o">=</span> <span class="n">ex</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_data">[docs]</a>    <span class="k">def</span> <span class="nf">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ops&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check that the event directory and it&#39;s data is of the expected format.</span>
+
+<span class="sd">        This method inspects the event directory and raises an exception if a problem is found.  The following aspects</span>
+<span class="sd">        of the event directory and waveform data are validated.</span>
+
+<span class="sd">        * Data can be found on disk</span>
+
+<span class="sd">        * All eight cavities are represented by exactly one capture file</span>
+
+<span class="sd">        * All of the required waveforms are represented exactly once</span>
+
+<span class="sd">        * All of the capture files use the same timespan and have constant sampling intervals</span>
+
+<span class="sd">        * All of the cavity are in the appropriate control mode (GDR I/Q =&gt; 4) or bypassed</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            deployment: Which MYA deployment should be used when checking archiver data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If a problem is found with the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df_exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_capture_file_counts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_capture_file_waveforms</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_waveform_times</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_cavity_modes</span><span class="p">(</span><span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_zones</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_capture_file_counts"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_capture_file_counts">[docs]</a>    <span class="k">def</span> <span class="nf">validate_capture_file_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This method checks that we have exactly one capture file per cavity/IOC.</span>
+
+<span class="sd">        The harvester grouping logic coupled with unreliable IOC behavior seems to produce fault event directories where</span>
+<span class="sd">        either an IOC has multiple capture files or are missing.  We want to make sure we have exactly eight capture</span>
+<span class="sd">        files - one per IOC.  Raises an exception in the case that something is amiss.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if either missing or &quot;duplicate&quot; capture files are found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Count capture files per cavity</span>
+        <span class="n">capture_file_counts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;7&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;8&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="c1"># Count the filenames that match each cavity</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_cf_content</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cavity</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">capture_file_counts</span><span class="p">[</span><span class="n">cavity</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Verify that we have the right counts - one for each cavity</span>
+        <span class="k">for</span> <span class="n">cavity</span> <span class="ow">in</span> <span class="n">capture_file_counts</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">capture_file_counts</span><span class="p">[</span><span class="n">cavity</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Duplicate capture files exist for zone &#39;&quot;</span> <span class="o">+</span> <span class="n">cavity</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">capture_file_counts</span><span class="p">[</span><span class="n">cavity</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing capture file for zone &#39;&quot;</span> <span class="o">+</span> <span class="n">cavity</span> <span class="o">+</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_capture_file_waveforms"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_capture_file_waveforms">[docs]</a>    <span class="k">def</span> <span class="nf">validate_capture_file_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks that all of the required waveforms are present exactly one time across all capture files.</span>
+
+<span class="sd">        If event_df is None, then the capture files themselves are loaded.  If event_df is not None, then the files are</span>
+<span class="sd">        checked directly.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if any required waveform is repeated or missing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get a structure for counting matches of waveforms</span>
+        <span class="n">req_signals</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;IMES&quot;</span><span class="p">,</span> <span class="s2">&quot;QMES&quot;</span><span class="p">,</span> <span class="s2">&quot;GMES&quot;</span><span class="p">,</span> <span class="s2">&quot;PMES&quot;</span><span class="p">,</span> <span class="s2">&quot;IASK&quot;</span><span class="p">,</span> <span class="s2">&quot;QASK&quot;</span><span class="p">,</span> <span class="s2">&quot;GASK&quot;</span><span class="p">,</span> <span class="s2">&quot;PASK&quot;</span><span class="p">,</span> <span class="s2">&quot;CRFP&quot;</span><span class="p">,</span> <span class="s2">&quot;CRFPP&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;CRRP&quot;</span><span class="p">,</span> <span class="s2">&quot;CRRPP&quot;</span><span class="p">,</span> <span class="s2">&quot;GLDE&quot;</span><span class="p">,</span> <span class="s2">&quot;PLDE&quot;</span><span class="p">,</span> <span class="s2">&quot;DETA2&quot;</span><span class="p">,</span> <span class="s2">&quot;CFQE2&quot;</span><span class="p">,</span> <span class="s2">&quot;DFQES&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Assume we have the event_df.  Compare the DataFrame columns to the required signals</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing fault event waveform data (event_df)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Generate the list of required and actual columns</span>
+        <span class="n">req_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">((</span><span class="s2">&quot;1_&quot;</span><span class="p">,</span> <span class="s2">&quot;2_&quot;</span><span class="p">,</span> <span class="s2">&quot;3_&quot;</span><span class="p">,</span> <span class="s2">&quot;4_&quot;</span><span class="p">,</span> <span class="s2">&quot;5_&quot;</span><span class="p">,</span> <span class="s2">&quot;6_&quot;</span><span class="p">,</span> <span class="s2">&quot;7_&quot;</span><span class="p">,</span> <span class="s2">&quot;8_&quot;</span><span class="p">),</span>
+                                                           <span class="n">req_signals</span><span class="p">)]</span>
+        <span class="n">req_columns</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>  <span class="c1"># Don&#39;t want to modify the actual event_df</span>
+
+        <span class="c1"># Sort them so we can do element wise comparison</span>
+        <span class="n">req_columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">columns</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">req_columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="ow">or</span> <span class="n">req_columns</span> <span class="o">!=</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found event_df does not have the required waveform columns.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_waveform_times"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_waveform_times">[docs]</a>    <span class="k">def</span> <span class="nf">validate_waveform_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">min_end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">100.0</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
+                                <span class="n">delta_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Verify the Time column of all capture files are identical and have a valid range and sample interval.</span>
+
+<span class="sd">        Note: The default 0.02 delta_max is chosen because the actual time step ranges from 0.18... to 0.21... when</span>
+<span class="sd">        a time step of 0.2 is specified.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            max_start: The latest acceptable start time for the waveforms</span>
+<span class="sd">            min_end: The earliest acceptable end time for the waveforms</span>
+<span class="sd">            step_size: The expected step_size of each waveform in milliseconds</span>
+<span class="sd">            delta_max: The maximum difference between the observed time steps and step_size in milliseconds.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if either Time columns mismatch or Time columns are beyond expected thresholds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing fault event waveform data (event_df)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check that the time range is somewhere in the [-1.6s, 1.6s] range</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span>
+        <span class="n">min_t</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">max_t</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_start</span> <span class="o">&lt;</span> <span class="n">min_t</span> <span class="ow">or</span> <span class="n">min_end</span> <span class="o">&gt;</span> <span class="n">max_t</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid time range of [</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">] found.  Does not include minimum range for fault data [</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">min_t</span><span class="p">,</span> <span class="n">max_t</span><span class="p">,</span> <span class="n">max_start</span><span class="p">,</span> <span class="n">min_end</span><span class="p">))</span>
+
+        <span class="c1"># Check that the time sample interval is approximately the same.  Since this is floating point, there may be</span>
+        <span class="c1"># slight differences</span>
+        <span class="n">lag</span> <span class="o">=</span> <span class="n">time</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">lag</span> <span class="o">=</span> <span class="n">lag</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">lag</span><span class="p">)]</span>
+        <span class="n">max_step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span>
+        <span class="n">min_step</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step_size</span> <span class="o">-</span> <span class="n">max_step</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">delta_max</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">step_size</span> <span class="o">-</span> <span class="n">min_step</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">delta_max</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found improper step size.  Expect: </span><span class="si">{}</span><span class="s2">, Step size range: (</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">), Acceptable delta: </span><span class="si">{}</span><span class="s2">&quot;</span>
+                             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_step</span><span class="p">,</span> <span class="n">max_step</span><span class="p">,</span> <span class="n">delta_max</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_cavity_modes"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_cavity_modes">[docs]</a>    <span class="k">def</span> <span class="nf">validate_cavity_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">deployment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ops&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Checks that each cavity was in the appropriate control mode or is bypassed.</span>
+
+<span class="sd">        A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event</span>
+<span class="sd">        timestamp.  Currently the proper mode is GDR (I/Q).</span>
+
+<span class="sd">        According to the RF low-level software developer (lahti), the proper PV for C100 IOCs is</span>
+<span class="sd">        R&lt;Linac&gt;&lt;Zone&gt;&lt;Cavity&gt;CNTL2MODE which is a float treated like a bit word.  At the time of writing, the most</span>
+<span class="sd">        common modes are:</span>
+
+<span class="sd">        * 2 == SEL</span>
+<span class="sd">        * 4 == GDR (I/Q)</span>
+
+<span class="sd">        A single cavity may be bypassed by operations to alleviate performance problems.  In the situation the rest of</span>
+<span class="sd">        the zone is working normally and is considered to produce valid data for modeling purposes.  Only the control</span>
+<span class="sd">        modes of the non-bypassed cavities will be considered for invalidating the data.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            mode:  The mode number associated with the proper control mode.</span>
+<span class="sd">            offset: The number of seconds before the fault event the mode setting should be checked.</span>
+<span class="sd">            deployment: The MYA archiver deployment used for querying historical PV values</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if any cavity mode does not match the value specified by the mode parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.</span>
+        <span class="n">mode_template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">CNTL2MODE&#39;</span>
+
+        <span class="c1"># &quot;Newer&quot; C100 bypass control.  It&#39;s a bit word that represents the bypass status of all cavities</span>
+        <span class="n">bypassed_template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">XMOUT&#39;</span>
+
+        <span class="c1"># Still need to check if GSET == 0 since this is how many operators &quot;bypass&quot; a cavity, at least historically.</span>
+        <span class="n">gset_template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">GSET&#39;</span>
+
+        <span class="c1"># Check these PVs just before the fault, since they may have changed in response to the fault</span>
+        <span class="n">pre_fault_dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
+
+        <span class="c1"># We need the zone to check the bypass bit word that has bit 0-7 corresponding to cavity 1-8</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cfs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_cf_content</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">cfs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No capture file content found.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">zone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could parse zone name from capture file name&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the bypassed bit word.  Check each cavity&#39;s status in the loop below.</span>
+        <span class="n">bypassed</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">bypassed</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">bypassed_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate</span>
+            <span class="c1"># archival of the R...XMOUT PVs</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Switch to binary string.  &quot;08b&quot; means include leading zeros (&quot;0&quot;), have eight bits (&quot;8&quot;), and format string as</span>
+        <span class="c1"># binary number (&quot;b&quot;).  The [::-1] is an extended slice that says to step along the characters in reverse.</span>
+        <span class="c1"># The reversal puts the bits in cavity order - bit_0 -&gt; cav_1, bit_1 -&gt; cav_2, ...</span>
+        <span class="n">bypassed_bits</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;08b&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bypassed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">bypassed_bits</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">bypassed</span><span class="p">,</span> <span class="s2">&quot;08b&quot;</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_cf_content</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cav</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+            <span class="c1"># Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don&#39;t care about it&#39;s</span>
+            <span class="c1"># control mode</span>
+            <span class="n">gset</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">gset_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Check if the cavity was formally bypassed.  bypassed_bits is zero indexed, while cavities are one</span>
+            <span class="c1"># indexed.  1 is bypassed, 0 is not</span>
+            <span class="k">if</span> <span class="n">bypassed_bits</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">cav</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">val</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">mode_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cavity &#39;&quot;</span> <span class="o">+</span> <span class="n">cav</span> <span class="o">+</span> <span class="s2">&quot;&#39; not in GDR mode.  Mode = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ExampleValidator.validate_zones"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_zones">[docs]</a>    <span class="k">def</span> <span class="nf">validate_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if the zone name is 0L04.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">invalid_zones</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0L04&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="ow">in</span> <span class="n">invalid_zones</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Zone </span><span class="si">{}</span><span class="s2"> is not a valid zone for this model&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="WindowedExampleValidator"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.WindowedExampleValidator.html#rfwtools.example_validator.WindowedExampleValidator">[docs]</a><span class="k">class</span> <span class="nc">WindowedExampleValidator</span><span class="p">(</span><span class="n">ExampleValidator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Checks that WindowedExamples meet our validation criteria.  Similar to ExampleValidator</span>
+
+<span class="sd">    Major difference between parent class is that this has updated checks for waveform Time stamps being relative to</span>
+<span class="sd">    the start of the window</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WindowedExampleValidator.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.WindowedExampleValidator.html#rfwtools.example_validator.WindowedExampleValidator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct an instance.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1">#: The start of the Example&#39;s time window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_start</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: The end of the Example&#39;s time window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_end</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="WindowedExampleValidator.set_example"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.WindowedExampleValidator.html#rfwtools.example_validator.WindowedExampleValidator.set_example">[docs]</a>    <span class="k">def</span> <span class="nf">set_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">:</span> <span class="n">WindowedExample</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Set internal information about the example to validate.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            example: The example that is to be validated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_example</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_start</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_end</span> <span class="o">=</span> <span class="n">example</span><span class="o">.</span><span class="n">end</span></div>
+
+<div class="viewcode-block" id="WindowedExampleValidator.validate_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.WindowedExampleValidator.html#rfwtools.example_validator.WindowedExampleValidator.validate_data">[docs]</a>    <span class="k">def</span> <span class="nf">validate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deployment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ops&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check that the event directory and it&#39;s data is of the expected format.</span>
+
+<span class="sd">        This method inspects the event directory and raises an exception if a problem is found.  The following aspects</span>
+<span class="sd">        of the event directory and waveform data are validated.</span>
+
+<span class="sd">        * Data can be found on disk</span>
+
+<span class="sd">        * All eight cavities are represented by exactly one capture file</span>
+
+<span class="sd">        * All of the required waveforms are represented exactly once</span>
+
+<span class="sd">        * All of the capture files use the same timespan, have constant sampling intervals, and are within tolerances</span>
+<span class="sd">          for their stated windows.</span>
+
+<span class="sd">        * All of the cavity are in the appropriate control mode (GDR I/Q =&gt; 4) or bypassed</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            deployment: Which MYA deployment should be used when checking archiver data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If a problem is found with the data.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># This is the standard step size for a valid example.</span>
+        <span class="n">step_size</span> <span class="o">=</span> <span class="mf">0.2</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_start</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df_exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_capture_file_counts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_capture_file_waveforms</span><span class="p">()</span>
+
+        <span class="c1"># Make sure that the start is not too late, and the the end is not too early.  Note max_start == 0+step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_waveform_times</span><span class="p">(</span><span class="n">max_start</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_end</span><span class="o">=</span><span class="p">(</span><span class="n">window_size</span><span class="o">-</span><span class="n">step_size</span><span class="p">),</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_cavity_modes</span><span class="p">(</span><span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_zones</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adam Carpenter.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

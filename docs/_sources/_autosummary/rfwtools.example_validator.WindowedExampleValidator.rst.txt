@@ -1,0 +1,32 @@
+rfwtools.example\_validator.WindowedExampleValidator
+====================================================
+
+.. currentmodule:: rfwtools.example_validator
+
+.. autoclass:: WindowedExampleValidator
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~WindowedExampleValidator.__init__
+      ~WindowedExampleValidator.set_example
+      ~WindowedExampleValidator.validate_capture_file_counts
+      ~WindowedExampleValidator.validate_capture_file_waveforms
+      ~WindowedExampleValidator.validate_cavity_modes
+      ~WindowedExampleValidator.validate_data
+      ~WindowedExampleValidator.validate_waveform_times
+      ~WindowedExampleValidator.validate_zones
+   
+   
+
+   
+   
+   

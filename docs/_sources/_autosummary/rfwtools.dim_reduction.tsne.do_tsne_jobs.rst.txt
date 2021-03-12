@@ -1,0 +1,6 @@
+rfwtools.dim\_reduction.tsne.do\_tsne\_jobs
+===========================================
+
+.. currentmodule:: rfwtools.dim_reduction.tsne
+
+.. autofunction:: do_tsne_jobs

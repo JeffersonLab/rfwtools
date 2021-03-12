@@ -1,0 +1,46 @@
+﻿rfwtools.example.Example
+========================
+
+.. currentmodule:: rfwtools.example
+
+.. autoclass:: Example
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Example.__init__
+      ~Example.capture_files_on_disk
+      ~Example.convert_waveform_column_names
+      ~Example.get_capture_file_contents
+      ~Example.get_event_path
+      ~Example.get_example_type
+      ~Example.has_matching_labels
+      ~Example.is_capture_file
+      ~Example.load_data
+      ~Example.parse_capture_file
+      ~Example.parse_event_dir
+      ~Example.plot_waveforms
+      ~Example.remove_event_df_from_disk
+      ~Example.save_event_df_to_disk
+      ~Example.to_string
+      ~Example.unload_data
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Example.capture_file_regex
+   
+   

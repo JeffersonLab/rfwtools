@@ -1,0 +1,26 @@
+rfwtools.example.ExampleType
+============================
+
+.. currentmodule:: rfwtools.example
+
+.. autoclass:: ExampleType
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ExampleType.EXAMPLE
+      ~ExampleType.WINDOWED_EXAMPLE
+   
+   

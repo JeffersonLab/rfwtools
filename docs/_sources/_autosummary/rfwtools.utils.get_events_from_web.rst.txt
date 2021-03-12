@@ -1,0 +1,6 @@
+rfwtools.utils.get\_events\_from\_web
+=====================================
+
+.. currentmodule:: rfwtools.utils
+
+.. autofunction:: get_events_from_web

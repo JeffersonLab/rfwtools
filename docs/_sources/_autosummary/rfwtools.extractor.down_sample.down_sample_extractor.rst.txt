@@ -1,0 +1,6 @@
+rfwtools.extractor.down\_sample.down\_sample\_extractor
+=======================================================
+
+.. currentmodule:: rfwtools.extractor.down_sample
+
+.. autofunction:: down_sample_extractor

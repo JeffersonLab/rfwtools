@@ -1,0 +1,6 @@
+rfwtools.extractor.down\_sample.lttb\_extractor
+===============================================
+
+.. currentmodule:: rfwtools.extractor.down_sample
+
+.. autofunction:: lttb_extractor

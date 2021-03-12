@@ -1,0 +1,282 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rfwtools.example_validator &mdash; rfwtools 1.0.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rfwtools.example_validator.ExampleValidator" href="rfwtools.example_validator.ExampleValidator.html" />
+    <link rel="prev" title="rfwtools.example_set.ExampleSet" href="rfwtools.example_set.ExampleSet.html" />
+    <link href="../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> rfwtools
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="rfwtools.html">rfwtools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.config.html">rfwtools.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.data_set.html">rfwtools.data_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.dim_reduction.html">rfwtools.dim_reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example.html">rfwtools.example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example_set.html">rfwtools.example_set</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rfwtools.example_validator</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="rfwtools.example_validator.ExampleValidator.html">rfwtools.example_validator.ExampleValidator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rfwtools.example_validator.WindowedExampleValidator.html">rfwtools.example_validator.WindowedExampleValidator</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.extractor.html">rfwtools.extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.feature_set.html">rfwtools.feature_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.mya.html">rfwtools.mya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.network.html">rfwtools.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.timestamp.html">rfwtools.timestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.utils.html">rfwtools.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.visualize.html">rfwtools.visualize</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rfwtools</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="rfwtools.html">rfwtools</a> &raquo;</li>
+        
+      <li>rfwtools.example_validator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_autosummary/rfwtools.example_validator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-rfwtools.example_validator">
+<span id="rfwtools-example-validator"></span><h1>rfwtools.example_validator<a class="headerlink" href="#module-rfwtools.example_validator" title="Permalink to this headline">¶</a></h1>
+<p>This package manages the validation of Examples.  While much data is collected, some data is unsuitable for analysis.</p>
+<p>An ExampleValidator object is responsible for investigating an Example object and determining if it suitable for
+analysis.  ExampleValidator should be subclassed as needed to support the individual requirements of different analytical approaches.</p>
+<p>Typically you won’t use these directly, and instead pass it to the ExapmleSet.purge_invalid_examples() method.
+Basic Usage Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">Example</span>
+<span class="kn">from</span> <span class="nn">rfwtools.example_validator</span> <span class="kn">import</span> <span class="n">ExampleValidator</span>
+
+<span class="c1"># Make an example to validate</span>
+<span class="n">ex</span> <span class="o">=</span> <span class="n">Example</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="s1">&#39;1L25&#39;</span><span class="p">,</span>
+             <span class="n">dtime</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;2020-03-10 01:08:41.2&quot;</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">),</span>
+             <span class="n">cavity_label</span><span class="o">=</span><span class="s2">&quot;4&quot;</span><span class="p">,</span>
+             <span class="n">fault_label</span><span class="o">=</span><span class="s2">&quot;Microphonics&quot;</span><span class="p">,</span>
+             <span class="n">cavity_conf</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+             <span class="n">fault_conf</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+             <span class="n">label_source</span><span class="o">=</span><span class="s1">&#39;my_label_file.txt&#39;</span>
+            <span class="p">)</span>
+
+<span class="c1"># Setup the validator</span>
+<span class="n">ev</span> <span class="o">=</span> <span class="n">ExampleValidator</span><span class="p">()</span>
+<span class="n">ev</span><span class="o">.</span><span class="n">set_example</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
+
+<span class="c1"># If anything is wrong with the example, the validator will raise an exception.  The exception clause is</span>
+<span class="c1"># intentionally broad to capture the bevy of problems that could be encountered.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">ev</span><span class="o">.</span><span class="n">validate_data</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid event - </span><span class="si">{</span><span class="n">ex</span><span class="si">}</span><span class="se">\n</span><span class="s2">  </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Classes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator" title="rfwtools.example_validator.ExampleValidator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExampleValidator</span></code></a>()</p></td>
+<td><p>This class provides functionality for checking that an individual example meets the criteria for validity.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rfwtools.example_validator.WindowedExampleValidator.html#rfwtools.example_validator.WindowedExampleValidator" title="rfwtools.example_validator.WindowedExampleValidator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindowedExampleValidator</span></code></a>()</p></td>
+<td><p>Checks that WindowedExamples meet our validation criteria.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="rfwtools.example_validator.ExampleValidator.html" class="btn btn-neutral float-right" title="rfwtools.example_validator.ExampleValidator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rfwtools.example_set.ExampleSet.html" class="btn btn-neutral float-left" title="rfwtools.example_set.ExampleSet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Adam Carpenter.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

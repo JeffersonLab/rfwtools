@@ -1,0 +1,6 @@
+rfwtools.extractor.autoregressive.autoregressive\_extractor\_faulted\_cavity
+============================================================================
+
+.. currentmodule:: rfwtools.extractor.autoregressive
+
+.. autofunction:: autoregressive_extractor_faulted_cavity

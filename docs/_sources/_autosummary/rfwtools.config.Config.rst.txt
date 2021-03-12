@@ -1,0 +1,35 @@
+﻿rfwtools.config.Config
+======================
+
+.. currentmodule:: rfwtools.config
+
+.. autoclass:: Config
+   :members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Config.__init__
+      ~Config.dump_yaml_string
+      ~Config.load_yaml_string
+      ~Config.read_config_file
+      ~Config.write_config_file
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Config.instance
+   
+   

@@ -1,0 +1,31 @@
+rfwtools.extractor.down\_sample
+===============================
+
+.. automodule:: rfwtools.extractor.down_sample
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      down_sample_extractor
+      lttb_extractor
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

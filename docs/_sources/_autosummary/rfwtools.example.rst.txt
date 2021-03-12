@@ -1,0 +1,35 @@
+﻿rfwtools.example
+================
+
+.. automodule:: rfwtools.example
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      Example
+      ExampleType
+      Factory
+      IExample
+      WindowedExample
+   
+   
+
+   
+   
+   
+
+
+

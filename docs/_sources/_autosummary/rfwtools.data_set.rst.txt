@@ -1,0 +1,31 @@
+rfwtools.data\_set
+==================
+
+.. automodule:: rfwtools.data_set
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:
+      :template: custom-class-template.rst
+   
+      DataSet
+   
+   
+
+   
+   
+   
+
+
+
