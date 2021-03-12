@@ -673,7 +673,11 @@ class WindowedExample(Example):
         self.end = end
 
     def load_data(self, verbose: bool = False) -> None:
-        """Load the fault event data and retain only the defined time window.
+        """Load the fault event data according to Example.load_data() and retain only the defined time window.
+
+        This changes the Time column from being relative to the fault onset to being relative to the start of the
+        window.  This means that the first time value is unlikely to be exactly 0, but should be a small positive
+        number.
 
         Arguments:
             verbose: Should extra information be printed during operation
@@ -689,3 +693,4 @@ class WindowedExample(Example):
             raise RuntimeError(f"Requested window of [{self.start}, {self.end}], but event data is [{t_min}, {t_max}]")
 
         self.event_df = self.event_df.query(f"Time >= {self.start} & Time <= {self.end}")
+        self.event_df.Time = self.event_df.Time - self.start
