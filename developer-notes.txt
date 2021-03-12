@@ -34,6 +34,12 @@ python3 -m unittest
 # To build distributions.  You may need to remove directory content if rebuilding
 python setup.py sdist bdist_wheel
 
+# To build documentation that can be used in github
+docsrc/build-docs.bash
+git add .
+git commit -m"Updated documentation"
+# You should probably also increment version numbers in setup.cfg and put out a new package to PyPI (shown below).
+
 # To upload to the test PyPI repo.  You may need to add the --cert /etc/pki/tls/cert.pem option for SSL problems.
 edit setup.cfg with latest info
 twine upload --repository testpypi dist/*
