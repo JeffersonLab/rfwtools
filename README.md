@@ -4,6 +4,10 @@ This package provides commonly used functionality around CEBAF C100 RF Waveforms
 includes data management such as download capture files, reading data from disk, parsing label files, running feature
 extraction tasks, and generating data reports and visualizations.
 
+## Latest API Documentation
+
+https://jeffersonlab.github.io/rfwtools/
+
 ## Installation
 
 This package has been posted to PyPI to ease installation.
