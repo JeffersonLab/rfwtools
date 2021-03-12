@@ -1,3 +1,5 @@
+"""This module is a work in progress left here for future improvement.  It's should be a light wrapper on t-SNE."""
+
 import matplotlib.pyplot as plt
 import os
 from sklearn.manifold import TSNE
