@@ -241,6 +241,13 @@ Number of mismatched labels: 6
         with self.assertRaises(ValueError):
             es.load_csv(bad_csv_file, in_dir=test.test_data_dir)
 
+        # Run the test with a WindowedExample
+        es = ExampleSet(e_type=ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -1000, 'end': -900})
+        es.load_csv(csv_file, in_dir=test.test_data_dir)
+
+        self.assertEqual(es.get_example_df().loc[0, 'example'].get_example_type(), ExampleType.WINDOWED_EXAMPLE)
+        self.assertEqual(es.get_example_df().loc[0, 'cavity_label'], "5")
+        self.assertTrue(math.isnan(es.get_example_df().loc[0, 'cavity_conf']))
 
 if __name__ == '__main__':
     unittest.main()
