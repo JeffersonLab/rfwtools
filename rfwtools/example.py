@@ -38,6 +38,12 @@ from rfwtools.network import SSLContextAdapter
 from rfwtools.config import Config
 
 
+class ExampleType(Enum):
+    """The types of supported IExample types"""
+    EXAMPLE = 1
+    WINDOWED_EXAMPLE = 2
+
+
 class IExample:
     """Abstract class that defines the basic interface for an Example.
 
@@ -50,23 +56,26 @@ class IExample:
         # Will eventually hold the waveform data from the event
         self.event_df = None
         self.data_dir = data_dir
+        self.e_type = None
 
-    def load_data(self):
+    def load_data(self) -> None:
         """This method should do everything necessary to create an example_df DataFrame at a minimum.
 
         Subclasses should use this method as the interface for loading all data associated with the fault event.
         """
         raise NotImplementedError("This method has not been implement by child class")
 
-    def unload_data(self):
+    def unload_data(self) -> None:
         """This method should do everything necessary to free up memory used in load_data."""
         raise NotImplementedError("This method has not been implement by child class")
 
+    def get_example_type(self) -> ExampleType:
+        """Get this Example's ExampleType.
 
-class ExampleType(Enum):
-    """The types of supported IExample types"""
-    EXAMPLE = 1
-    WINDOWED_EXAMPLE = 2
+        Return:
+            The Enum corresponding to the class type
+        """
+        return self.e_type
 
 
 class Factory:
@@ -140,13 +149,17 @@ class Example(IExample):
     dt: datetime object matching the local time of the fault event
     cavity_label: a string label specifying the cavity that caused fault (typically "0", "1", ..., "8")
     fault_label: a string label specifying the type of fault that occurred (ExampleSet has a list of "known" labels")
+    cavity_conf: A floating point number in [0, 1] representing the probability/confidence placed in the cavity label
+    fault_conf: A floating point number in [0, 1] representing the probability/confidence placed in the fault label
+    label_source: The source of the labels.  Typically either label files or the output of a model
     data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.
     """
 
     # A regex for matching
     capture_file_regex = re.compile(r"R.*harv\..*\.txt")
 
-    def __init__(self, zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir=None):
+    def __init__(self, zone:str , dt: datetime, cavity_label: str, fault_label: str, cavity_conf: float,
+                 fault_conf: float, label_source: str, data_dir:str =None):
         """Construct an instance of the Example class."""
 
         super().__init__(data_dir=data_dir)
@@ -161,6 +174,10 @@ class Example(IExample):
         # Zone and timestamp info for the example event
         self.event_datetime = dt
         self.event_zone = zone
+
+        #: The type of example this is.
+        self.e_type = ExampleType.EXAMPLE
+
 
     def load_data(self, verbose: bool = False) -> None:
         """Top-level method for loading data associated with Example instance.
@@ -665,6 +682,7 @@ class WindowedExample(Example):
             end: The end of the time window.
         """
         super().__init__(zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir)
+        self.e_type = ExampleType.WINDOWED_EXAMPLE
 
         if not start < end:
             raise ValueError(f"start ({start}) must be less than end ({end}).")
