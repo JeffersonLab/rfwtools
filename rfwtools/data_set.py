@@ -80,7 +80,7 @@ class DataSet:
 
         # A ExampleSet object - contains logic for managing a cohesive set of labeled fault events (i.e., examples)
         # This will hold the labels processed from label files unless otherwise modified
-        self.example_set = ExampleSet(e_type=e_type, **example_kwargs)
+        self.example_set = ExampleSet(e_type=e_type, example_kwargs=example_kwargs)
 
         # An ExampleSet for holding the corresponding results from our in service models.
         self.example_set_model = ExampleSet()
