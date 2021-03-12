@@ -176,18 +176,18 @@ class FeatureSet(ExampleSet):
         else:
             return self.__pca_df.copy()
 
-    def update_example_set(self, df: pd.DataFrame, metadata_cols: List[str] = None) -> None:
+    def update_example_set(self, df: pd.DataFrame, metadata_columns: List[str] = None) -> None:
         """Update the _example_df and blanks other internal data derived from it.
 
         Arguments:
             df:
                 A DataFrame containing an example per row with additional feature information.  Must be valid for this
                 FeatureSet.
-            metadata_cols:
+            metadata_columns:
                 A new list of metadata columns for df
         """
-        if metadata_cols is not None:
-            self._update_metadata_columns(metadata_columns=metadata_cols)
+        if metadata_columns is not None:
+            self._update_metadata_columns(metadata_columns=metadata_columns)
 
         super().update_example_set(df)
         self.__pca_df = None

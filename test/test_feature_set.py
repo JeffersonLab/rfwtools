@@ -151,7 +151,7 @@ class TestFeatureSet(TestCase):
         m_cols = fs.metadata_columns + ['junk']
         df = fs.get_example_df()
         df['junk'] = ['junker'] * len(df)
-        fs.update_example_set(df, metadata_cols=m_cols)
+        fs.update_example_set(df, metadata_columns=m_cols)
 
         self.assertListEqual(fs.metadata_columns, m_cols)
 
