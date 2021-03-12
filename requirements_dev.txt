@@ -2,3 +2,7 @@ pip==20.1
 wheel==0.34.2
 twine==1.13.0
 tox==3.21.4
+sphinx==3.5.1
+sphinx-rtd-theme==0.5.1
+sphinx-napoleon==0.7
+sphinx-autodoc-typehints==1.11.1
