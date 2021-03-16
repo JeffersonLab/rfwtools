@@ -219,6 +219,8 @@ class DataSet:
 
             # Combine them into a single long row, with the standard info first.
             if result is not None:
+                if len(result) > 1:
+                    df = df.loc[df.index.repeat(len(result))].reset_index()
                 result = pd.concat((df, result), axis=1)
         except Exception as exc:
             print("### Error extracting features from event {}".format(str(example)))
