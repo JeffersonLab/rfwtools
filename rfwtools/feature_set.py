@@ -77,7 +77,7 @@ class FeatureSet(ExampleSet):
 
         #: These columns are required in internal DataFrames and are excluded from analysis routines.
         self.metadata_columns = None
-        self._update_metadata_columns(metadata_columns=metadata_columns)
+        self.update_metadata_columns(metadata_columns=metadata_columns)
 
         if df is not None:
             # Make sure the DataFrame has the metadata columns.  The
@@ -127,7 +127,7 @@ class FeatureSet(ExampleSet):
         
         # Update the column info if indicated
         if metadata_columns is not None:
-            self._update_metadata_columns(metadata_columns=metadata_columns)
+            self.update_metadata_columns(metadata_columns=metadata_columns)
 
         # Clear the dimensionality reduction attributes
         self.__pca_df = None
@@ -136,7 +136,7 @@ class FeatureSet(ExampleSet):
         # Load it into the parent's ExampleSet _example_df
         super().load_csv(filename=filename, in_dir=in_dir, sep=sep)
 
-    def _update_metadata_columns(self, metadata_columns: List[str]) -> None:
+    def update_metadata_columns(self, metadata_columns: List[str]) -> None:
         """This updates the metadata columns and alters other related data structures.
 
         self.metadata_columns always include ExampleSet._mandatory_columns.  Does deduplication should you include those
@@ -187,7 +187,7 @@ class FeatureSet(ExampleSet):
                 A new list of metadata columns for df
         """
         if metadata_columns is not None:
-            self._update_metadata_columns(metadata_columns=metadata_columns)
+            self.update_metadata_columns(metadata_columns=metadata_columns)
 
         super().update_example_set(df)
         self.__pca_df = None
