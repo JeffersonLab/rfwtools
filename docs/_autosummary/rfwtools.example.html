@@ -191,18 +191,16 @@ in the specified location, then it will attempt to download the data and create 
 This functionality typically requires access to JLab’s internal networks (e.g., VPN).</p>
 <p>Expected data structure is &lt;data_dir&gt;/&lt;zone&gt;/&lt;date&gt;/&lt;timestamp&gt;/&lt;capture files&gt;.  Alternatively, event data may be
 compressed at the &lt;timestamp&gt; directory level, i.e. &lt;timestamp&gt;.tar.gz.</p>
-<blockquote>
-<div><p>Typical usage example:</p>
-<p>import Example
-e = Example(zone=”1L23”, dt=datetime.strptime(“%Y-%m-%d %H:%M:%S.%f”), cavity_label=”1”, fault_label=”Microphonics”,</p>
-<blockquote>
-<div><p>cavity_conf=math.nan, fault_conf=math.nan, label_source=’my_label_file.txt’)</p>
-</div></blockquote>
-<p>e.load_data()
-df = e.event_df
-e.unload_data()
-# Now do something with the data</p>
-</div></blockquote>
+<p>Typical usage example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">Example</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">Example</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="s2">&quot;1L23&quot;</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">cavity_label</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">fault_label</span><span class="o">=</span><span class="s2">&quot;Microphonics&quot;</span><span class="p">,</span>
+            <span class="n">cavity_conf</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">fault_conf</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">label_source</span><span class="o">=</span><span class="s1">&#39;my_label_file.txt&#39;</span><span class="p">)</span>
+<span class="n">e</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">event_df</span>
+<span class="n">e</span><span class="o">.</span><span class="n">unload_data</span><span class="p">()</span>
+<span class="c1"># Now do something with the data</span>
+</pre></div>
+</div>
 <p class="rubric">Classes</p>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -243,7 +241,7 @@ e.unload_data()
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Adam Carpenter.
+        &#169; Copyright 2021, Jefferson Lab.
 
     </p>
   </div>

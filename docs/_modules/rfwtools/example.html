@@ -165,15 +165,17 @@
 <span class="sd">Expected data structure is &lt;data_dir&gt;/&lt;zone&gt;/&lt;date&gt;/&lt;timestamp&gt;/&lt;capture files&gt;.  Alternatively, event data may be</span>
 <span class="sd">compressed at the &lt;timestamp&gt; directory level, i.e. &lt;timestamp&gt;.tar.gz.</span>
 
-<span class="sd">    Typical usage example:</span>
+<span class="sd">Typical usage example:</span>
 
-<span class="sd">    import Example</span>
-<span class="sd">    e = Example(zone=&quot;1L23&quot;, dt=datetime.strptime(&quot;%Y-%m-%d %H:%M:%S.%f&quot;), cavity_label=&quot;1&quot;, fault_label=&quot;Microphonics&quot;,</span>
-<span class="sd">                cavity_conf=math.nan, fault_conf=math.nan, label_source=&#39;my_label_file.txt&#39;)</span>
-<span class="sd">    e.load_data()</span>
-<span class="sd">    df = e.event_df</span>
-<span class="sd">    e.unload_data()</span>
-<span class="sd">    # Now do something with the data</span>
+<span class="sd">::</span>
+
+<span class="sd">   import Example</span>
+<span class="sd">   e = Example(zone=&quot;1L23&quot;, dt=datetime.strptime(&quot;%Y-%m-%d %H:%M:%S.%f&quot;), cavity_label=&quot;1&quot;, fault_label=&quot;Microphonics&quot;,</span>
+<span class="sd">               cavity_conf=math.nan, fault_conf=math.nan, label_source=&#39;my_label_file.txt&#39;)</span>
+<span class="sd">   e.load_data()</span>
+<span class="sd">   df = e.event_df</span>
+<span class="sd">   e.unload_data()</span>
+<span class="sd">   # Now do something with the data</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -832,21 +834,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="WindowedExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                 <span class="n">fault_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">label_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+                 <span class="n">fault_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">label_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct an instance th will only store the required window upon a load_data() call.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            start: The start of the time window.</span>
-<span class="sd">            end: The end of the time window.</span>
+<span class="sd">            n_samples: The number of samples to include after the start of the window.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">,</span> <span class="n">fault_conf</span><span class="p">,</span> <span class="n">label_source</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">WINDOWED_EXAMPLE</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">start</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;start (</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">) must be less than end (</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
-
+        <span class="c1">#: The start of the window relative to the fault onset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span></div>
+
+        <span class="c1">#: The number of samples requested after the start value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
+
+        <span class="c1">#: The last Time value in the window.  Determined after loading data for the first time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="WindowedExample.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Load the fault event data according to Example.load_data() and retain only the defined time window.</span>
@@ -862,13 +867,33 @@
 <span class="sd">            RuntimeError: If the specified window of data is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="n">t_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">t_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">t_min</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;=</span> <span class="n">t_max</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested window of [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="si">}</span><span class="s2">], but event data is [</span><span class="si">{</span><span class="n">t_min</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_max</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="c1"># Check that start is in the data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Requested window is before start of event_df data.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Requested window is after end of event_df data.&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time &gt;= </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2"> &amp; Time &lt;= </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Compute some importance index values</span>
+        <span class="n">start_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[</span><span class="s2">&quot;Time&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+        <span class="n">end_i</span> <span class="o">=</span> <span class="n">start_i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
+        <span class="n">i_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">i_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">t_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="p">[</span><span class="n">i_min</span><span class="p">]</span>
+        <span class="n">t_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="p">[</span><span class="n">i_max</span><span class="p">]</span>
+
+        <span class="c1"># Check if the requested window is in the data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">t_min</span> <span class="ow">and</span> <span class="n">end_i</span> <span class="o">&lt;=</span> <span class="n">i_max</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested window of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2"> plus </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> samples, but event data is&quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">t_min</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_max</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Grab the window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start_i</span><span class="p">:</span><span class="n">end_i</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># Set the end time before changing the Time column meaning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="c1"># Convert the Time column to be relative to the start of the window, not the fault onset.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span></div></div>
 </pre></div>
 
@@ -881,7 +906,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Adam Carpenter.
+        &#169; Copyright 2021, Jefferson Lab.
 
     </p>
   </div>

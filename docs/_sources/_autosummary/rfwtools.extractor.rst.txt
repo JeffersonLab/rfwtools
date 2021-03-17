@@ -32,4 +32,5 @@
    rfwtools.extractor.down_sample
    rfwtools.extractor.tsf
    rfwtools.extractor.utils
+   rfwtools.extractor.windowing
 

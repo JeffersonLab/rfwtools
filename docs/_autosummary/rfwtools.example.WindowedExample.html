@@ -189,7 +189,7 @@
 <h1>rfwtools.example.WindowedExample<a class="headerlink" href="#rfwtools-example-windowedexample" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt id="rfwtools.example.WindowedExample">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rfwtools.example.</span></code><code class="sig-name descname"><span class="pre">WindowedExample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example.html#WindowedExample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example.WindowedExample" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rfwtools.example.</span></code><code class="sig-name descname"><span class="pre">WindowedExample</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example.html#WindowedExample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example.WindowedExample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="rfwtools.example.Example.html#rfwtools.example.Example" title="rfwtools.example.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">rfwtools.example.Example</span></code></a></p>
 <p>An extension of Example class that allows the caller to specify only a time-window of event_df be returned.</p>
 <p>This window is based on the relative values in the Time column.  The standard time range is approximately
@@ -197,13 +197,13 @@
 specified time range is not a strict subset of the Examples Time column.</p>
 <dl class="py method">
 <dt id="rfwtools.example.WindowedExample.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example.html#WindowedExample.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example.WindowedExample.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zone</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cavity_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fault_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example.html#WindowedExample.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example.WindowedExample.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct an instance th will only store the required window upon a load_data() call.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>start</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The start of the time window.</p></li>
-<li><p><strong>end</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The end of the time window.</p></li>
+<li><p><strong>n_samples</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The number of samples to include after the start of the window.</p></li>
 </ul>
 </dd>
 </dl>
@@ -318,6 +318,12 @@ specified time range is not a strict subset of the Examples Time column.</p>
 <dd><p>The type of example this is.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="rfwtools.example.WindowedExample.end">
+<code class="sig-name descname"><span class="pre">end</span></code><a class="headerlink" href="#rfwtools.example.WindowedExample.end" title="Permalink to this definition">¶</a></dt>
+<dd><p>The last Time value in the window.  Determined after loading data for the first time.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="rfwtools.example.WindowedExample.get_capture_file_contents">
 <code class="sig-name descname"><span class="pre">get_capture_file_contents</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example.WindowedExample.get_capture_file_contents" title="Permalink to this definition">¶</a></dt>
@@ -417,6 +423,12 @@ number.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="rfwtools.example.WindowedExample.n_samples">
+<code class="sig-name descname"><span class="pre">n_samples</span></code><a class="headerlink" href="#rfwtools.example.WindowedExample.n_samples" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of samples requested after the start value</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="rfwtools.example.WindowedExample.parse_capture_file">
 <em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">parse_capture_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example.WindowedExample.parse_capture_file" title="Permalink to this definition">¶</a></dt>
@@ -504,6 +516,12 @@ every capture file will end up with the same timestamp as self.event_datetime.</
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt id="rfwtools.example.WindowedExample.start">
+<code class="sig-name descname"><span class="pre">start</span></code><a class="headerlink" href="#rfwtools.example.WindowedExample.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>The start of the window relative to the fault onset</p>
+</dd></dl>
+
 <dl class="py method">
 <dt id="rfwtools.example.WindowedExample.to_string">
 <code class="sig-name descname"><span class="pre">to_string</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example.WindowedExample.to_string" title="Permalink to this definition">¶</a></dt>
@@ -550,7 +568,7 @@ every capture file will end up with the same timestamp as self.event_datetime.</
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Adam Carpenter.
+        &#169; Copyright 2021, Jefferson Lab.
 
     </p>
   </div>
