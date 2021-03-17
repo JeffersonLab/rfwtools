@@ -7,15 +7,17 @@ This functionality typically requires access to JLab's internal networks (e.g., 
 Expected data structure is <data_dir>/<zone>/<date>/<timestamp>/<capture files>.  Alternatively, event data may be
 compressed at the <timestamp> directory level, i.e. <timestamp>.tar.gz.
 
-    Typical usage example:
+Typical usage example:
 
-    import Example
-    e = Example(zone="1L23", dt=datetime.strptime("%Y-%m-%d %H:%M:%S.%f"), cavity_label="1", fault_label="Microphonics",
-                cavity_conf=math.nan, fault_conf=math.nan, label_source='my_label_file.txt')
-    e.load_data()
-    df = e.event_df
-    e.unload_data()
-    # Now do something with the data
+::
+
+   import Example
+   e = Example(zone="1L23", dt=datetime.strptime("%Y-%m-%d %H:%M:%S.%f"), cavity_label="1", fault_label="Microphonics",
+               cavity_conf=math.nan, fault_conf=math.nan, label_source='my_label_file.txt')
+   e.load_data()
+   df = e.event_df
+   e.unload_data()
+   # Now do something with the data
 
 """
 
