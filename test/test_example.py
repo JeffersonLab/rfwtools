@@ -172,9 +172,10 @@ class TestExample(TestCase):
 
     def test_windowed_example(self):
         start = -100
-        end = 100
+        n_samples = 200 * 5  # ~0.2 ms step sizes.  I want 200 ms worth of a window here.
+        end = start + (n_samples / 5)
         wex = WindowedExample(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=math.nan,
-                              fault_conf=math.nan, label_source="test", start=start, end=end)
+                              fault_conf=math.nan, label_source="test", start=start, n_samples=n_samples)
         wex.load_data()
 
         # Check that we got something after load
@@ -183,7 +184,9 @@ class TestExample(TestCase):
         t_min = wex.event_df.Time.min()
         t_max = wex.event_df.Time.max()
         self.assertAlmostEqual(0, t_min, 1)
-        self.assertAlmostEqual(end-start, t_max, 1)
+
+        # There's rounding error here so I know they should only match up to the whole number
+        self.assertEqual(math.ceil(end - start), math.ceil(t_max), 1)
 
         # Check that we got some data
         self.assertTrue(len(wex.event_df) > 10, "wex.event_df is unexpectedly small")
@@ -192,9 +195,15 @@ class TestExample(TestCase):
         wex.unload_data()
         self.assertIsNone(wex.event_df, "unload_data failed to clear event_df")
 
-        # Check that load_data() raises if it can't provide the window you're looking for.
+        # Check that load_data() raises if it can't provide the window you're looking for.  Starts too late
         wex = WindowedExample(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=math.nan,
-                              fault_conf=math.nan, label_source="test", start=1000, end=2000)
+                              fault_conf=math.nan, label_source="test", start=1000, n_samples=(1000 * 5))
+        with self.assertRaises(RuntimeError):
+            wex.load_data()
+
+        # Not enough samples after start
+        wex = WindowedExample(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=math.nan,
+                              fault_conf=math.nan, label_source="test", start=100, n_samples=(1000 * 5))
         with self.assertRaises(RuntimeError):
             wex.load_data()
 
@@ -208,7 +217,7 @@ class TestExample(TestCase):
         wex = f.get_example(e_type=ExampleType.WINDOWED_EXAMPLE, zone="1L24",
                             dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
                             cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
-                            start=-105, end=-5)
+                            start=-105, n_samples=500)
 
         self.assertEqual(type(ex).__name__, "Example")
         self.assertEqual(type(wex).__name__, "WindowedExample")
@@ -218,7 +227,7 @@ class TestExample(TestCase):
         ex = f.get_example(zone="1L24", dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
                            cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test")
 
-        f = Factory(e_type=ExampleType.WINDOWED_EXAMPLE, start=-105, end=-5)
+        f = Factory(e_type=ExampleType.WINDOWED_EXAMPLE, start=-105, n_samples=500)
         wex = f.get_example(zone="1L24", dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
                             cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None, label_source="test")
 

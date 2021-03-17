@@ -674,21 +674,24 @@ class WindowedExample(Example):
     """
 
     def __init__(self, zone: str, dt: datetime, cavity_label: str, fault_label: str, cavity_conf: float,
-                 fault_conf: float, label_source: str, start: float, end: float, data_dir: str = None):
+                 fault_conf: float, label_source: str, start: float, n_samples: int, data_dir: str = None):
         """Construct an instance th will only store the required window upon a load_data() call.
 
         Arguments:
             start: The start of the time window.
-            end: The end of the time window.
+            n_samples: The number of samples to include after the start of the window.
         """
         super().__init__(zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir)
         self.e_type = ExampleType.WINDOWED_EXAMPLE
 
-        if not start < end:
-            raise ValueError(f"start ({start}) must be less than end ({end}).")
-
+        #: The start of the window relative to the fault onset
         self.start = start
-        self.end = end
+
+        #: The number of samples requested after the start value
+        self.n_samples = n_samples
+
+        #: The last Time value in the window.  Determined after loading data for the first time.
+        self.end = None
 
     def load_data(self, verbose: bool = False) -> None:
         """Load the fault event data according to Example.load_data() and retain only the defined time window.
@@ -704,11 +707,31 @@ class WindowedExample(Example):
             RuntimeError: If the specified window of data is not available.
         """
         super().load_data(verbose)
-        t_min = self.event_df.Time.min()
-        t_max = self.event_df.Time.max()
 
-        if not (self.start >= t_min and self.end <= t_max):
-            raise RuntimeError(f"Requested window of [{self.start}, {self.end}], but event data is [{t_min}, {t_max}]")
+        # Check that start is in the data
+        if self.event_df.Time.min() > self.start:
+            raise RuntimeError("Requested window is before start of event_df data.")
+        if self.event_df.Time.max() < self.start:
+            raise RuntimeError("Requested window is after end of event_df data.")
 
-        self.event_df = self.event_df.query(f"Time >= {self.start} & Time <= {self.end}")
+        # Compute some importance index values
+        start_i = self.event_df[self.event_df["Time"] >= self.start].Time.idxmin()
+        end_i = start_i + self.n_samples
+        i_min = self.event_df.index.min()
+        i_max = self.event_df.index.max()
+        t_min = self.event_df.Time[i_min]
+        t_max = self.event_df.Time[i_max]
+
+        # Check if the requested window is in the data
+        if not (self.start >= t_min and end_i <= i_max):
+            raise RuntimeError(f"Requested window of {self.start} plus {self.n_samples} samples, but event data is"
+                               f"[{t_min}, {t_max}]")
+
+        # Grab the window
+        self.event_df = self.event_df.iloc[start_i:end_i, :]
+
+        # Set the end time before changing the Time column meaning
+        self.end = self.event_df.Time.max()
+
+        # Convert the Time column to be relative to the start of the window, not the fault onset.
         self.event_df.Time = self.event_df.Time - self.start

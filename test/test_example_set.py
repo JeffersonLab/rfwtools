@@ -137,7 +137,7 @@ Number of mismatched labels: 6
         self.assertEqual(exp_report, es.get_label_file_report())
 
         # Do a simple test with a different IExample subclass
-        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'end': -400})
+        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'n_samples': 100*5})
         es.add_label_file_data(label_files=['test1.txt', 'test2.txt'])
         self.assertTrue(isinstance(es.get_example_df().loc[0, 'example'], WindowedExample),
                         "Is not instance of WindowedExample")
@@ -200,7 +200,7 @@ Number of mismatched labels: 6
         self.assertEqual(14, len(es.get_example_df()))
 
         # Now try it with another type of IExample object - WindowedExample
-        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'end': -400})
+        es = ExampleSet(ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -500, 'n_samples': 100*5})
         es.add_web_service_data(begin=datetime.strptime("2020-03-23", "%Y-%m-%d"),
                                 end=datetime.strptime("2020-03-24", "%Y-%m-%d"))
         self.assertEqual(14, len(es.get_example_df()))
@@ -242,7 +242,7 @@ Number of mismatched labels: 6
             es.load_csv(bad_csv_file, in_dir=test.test_data_dir)
 
         # Run the test with a WindowedExample
-        es = ExampleSet(e_type=ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -1000, 'end': -900})
+        es = ExampleSet(e_type=ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -1000, 'n_samples': 100*5})
         es.load_csv(csv_file, in_dir=test.test_data_dir)
 
         self.assertEqual(es.get_example_df().loc[0, 'example'].get_example_type(), ExampleType.WINDOWED_EXAMPLE)

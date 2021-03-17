@@ -140,7 +140,7 @@ class TestExampleValidator(TestCase):
 
         ex = WindowedExample(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
                              fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
-                             data_dir=os.path.join(data_dir, "good-example"), start=-200, end=50)
+                             data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250*5)
         wev = WindowedExampleValidator()
         wev.set_example(ex)
         wev.validate_data()
