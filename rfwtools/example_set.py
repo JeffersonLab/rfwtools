@@ -205,7 +205,8 @@ class ExampleSet:
         if not skip_example:
             df_e_type = df.example[0].get_example_type()
             if self.e_type != df_e_type:
-                print(f"New DataFrame different ExampleType '{df_e_type}' from '{self.e_type}", file=sys.stderr)
+                if Config().debug:
+                    print(f"New DataFrame different ExampleType '{df_e_type}' from '{self.e_type}", file=sys.stderr)
                 return False
 
         # Check that the columns have the same dtype
