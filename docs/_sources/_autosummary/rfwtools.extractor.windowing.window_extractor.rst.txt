@@ -1,0 +1,6 @@
+rfwtools.extractor.windowing.window\_extractor
+==============================================
+
+.. currentmodule:: rfwtools.extractor.windowing
+
+.. autofunction:: window_extractor

@@ -1,0 +1,38 @@
+rfwtools.extractor.windowing
+============================
+
+.. automodule:: rfwtools.extractor.windowing
+
+   
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+      :toctree:
+   
+      window_extractor_metadata
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:
+   
+      window_extractor
+      window_extractor_faulted_cavity
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

@@ -1,0 +1,6 @@
+rfwtools.extractor.windowing.window\_extractor\_metadata
+========================================================
+
+.. currentmodule:: rfwtools.extractor.windowing
+
+.. autodata:: window_extractor_metadata

@@ -1,0 +1,6 @@
+rfwtools.extractor.windowing.window\_extractor\_faulted\_cavity
+===============================================================
+
+.. currentmodule:: rfwtools.extractor.windowing
+
+.. autofunction:: window_extractor_faulted_cavity
