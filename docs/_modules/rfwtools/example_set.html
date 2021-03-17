@@ -354,7 +354,8 @@
         <span class="c1"># Check that the columns have the same names</span>
         <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">req_cols</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">():</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame missing column &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame missing column &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Now that we know the df has an example column.  Check that the examples have the same type as defined for this</span>
@@ -362,7 +363,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_example</span><span class="p">:</span>
             <span class="n">df_e_type</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">example</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_example_type</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">!=</span> <span class="n">df_e_type</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame different ExampleType &#39;</span><span class="si">{</span><span class="n">df_e_type</span><span class="si">}</span><span class="s2">&#39; from &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">e_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New DataFrame different ExampleType &#39;</span><span class="si">{</span><span class="n">df_e_type</span><span class="si">}</span><span class="s2">&#39; from &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">e_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Check that the columns have the same dtype</span>
@@ -688,7 +690,7 @@
         <span class="c1"># Add the new data to the bottom of the internal DataFrame, and add it to the dict of included label files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_example_df</span><span class="p">,</span> <span class="n">df</span><span class="p">),</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_create_dataframe_from_web_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">_create_dataframe_from_web_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                                          <span class="n">models</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;This creates a ExampleSet consistent DataFrame based on the responses of the web query.  Labeled faults only.</span>
 
@@ -1290,7 +1292,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Adam Carpenter.
+        &#169; Copyright 2021, Jefferson Lab.
 
     </p>
   </div>

@@ -46,8 +46,8 @@
       ~FeatureSet.purge_invalid_examples
       ~FeatureSet.remove_duplicates_and_mismatches
       ~FeatureSet.save_csv
-      ~FeatureSet.update_example_df
       ~FeatureSet.update_example_set
+      ~FeatureSet.update_metadata_columns
    
    
 
