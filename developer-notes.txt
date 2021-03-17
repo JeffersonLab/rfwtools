@@ -31,17 +31,21 @@ tox
 cd /path/to/.../rfwtools
 python3 -m unittest
 
-# To build distributions.  You may need to remove directory content if rebuilding
-python setup.py sdist bdist_wheel
-
 # To build documentation that can be used in github
 docsrc/build-docs.bash
 git add .
 git commit -m"Updated documentation"
 # You should probably also increment version numbers in setup.cfg and put out a new package to PyPI (shown below).
 
+# Update the requirements files if they changed.  At a minimum, this should always be requirements.txt.  See comments
+# below for details.
+pip freeze > requirements.txt
+
+# To build distributions.  You may need to remove directory content if rebuilding
+python setup.py sdist bdist_wheel
+
 # To upload to the test PyPI repo.  You may need to add the --cert /etc/pki/tls/cert.pem option for SSL problems.
-edit setup.cfg with latest info
+edit setup.cfg with latest info, and run 'python setup.py sdist bdist_wheel'.
 twine upload --repository testpypi dist/*
 
 # To upload to the production PyPI repo
@@ -50,17 +54,18 @@ twine upload --repository pypi dist/*
 
 # The distribution package is called rfwtools_jlab, but the import package root is rfwtools
 # To install from production PyPI
-pip install rfwtools_jlab
+pip install rfwtools
 
 # To install from Test PyPI
-pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ rfwtools_jlab
+pip3 install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ rfwtools
 
 ## Some other comments
 requirements.txt are the versions that were used from within my IDE and with my IDE unit test runner.  This is the set
-that worked during development, installation set will probably be different.
+that worked during development, installation set will probably be different.  This is every installed package, not just
+the ones that my package directly uses.
 
 requirements_dev.txt are the versions of tools required to build, test, and distribute the package.  These are the set
 that worked during the last development cycle.
 
-requirements.testing.txt are the packages that needed to be installed for testing to work.  They are basically the same
+requirements_testing.txt are the packages that needed to be installed for testing to work.  They are basically the same
 as requirements.txt, but with a few extras used exclusively in tests and the local rfwtools package itself.
