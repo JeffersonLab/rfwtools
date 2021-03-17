@@ -196,7 +196,8 @@ class ExampleSet:
         # Check that the columns have the same names
         for col in req_cols:
             if col not in df.columns.to_list():
-                print(f"New DataFrame missing column '{col}'", file=sys.stderr)
+                if Config().debug:
+                    print(f"New DataFrame missing column '{col}'", file=sys.stderr)
                 return False
 
         # Now that we know the df has an example column.  Check that the examples have the same type as defined for this
