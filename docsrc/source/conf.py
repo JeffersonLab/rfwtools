@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'rfwtools'
-copyright = u'2021, Adam Carpenter'
+copyright = u'2021, Jefferson Lab'
 author = u'Adam Carpenter'
 
 # The version info for the project you're documenting, acts as replacement for
