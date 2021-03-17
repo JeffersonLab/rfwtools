@@ -31,7 +31,7 @@ class TestExample(Example):
 
         # No standardizing, no down sampling
         self.win_0_3_df = pd.DataFrame(
-            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'window_size': [3], 'window_min': [0.1],
+            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'n_samples': [3], 'window_min': [0.1],
              'window_max': [0.3], 'window_standardized': [False], 'window_downsampled': [False],
              'window_downsample_size': [None],
              'Sample_1_1_sig': [1], 'Sample_2_1_sig': [2], 'Sample_3_1_sig': [3],
@@ -39,7 +39,7 @@ class TestExample(Example):
 
         # Standardized, no down sample
         self.win_0_3_standard_df = pd.DataFrame(
-            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'window_size': [3], 'window_min': [0.1],
+            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'n_samples': [3], 'window_min': [0.1],
              'window_max': [0.3], 'window_standardized': [True], 'window_downsampled': [False],
              'window_downsample_size': [None],
              'Sample_1_1_sig': [-1.22474487], 'Sample_2_1_sig': [0.],
@@ -48,7 +48,7 @@ class TestExample(Example):
 
         # No standard scaling, down sampled to two points
         self.win_0_3_ds_2_df = pd.DataFrame(
-            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'window_size': [3], 'window_min': [0.1],
+            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'n_samples': [3], 'window_min': [0.1],
              'window_max': [0.3], 'window_standardized': [False], 'window_downsampled': [True],
              'window_downsample_size': [2],
              'Sample_1_1_sig': [1.], 'Sample_2_1_sig': [3.], 'Sample_1_2_sig': [2.],
@@ -56,7 +56,7 @@ class TestExample(Example):
 
         # Standardized, down sampled to two points
         self.win_0_3_standard_ds_2_df = pd.DataFrame(
-            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'window_size': [3], 'window_min': [0.1],
+            {'window_label': pd.Categorical(['test']), 'window_start': [0], 'n_samples': [3], 'window_min': [0.1],
              'window_max': [0.3], 'window_standardized': [True], 'window_downsampled': [True],
              'window_downsample_size': [2],
              'Sample_1_1_sig': [-1.22474487], 'Sample_2_1_sig': [1.22474487],
@@ -78,25 +78,25 @@ class TestWindowExtractor(TestCase):
 
         # Test a simple window
         exp = ex.win_0_3_df
-        res = window_extractor(ex, windows={'test': 0}, window_size=3, signals=sigs, standardize=False,
+        res = window_extractor(ex, windows={'test': 0}, n_samples=3, signals=sigs, standardize=False,
                                downsample=False)
         pd.testing.assert_frame_equal(exp, res)
 
         # Test a standardized window
         exp = ex.win_0_3_standard_df
-        res = window_extractor(ex, windows={'test': 0}, window_size=3, signals=sigs, standardize=True,
+        res = window_extractor(ex, windows={'test': 0}, n_samples=3, signals=sigs, standardize=True,
                                downsample=False)
         pd.testing.assert_frame_equal(exp, res)
 
         # Test a down sampled window
         exp = ex.win_0_3_ds_2_df
-        res = window_extractor(ex, windows={'test': 0}, window_size=3, signals=sigs, standardize=False,
+        res = window_extractor(ex, windows={'test': 0}, n_samples=3, signals=sigs, standardize=False,
                                downsample=True, ds_kwargs={'num': 2, 'axis': 0})
         pd.testing.assert_frame_equal(exp, res)
 
         # Test a down sampled window
         exp = ex.win_0_3_standard_ds_2_df
-        res = window_extractor(ex, windows={'test': 0}, window_size=3, signals=sigs, standardize=True,
+        res = window_extractor(ex, windows={'test': 0}, n_samples=3, signals=sigs, standardize=True,
                                downsample=True, ds_kwargs={'num': 2, 'axis': 0})
         pd.testing.assert_frame_equal(exp, res)
 
@@ -117,7 +117,7 @@ class TestWindowExtractor(TestCase):
                       fault_conf=math.nan, label_source="test")
         examples = (ex1, ex2)
         windows = {'good': -1536, 'bad': -105}
-        result = pd.concat([window_extractor(ex, windows=windows, window_size=500) for ex in examples], axis=0,
+        result = pd.concat([window_extractor(ex, windows=windows, n_samples=500) for ex in examples], axis=0,
                            ignore_index=True)
 
         #result.to_csv(os.path.join(test.test_data_dir, "test-window-feature_set.csv"), index=False)
