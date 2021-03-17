@@ -10,7 +10,24 @@ This package aims to provide standardized and easy usage of the C100's harvester
 
 Github Page: https://github.com/JeffersonLab/rfwtools
 
-Examples:
+Contents:
+
+.. autosummary::
+  :toctree: _autosummary
+  :template: custom-module-template.rst
+  :recursive:
+
+  rfwtools
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
+Usage Examples:
 -----------------
 Here are a couple of different workflows supported by the package.
 
@@ -38,6 +55,7 @@ You may also need to create a configuration file or update the configuration in 
 in your current directory with the following information.  Other options are available.:
 
 ::
+
    data_dir: /path/to/parent_dir/of/zone_dirs
    label_dir: /path/to/dir/containing/label_files
    output_dir: /path/to/where/save/files/live
@@ -45,6 +63,7 @@ in your current directory with the following information.  Other options are ava
 Alternatively, do this in code:
 
 ::
+
    from rfwtools.config import Config
 
    Config().data_dir = "/path/to/parent_dir/of/zone_dirs"
@@ -55,6 +74,7 @@ Workflow Using DataSet and "regular" Examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Here we use the tiny my-sample-labels.txt setup above.  Much the workflow goes through the DataSet object.  Since
 the Example class is the default for the DataSet, you don't need to specify much.
+
 ::
 
    from rfwtools.data_set import DataSet
@@ -94,7 +114,10 @@ the Example class is the default for the DataSet, you don't need to specify much
 
 Workflow Using DataSet and WindowedExamples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is very similar to the above, except that now we are using WindowedExamples and everything that comes with it
+This is very similar to the above, except that now we are using WindowedExamples and everything that comes with it.
+Please note that this is one of two ways to get "windowed" data.  The other is to use the
+rfwtools.extractor.window_extractor method (see rfwtools.extractor.windowing for details).
+
 ::
 
    from rfwtools.data_set import DataSet
@@ -106,8 +129,8 @@ This is very similar to the above, except that now we are using WindowedExamples
    e_type = ExampleType.WINDOWED_EXAMPLE
 
    # These parameters will be passed to the Example objects upon construction, e.g., all example will have the same
-   # window.
-   e_kw = {"start": -1536, "end": -1436}
+   # window.  Here we assume 0.2ms sample steps, and we want windows of 100ms, so 100*(1/0.2) = 500.
+   e_kw = {"start": -1536, "n_samples": 500}
 
    # The WindowedExample class works slightly differently so it needs a different validator.  This makes sure that the
    # each example has all of the characteristics we want (sample step size, number of capture files, etc.).
@@ -131,6 +154,7 @@ FeatureSet, but their is no need to use one if you already have saved files read
 Here we load a file and add a day of week to the ExampleSet:
 
 ::
+
    from rfwtools.example_set import ExampleSet
 
    es = ExampleSet()
@@ -142,12 +166,14 @@ Here we load a file and add a day of week to the ExampleSet:
 Here we determine bypassed cavity information for a FeatureSet:
 
 ::
+
    from rfwtools.feature_set import FeatureSet
    from rfwtools.example import Example
    import pandas as pd
 
    # This method determines if a cavity was producing gradient above a threshold.  It not, it is considered bypassed.
    def bypassed_cavity_extractor(example: Example, threshold: float = 0.5) -> pd.DataFrame:
+
        example.load_data()
        df = example.event_df
        example.unload_data()
@@ -163,6 +189,7 @@ Here we determine bypassed cavity information for a FeatureSet:
                out.has_bypassed = True
                out.num_bypassed += 1
                out[f"c{cav}_bypassed"] = True
+
        return out
 
    # Load up the FeatureSet
@@ -175,25 +202,9 @@ Here we determine bypassed cavity information for a FeatureSet:
    df = pd.concat([df, bypassed_df], axis=1)
 
    # Update the FeatureSet
-   m_cols = fs.metadata_columns + ['has_bypassed', 'num_bypassed', 'c1_bypassed', 'c2_bypassed', 'c3_bypassed',
-                                   'c4_bypassed', 'c5_bypassed', 'c6_bypassed', 'c7_bypassed', 'c8_bypassed',
+   new_cols = ['has_bypassed', 'num_bypassed', 'c1_bypassed', 'c2_bypassed', 'c3_bypassed',  'c4_bypassed',
+               'c5_bypassed', 'c6_bypassed', 'c7_bypassed', 'c8_bypassed']
+   m_cols = fs.metadata_columns + new_cols
    fs.update_example_set(df, metadata_columns=m_cols)
    fs.do_pca_reduction()
    fs.display_2d_scatterplot(style='zone', hue='num_bypassed')
-
-Contents:
-
-.. autosummary::
-  :toctree: _autosummary
-  :template: custom-module-template.rst
-  :recursive:
-
-  rfwtools
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
