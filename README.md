@@ -13,7 +13,7 @@ https://jeffersonlab.github.io/rfwtools/
 This package has been posted to PyPI to ease installation.
 
 ```bash
-pip install rfwtools_jlab
+pip install rfwtools
 ```
 
 If you would rather edit the code while using it you should do a git clone to a local directory, then install that
