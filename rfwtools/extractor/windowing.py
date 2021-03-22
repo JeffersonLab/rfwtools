@@ -13,15 +13,18 @@ Basic Usage Example:
     ds = DataSet()
     ds.load_example_set_csv("my_example_set.csv")
 
+    # Get a single example to work on
+    ex = ds.example_set.loc[0, 'example']
+
     # Run on one example with defaults (start at Time == -500, and include the next 100 samples)
-    window_extractor(ds.example_set.loc[0, 'example], windows={'my_window': -500}, n_samples=100)
+    window_extractor(ex, windows={'my_window': -500}, n_samples=100)
 
     # Run on one example with only 2 signals being processed
-    window_extractor(ds.example_set.loc[0, 'example], windows={'my_window': -500}, n_samples=100,
+    window_extractor(ex, windows={'my_window': -500}, n_samples=100,
                      signals=['1_GMES', '1_PMES'])
 
     # Produce one window for stable running and one window for impending fault
-    window_extractor(ds.example_set.loc[0, 'example], windows={'stable': -1536, 'impending': -105}, n_samples=500)
+    window_extractor(ex, windows={'stable': -1536, 'impending': -105}, n_samples=500)
 
     # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.
     ds.produce_feature_set(window_extractor, windows={'my_window': -500}, n_samples=100)

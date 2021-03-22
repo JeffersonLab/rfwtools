@@ -13,12 +13,15 @@ Basic Usage Example:
     ds = DataSet()
     ds.load_example_set_csv("my_example_set.csv")
 
+    # Get a single example to work on
+    ex = ds.example_set.loc[0, 'example']
+
     # Run on one example with defaults
-    down_sample_extractor(ds.example_set.loc[0, 'example])
+    down_sample_extractor(ex)
     # Run on one example with only 2 signals being processed
-    down_sample_extractor(ds.example_set.loc[0, 'example], signals=['1_GMES', '1_PMES'])
+    down_sample_extractor(ex, signals=['1_GMES', '1_PMES'])
     # Run on one example, but only include values before the fault on set.
-    down_sample_extractor(ds.example_set.loc[0, 'example], query="Time < 0")
+    down_sample_extractor(ex, query="Time < 0")
 
     # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.
     ds.produce_feature_set(down_sample_extractor, query="Time < 0")
