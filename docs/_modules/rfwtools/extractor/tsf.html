@@ -171,12 +171,15 @@
 <span class="sd">    ds = DataSet()</span>
 <span class="sd">    ds.load_example_set_csv(&quot;my_example_set.csv&quot;)</span>
 
+<span class="sd">    # Get a single example to work on</span>
+<span class="sd">    ex = ds.example_set.loc[0, &#39;example&#39;]</span>
+
 <span class="sd">    # Run on one example with defaults</span>
-<span class="sd">    tsfresh_extractor(ds.example_set.loc[0, &#39;example])</span>
+<span class="sd">    tsfresh_extractor(ex)</span>
 <span class="sd">    # Run on one example with only 2 signals being processed</span>
-<span class="sd">    tsfresh_extractor(ds.example_set.loc[0, &#39;example], signals=[&#39;1_GMES&#39;, &#39;1_PMES&#39;])</span>
+<span class="sd">    tsfresh_extractor(ex, signals=[&#39;1_GMES&#39;, &#39;1_PMES&#39;])</span>
 <span class="sd">    # Run on one example, but only include values before the fault on set.</span>
-<span class="sd">    tsfresh_extractor(ds.example_set.loc[0, &#39;example], query=&quot;Time &lt; 0&quot;)</span>
+<span class="sd">    tsfresh_extractor(ex, query=&quot;Time &lt; 0&quot;)</span>
 
 <span class="sd">    # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.</span>
 <span class="sd">    ds.produce_feature_set(tsfresh_extractor, query=&quot;Time &lt; 0&quot;)</span>

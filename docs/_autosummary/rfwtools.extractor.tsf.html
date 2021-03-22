@@ -202,12 +202,15 @@ externally.</p>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">()</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">load_example_set_csv</span><span class="p">(</span><span class="s2">&quot;my_example_set.csv&quot;</span><span class="p">)</span>
 
+<span class="c1"># Get a single example to work on</span>
+<span class="n">ex</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">example_set</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;example&#39;</span><span class="p">]</span>
+
 <span class="c1"># Run on one example with defaults</span>
-<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">example_set</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;example])</span>
+<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ex</span><span class="p">)</span>
 <span class="c1"># Run on one example with only 2 signals being processed</span>
-<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">example_set</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;example], signals=[&#39;</span><span class="mi">1</span><span class="n">_GMES</span><span class="s1">&#39;, &#39;</span><span class="mi">1</span><span class="n">_PMES</span><span class="s1">&#39;])</span>
+<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">signals</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;1_GMES&#39;</span><span class="p">,</span> <span class="s1">&#39;1_PMES&#39;</span><span class="p">])</span>
 <span class="c1"># Run on one example, but only include values before the fault on set.</span>
-<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">example_set</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;example], query=&quot;Time &lt; 0&quot;)</span>
+<span class="n">tsfresh_extractor</span><span class="p">(</span><span class="n">ex</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;Time &lt; 0&quot;</span><span class="p">)</span>
 
 <span class="c1"># Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">produce_feature_set</span><span class="p">(</span><span class="n">tsfresh_extractor</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s2">&quot;Time &lt; 0&quot;</span><span class="p">)</span>

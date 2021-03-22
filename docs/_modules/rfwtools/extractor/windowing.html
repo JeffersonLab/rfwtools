@@ -171,15 +171,18 @@
 <span class="sd">    ds = DataSet()</span>
 <span class="sd">    ds.load_example_set_csv(&quot;my_example_set.csv&quot;)</span>
 
+<span class="sd">    # Get a single example to work on</span>
+<span class="sd">    ex = ds.example_set.loc[0, &#39;example&#39;]</span>
+
 <span class="sd">    # Run on one example with defaults (start at Time == -500, and include the next 100 samples)</span>
-<span class="sd">    window_extractor(ds.example_set.loc[0, &#39;example], windows={&#39;my_window&#39;: -500}, n_samples=100)</span>
+<span class="sd">    window_extractor(ex, windows={&#39;my_window&#39;: -500}, n_samples=100)</span>
 
 <span class="sd">    # Run on one example with only 2 signals being processed</span>
-<span class="sd">    window_extractor(ds.example_set.loc[0, &#39;example], windows={&#39;my_window&#39;: -500}, n_samples=100,</span>
+<span class="sd">    window_extractor(ex, windows={&#39;my_window&#39;: -500}, n_samples=100,</span>
 <span class="sd">                     signals=[&#39;1_GMES&#39;, &#39;1_PMES&#39;])</span>
 
 <span class="sd">    # Produce one window for stable running and one window for impending fault</span>
-<span class="sd">    window_extractor(ds.example_set.loc[0, &#39;example], windows={&#39;stable&#39;: -1536, &#39;impending&#39;: -105}, n_samples=500)</span>
+<span class="sd">    window_extractor(ex, windows={&#39;stable&#39;: -1536, &#39;impending&#39;: -105}, n_samples=500)</span>
 
 <span class="sd">    # Run this on every example in the example set and produce a corresponding feature set for pre-fault signal data.</span>
 <span class="sd">    ds.produce_feature_set(window_extractor, windows={&#39;my_window&#39;: -500}, n_samples=100)</span>
