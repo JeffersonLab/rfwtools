@@ -22,6 +22,7 @@ Creation through a DataSet workflow:
 
 Loading from file:
 ::
+
     from rfwtools.feature_set import FeatureSet
 
     fs = FeatureSet()

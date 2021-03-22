@@ -5,6 +5,7 @@ includes the definition of several resource locations, debug behavior, and filte
 
 Basic Usage:
 ::
+
     from rfwtools.config import Config
     config = Config()
     config.output_dir = '/path/to/my/save/files/'
