@@ -225,6 +225,9 @@ class ExampleSet:
     def save_csv(self, filename: str, out_dir: str = None, sep: str = ',') -> None:
         """Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.
 
+        This also writes out a comment header section that includes information about ExampleSet parameters at the time
+        the file was written.
+
         Arguments:
             filename: The filename to save.  Will be relative out_dir
             out_dir: The directory to save the file in.  Defaults to Config().output_dir
@@ -232,10 +235,19 @@ class ExampleSet:
         """
         if out_dir is None:
             out_dir = Config().output_dir
-        self._example_df.drop('example', axis=1).to_csv(os.path.join(out_dir, filename), sep=sep, index=False)
+        with open(os.path.join(out_dir, filename), mode="w") as f:
+            f.write(f"# e_type: {self.e_type}\n")
+            f.write(f"# example_kwargs: {ascii(self.example_kwargs)}\n")
+            f.write(f"# required_columns: {ascii(self._req_columns)}\n")
+            f.write(f"# known_zones: {ascii(self._known_zones)}\n")
+            f.write(f"# known_fault_labels: {ascii(self._known_fault_labels)}\n")
+            f.write(f"# known_cavity_labels: {ascii(self._known_cavity_labels)}\n")
+            self._example_df.drop('example', axis=1).to_csv(f, sep=sep, index=False)
 
     def load_csv(self, filename: str, in_dir: str = None, sep: str = ',') -> None:
         """Read in a CSV file that has ExampleSet data.
+
+        Treats '#' character as the start of a comment.  Includes rftwools generated headers from save_csv().
 
         Arguments:
             filename: The filename to save.  Will be relative in_dir
@@ -248,10 +260,10 @@ class ExampleSet:
         if in_dir is None:
             in_dir = Config().output_dir
         if type(filename).__name__ == 'str':
-            df = pd.read_csv(os.path.join(in_dir, filename), sep=sep)
+            df = pd.read_csv(os.path.join(in_dir, filename), comment='#', sep=sep)
         else:
             # Allows for tricks with file-like objects
-            df = pd.read_csv(filename, sep=sep)
+            df = pd.read_csv(filename, comment='#', sep=sep)
 
         if not self.has_required_columns(df):
             raise ValueError("Cannot load CSV file.  Unexpected column format.")
