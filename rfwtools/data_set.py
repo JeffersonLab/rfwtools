@@ -14,6 +14,13 @@ the examples for model building purposes (FeatureSet).
     ds.save_example_set_csv("my_examples.csv")
     ds.save_feature_set_csv("my_features.csv")
 
+  It is also possible to specify the type of Example that should be contained in the loaded ExampleSet.
+
+  ::
+
+    ds = DataSet()
+    ds.load_example_set_csv("my_windowed_examples.csv", e_type=ExampleType.WINDOWED_EXAMPLE,
+                            example_kwargs={'start': -1000.0, 'n_samples': 100})
 """
 
 import bz2
