@@ -1,4 +1,4 @@
-﻿rfwtools.network.SSLContextAdapter
+rfwtools.network.SSLContextAdapter
 ==================================
 
 .. currentmodule:: rfwtools.network

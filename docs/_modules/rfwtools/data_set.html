@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.data_set &mdash; rfwtools 1.0.1 documentation</title>
+  <title>rfwtools.data_set &mdash; rfwtools 1.0.2 documentation</title>
   
 
   
@@ -172,6 +172,13 @@
 <span class="sd">    ds.save_example_set_csv(&quot;my_examples.csv&quot;)</span>
 <span class="sd">    ds.save_feature_set_csv(&quot;my_features.csv&quot;)</span>
 
+<span class="sd">  It is also possible to specify the type of Example that should be contained in the loaded ExampleSet.</span>
+
+<span class="sd">  ::</span>
+
+<span class="sd">    ds = DataSet()</span>
+<span class="sd">    ds.load_example_set_csv(&quot;my_windowed_examples.csv&quot;, e_type=ExampleType.WINDOWED_EXAMPLE,</span>
+<span class="sd">                            example_kwargs={&#39;start&#39;: -1000.0, &#39;n_samples&#39;: 100})</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">bz2</span>
@@ -184,7 +191,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
 
 <span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">ExampleType</span>
 <span class="kn">from</span> <span class="nn">rfwtools.example_validator</span> <span class="kn">import</span> <span class="n">ExampleValidator</span>
@@ -493,14 +500,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">example_set</span><span class="o">.</span><span class="n">save_csv</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DataSet.load_example_set_csv"><a class="viewcode-back" href="../../_autosummary/rfwtools.data_set.DataSet.html#rfwtools.data_set.DataSet.load_example_set_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_example_set_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSet.load_example_set_csv"><a class="viewcode-back" href="../../_autosummary/rfwtools.data_set.DataSet.html#rfwtools.data_set.DataSet.load_example_set_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_example_set_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">e_type</span><span class="p">:</span> <span class="n">ExampleType</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">example_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load an ExampleSet CSV file.  Overwrites existing example_set with new ExampleSet.</span>
+
+<span class="sd">        This method allows the user to specify the type of Example that will be constructed from the rows of the CSV.</span>
+<span class="sd">        Some types will require specific example_kwargs values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filename: The name of the file to load.  Relative to in_dir (if supplied) or Config().output_dir.</span>
-<span class="sd">            **kwargs: All keyword args are passed on to FeatureSet.save_csv()</span>
+<span class="sd">            e_type: The type of Examples to be included in this ExampleSet</span>
+<span class="sd">            example_kwargs: A dictionary of key-word arguments pass on to the ExampleSet constructor</span>
+<span class="sd">            **kwargs: All keyword args are passed on to FeatureSet.load_csv()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">es</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">e_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">es</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">es</span> <span class="o">=</span> <span class="n">ExampleSet</span><span class="p">(</span><span class="n">e_type</span><span class="o">=</span><span class="n">e_type</span><span class="p">,</span> <span class="n">example_kwargs</span><span class="o">=</span><span class="n">example_kwargs</span><span class="p">)</span>
+
         <span class="n">es</span><span class="o">.</span><span class="n">load_csv</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">example_set</span> <span class="o">=</span> <span class="n">es</span></div>
 

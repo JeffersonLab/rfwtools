@@ -1,4 +1,4 @@
-﻿rfwtools.example\_set.ExampleSet
+rfwtools.example\_set.ExampleSet
 ================================
 
 .. currentmodule:: rfwtools.example_set

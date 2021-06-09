@@ -1,4 +1,4 @@
-﻿rfwtools.config.Config
+rfwtools.config.Config
 ======================
 
 .. currentmodule:: rfwtools.config

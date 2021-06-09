@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.example_set.ExampleSet &mdash; rfwtools 1.0.1 documentation</title>
+  <title>rfwtools.example_set.ExampleSet &mdash; rfwtools 1.0.2 documentation</title>
   
 
   
@@ -706,6 +706,7 @@ _examples_df is None.</p></li>
 <dt id="rfwtools.example_set.ExampleSet.load_csv">
 <code class="sig-name descname"><span class="pre">load_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example_set.html#ExampleSet.load_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example_set.ExampleSet.load_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read in a CSV file that has ExampleSet data.</p>
+<p>Treats ‘#’ character as the start of a comment.  Includes rftwools generated headers from save_csv().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -759,6 +760,8 @@ _examples_df is None.</p></li>
 <dt id="rfwtools.example_set.ExampleSet.save_csv">
 <code class="sig-name descname"><span class="pre">save_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/example_set.html#ExampleSet.save_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.example_set.ExampleSet.save_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.</p>
+<p>This also writes out a comment header section that includes information about ExampleSet parameters at the time
+the file was written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

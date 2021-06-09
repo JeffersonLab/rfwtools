@@ -1,4 +1,4 @@
-rfwtools.feature\_set
+﻿rfwtools.feature\_set
 =====================
 
 .. automodule:: rfwtools.feature_set

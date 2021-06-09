@@ -1,4 +1,4 @@
-﻿rfwtools.data\_set.DataSet
+rfwtools.data\_set.DataSet
 ==========================
 
 .. currentmodule:: rfwtools.data_set

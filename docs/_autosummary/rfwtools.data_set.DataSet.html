@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.data_set.DataSet &mdash; rfwtools 1.0.1 documentation</title>
+  <title>rfwtools.data_set.DataSet &mdash; rfwtools 1.0.2 documentation</title>
   
 
   
@@ -261,7 +261,7 @@ example_set.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set" title="rfwtools.data_set.DataSet.load_example_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set</span></code></a>(filename[, in_dir])</p></td>
 <td><p>DEPRECATED.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="rfwtools.data_set.DataSet.load_example_set_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set_csv</span></code></a>(filename, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="rfwtools.data_set.DataSet.load_example_set_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set_csv</span></code></a>(filename[, e_type, …])</p></td>
 <td><p>Load an ExampleSet CSV file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_feature_set" title="rfwtools.data_set.DataSet.load_feature_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_feature_set</span></code></a>(filename[, in_dir])</p></td>
@@ -334,13 +334,17 @@ and FeatureSets using their built in CSV methods for long-term storage.</p>
 
 <dl class="py method">
 <dt id="rfwtools.data_set.DataSet.load_example_set_csv">
-<code class="sig-name descname"><span class="pre">load_example_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">load_example_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load an ExampleSet CSV file.  Overwrites existing example_set with new ExampleSet.</p>
+<p>This method allows the user to specify the type of Example that will be constructed from the rows of the CSV.
+Some types will require specific example_kwargs values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> – The name of the file to load.  Relative to in_dir (if supplied) or Config().output_dir.</p></li>
-<li><p><strong>**kwargs</strong> – All keyword args are passed on to FeatureSet.save_csv()</p></li>
+<li><p><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The name of the file to load.  Relative to in_dir (if supplied) or Config().output_dir.</p></li>
+<li><p><strong>e_type</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="rfwtools.example.ExampleType.html#rfwtools.example.ExampleType" title="rfwtools.example.ExampleType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleType</span></code></a>]) – The type of Examples to be included in this ExampleSet</p></li>
+<li><p><strong>example_kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code>]]) – A dictionary of key-word arguments pass on to the ExampleSet constructor</p></li>
+<li><p><strong>**kwargs</strong> – All keyword args are passed on to FeatureSet.load_csv()</p></li>
 </ul>
 </dd>
 </dl>

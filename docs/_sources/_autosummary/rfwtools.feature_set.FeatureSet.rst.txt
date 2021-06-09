@@ -1,4 +1,4 @@
-﻿rfwtools.feature\_set.FeatureSet
+rfwtools.feature\_set.FeatureSet
 ================================
 
 .. currentmodule:: rfwtools.feature_set

@@ -1,4 +1,4 @@
-﻿rfwtools.example.WindowedExample
+rfwtools.example.WindowedExample
 ================================
 
 .. currentmodule:: rfwtools.example

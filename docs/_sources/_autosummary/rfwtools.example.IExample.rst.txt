@@ -1,4 +1,4 @@
-﻿rfwtools.example.IExample
+rfwtools.example.IExample
 =========================
 
 .. currentmodule:: rfwtools.example

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.data_set &mdash; rfwtools 1.0.1 documentation</title>
+  <title>rfwtools.data_set &mdash; rfwtools 1.0.2 documentation</title>
   
 
   
@@ -192,6 +192,12 @@ the examples for model building purposes (FeatureSet).</p>
 <span class="n">ds</span><span class="o">.</span><span class="n">produce_feature_set</span><span class="p">(</span><span class="n">my_feature_extract_func</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">save_example_set_csv</span><span class="p">(</span><span class="s2">&quot;my_examples.csv&quot;</span><span class="p">)</span>
 <span class="n">ds</span><span class="o">.</span><span class="n">save_feature_set_csv</span><span class="p">(</span><span class="s2">&quot;my_features.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is also possible to specify the type of Example that should be contained in the loaded ExampleSet.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">()</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">load_example_set_csv</span><span class="p">(</span><span class="s2">&quot;my_windowed_examples.csv&quot;</span><span class="p">,</span> <span class="n">e_type</span><span class="o">=</span><span class="n">ExampleType</span><span class="o">.</span><span class="n">WINDOWED_EXAMPLE</span><span class="p">,</span>
+                        <span class="n">example_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1000.0</span><span class="p">,</span> <span class="s1">&#39;n_samples&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">})</span>
 </pre></div>
 </div>
 </div></blockquote>

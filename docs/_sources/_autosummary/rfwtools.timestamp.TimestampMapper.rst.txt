@@ -1,4 +1,4 @@
-﻿rfwtools.timestamp.TimestampMapper
+rfwtools.timestamp.TimestampMapper
 ==================================
 
 .. currentmodule:: rfwtools.timestamp
