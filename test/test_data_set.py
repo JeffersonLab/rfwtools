@@ -10,6 +10,7 @@ import pandas as pd
 import test
 
 # Prime the pump on the timestamp map.
+from rfwtools.example import ExampleType, WindowedExample
 from rfwtools.feature_set import FeatureSet
 
 test.load_timestamp_map()
@@ -151,6 +152,35 @@ class TestDataSet(TestCase):
 
         # Compare results
         self.assertEqual(exp, ds.example_set)
+
+    def test_save_load_windowed_example_set(self):
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds.produce_example_set(get_model_data=False, report=False, progress=False)
+
+        # Grab a copy of the example set
+        exp = ds.example_set
+
+        filename = "test_windowed_example_set.csv"
+        f_path = os.path.join(Config().output_dir, filename)
+
+        # Delete the save file if it exists
+        if os.path.isfile(f_path):
+            os.unlink(f_path)
+
+        # Save ds.example_set, overwrite it, then load it
+        ds.save_example_set_csv(filename=filename)
+        ds.example_set = None
+        ds.load_example_set_csv(filename=filename, e_type=ExampleType.WINDOWED_EXAMPLE,
+                                example_kwargs={'start': -100.0, 'n_samples': 5})
+
+        ex = ds.example_set.get_example_df().loc[0, 'example']
+        self.assertTrue(isinstance(ex, WindowedExample))
+        self.assertEqual(ex.n_samples, 5)
+        self.assertEqual(ex.start, -100.0)
+
+        # Delete the save file
+        if os.path.isfile(f_path):
+            os.unlink(f_path)
 
     def test_save_load_feature_set(self):
         ds = DataSet(label_files=['test1.txt', 'test2.txt'])

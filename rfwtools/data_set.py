@@ -26,7 +26,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 
 from rfwtools.example import ExampleType
 from rfwtools.example_validator import ExampleValidator
@@ -335,14 +335,24 @@ class DataSet:
         """
         self.example_set.save_csv(filename=filename, **kwargs)
 
-    def load_example_set_csv(self, filename, **kwargs):
+    def load_example_set_csv(self, filename: str, e_type: ExampleType = None, example_kwargs: Dict[str, Any] = None,
+                             **kwargs):
         """Load an ExampleSet CSV file.  Overwrites existing example_set with new ExampleSet.
+
+        This method allows the user to specify the type of Example that will be constructed from the rows of the CSV.
+        Some types will require specific example_kwargs values.
 
         Args:
             filename: The name of the file to load.  Relative to in_dir (if supplied) or Config().output_dir.
-            **kwargs: All keyword args are passed on to FeatureSet.save_csv()
+            e_type: The type of Examples to be included in this ExampleSet
+            example_kwargs: A dictionary of key-word arguments pass on to the ExampleSet constructor
+            **kwargs: All keyword args are passed on to FeatureSet.load_csv()
         """
-        es = ExampleSet()
+        if e_type is None:
+            es = ExampleSet()
+        else:
+            es = ExampleSet(e_type=e_type, example_kwargs=example_kwargs)
+
         es.load_csv(filename=filename, **kwargs)
         self.example_set = es
 
