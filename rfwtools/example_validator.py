@@ -37,6 +37,7 @@ Basic Usage Example:
 
 import datetime
 import itertools
+from typing import Tuple, Union
 
 from rfwtools import mya
 from rfwtools.example import Example, WindowedExample
@@ -213,7 +214,8 @@ class ExampleValidator:
             raise ValueError("Found improper step size.  Expect: {}, Step size range: ({}, {}), Acceptable delta: {}"
                              .format(step_size, min_step, max_step, delta_max))
 
-    def validate_cavity_modes(self, mode: int = 4, offset: float = -1.0, deployment: str = 'ops') -> None:
+    def validate_cavity_modes(self, mode: Union[Tuple[int, ...], int] = (4,), offset: float = -1.0,
+                              deployment: str = 'ops') -> None:
         """Checks that each cavity was in the appropriate control mode or is bypassed.
 
         A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event
@@ -231,7 +233,7 @@ class ExampleValidator:
         modes of the non-bypassed cavities will be considered for invalidating the data.
 
         Arguments:
-            mode:  The mode number associated with the proper control mode.
+            mode:  A list of mode numbers associated with acceptable control modes.
             offset: The number of seconds before the fault event the mode setting should be checked.
             deployment: The MYA archiver deployment used for querying historical PV values
 
@@ -294,8 +296,15 @@ class ExampleValidator:
                 continue
 
             val = mya.get_pv_value(PV=mode_template.format(cav), datetime=pre_fault_dt, deployment=deployment)
-            if val != mode:
-                raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
+            exc = ValueError("Cavity '" + cav + f"' not in valid operating mode ({mode}).  Mode = " + str(val))
+            if type(mode) == tuple or type(mode) == list:
+                if val not in mode:
+                    raise exc
+            elif type(mode) == int:
+                if val != mode:
+                    raise exc
+            else:
+                raise ValueError(f"Unexpected mode variable type '{type(mode).__name__}'")
 
     def validate_zones(self) -> None:
         """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.
@@ -368,6 +377,6 @@ class WindowedExampleValidator(ExampleValidator):
         self.validate_capture_file_waveforms()
 
         # Make sure that the start is not too late, and the the end is not too early.  Note max_start == 0+step_size
-        self.validate_waveform_times(max_start=step_size, min_end=(window_size-step_size), step_size=step_size)
+        self.validate_waveform_times(max_start=step_size, min_end=(window_size - step_size), step_size=step_size)
         self.validate_cavity_modes(deployment=deployment)
         self.validate_zones()

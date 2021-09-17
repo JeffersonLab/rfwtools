@@ -128,9 +128,19 @@ class TestExampleValidator(TestCase):
         ev.set_example(TestExampleValidator.good_mode_example)
         ev.validate_cavity_modes()
 
+        try:
+            ev.validate_cavity_modes(mode=4)
+        except Exception as exc:
+            self.fail(f"ev.validate_cavity_modes raised an exception despite supplying single correct mode.\n {exc}")
+
         # The time for this should have at least one bad control mode and will raise and exception
         ev.set_example(TestExampleValidator.bad_mode_example)
         self.assertRaises(ValueError, ev.validate_cavity_modes)
+
+        try:
+            ev.validate_cavity_modes(mode=(2, 4))
+        except Exception as exc:
+            self.fail(f"ev.validate_cavity_modes raised an exception despite supplying multiple modes.\n {exc}")
 
     def test_validate_data(self):
         # Test overall validation of Examples
@@ -140,7 +150,7 @@ class TestExampleValidator(TestCase):
 
         ex = WindowedExample(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
                              fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
-                             data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250*5)
+                             data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250 * 5)
         wev = WindowedExampleValidator()
         wev.set_example(ex)
         wev.validate_data()
