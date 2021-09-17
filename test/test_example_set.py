@@ -2,6 +2,7 @@ import filecmp
 import math
 import unittest
 import os
+import warnings
 from datetime import datetime
 from unittest import TestCase
 import pandas as pd
@@ -56,7 +57,9 @@ class TestExampleSet(TestCase):
         # Column names should pass, but dtypes check should fail
         self.assertTrue(es.has_required_columns(df))
         self.assertTrue(es.has_required_columns(df, dtypes=False))
-        self.assertFalse(es.has_required_columns(df, dtypes=True))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertFalse(es.has_required_columns(df, dtypes=True))
 
         df = df.drop(columns=['example'])
         self.assertTrue(es.has_required_columns(df))
@@ -76,9 +79,11 @@ class TestExampleSet(TestCase):
         # Empty df should fail column names check
         self.assertRaises(ValueError, es.update_example_set, df=pd.DataFrame())
         # Column names should pass, but dtypes check should fail
-        self.assertRaises(ValueError, es.update_example_set, df=pd.DataFrame(
-            {"zone": [], "dtime": [], "cavity_label": [], "cavity_conf": [], "fault_label": [], "fault_conf": [],
-             "example": [], "label_source": []}))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.assertRaises(ValueError, es.update_example_set, df=pd.DataFrame(
+                {"zone": [], "dtime": [], "cavity_label": [], "cavity_conf": [], "fault_label": [], "fault_conf": [],
+                 "example": [], "label_source": []}))
 
         df = es.get_example_df()
         df.loc[1, "fault_conf"] = 0.73
