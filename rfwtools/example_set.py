@@ -197,7 +197,7 @@ class ExampleSet:
         for col in req_cols:
             if col not in df.columns.to_list():
                 if Config().debug:
-                    print(f"New DataFrame missing column '{col}'", file=sys.stderr)
+                    warnings.warn(f"New DataFrame missing column '{col}'", UserWarning)
                 return False
 
         # Now that we know the df has an example column.  Check that the examples have the same type as defined for this
@@ -206,7 +206,7 @@ class ExampleSet:
             df_e_type = df.example[0].get_example_type()
             if self.e_type != df_e_type:
                 if Config().debug:
-                    print(f"New DataFrame different ExampleType '{df_e_type}' from '{self.e_type}", file=sys.stderr)
+                    warnings.warn(f"New DataFrame different ExampleType '{df_e_type}' from '{self.e_type}", UserWarning)
                 return False
 
         # Check that the columns have the same dtype
@@ -217,7 +217,7 @@ class ExampleSet:
             e_df_dtype_names = [str(x) for x in self._example_df[man_cols].dtypes]
             df_dtype_names = [str(x) for x in df[man_cols].dtypes]
             if not e_df_dtype_names == df_dtype_names:
-                print(f"New DataFrame has at least one wrong dtype.", file=sys.stderr)
+                warnings.warn(f"New DataFrame has at least one wrong dtype.", UserWarning)
                 return False
 
         return True
