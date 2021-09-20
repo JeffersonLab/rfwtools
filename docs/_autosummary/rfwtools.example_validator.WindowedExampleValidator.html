@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.example_validator.WindowedExampleValidator &mdash; rfwtools 1.0.2 documentation</title>
+  <title>rfwtools.example_validator.WindowedExampleValidator &mdash; rfwtools 1.0.3 documentation</title>
   
 
   
@@ -337,7 +337,7 @@ checked directly.</p>
 
 <dl class="py method">
 <dt id="rfwtools.example_validator.WindowedExampleValidator.validate_cavity_modes">
-<code class="sig-name descname"><span class="pre">validate_cavity_modes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deployment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ops'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example_validator.WindowedExampleValidator.validate_cavity_modes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">validate_cavity_modes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deployment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ops'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example_validator.WindowedExampleValidator.validate_cavity_modes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks that each cavity was in the appropriate control mode or is bypassed.</p>
 <p>A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event
 timestamp.  Currently the proper mode is GDR (I/Q).</p>
@@ -354,7 +354,7 @@ modes of the non-bypassed cavities will be considered for invalidating the data.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – The mode number associated with the proper control mode.</p></li>
+<li><p><strong>mode</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, …], <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – A list of mode numbers associated with acceptable control modes.</p></li>
 <li><p><strong>offset</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The number of seconds before the fault event the mode setting should be checked.</p></li>
 <li><p><strong>deployment</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The MYA archiver deployment used for querying historical PV values</p></li>
 </ul>

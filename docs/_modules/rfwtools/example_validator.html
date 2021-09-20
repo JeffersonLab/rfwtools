@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rfwtools.example_validator &mdash; rfwtools 1.0.2 documentation</title>
+  <title>rfwtools.example_validator &mdash; rfwtools 1.0.3 documentation</title>
   
 
   
@@ -195,6 +195,7 @@
 
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">rfwtools</span> <span class="kn">import</span> <span class="n">mya</span>
 <span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">Example</span><span class="p">,</span> <span class="n">WindowedExample</span>
@@ -371,7 +372,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found improper step size.  Expect: </span><span class="si">{}</span><span class="s2">, Step size range: (</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">), Acceptable delta: </span><span class="si">{}</span><span class="s2">&quot;</span>
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_step</span><span class="p">,</span> <span class="n">max_step</span><span class="p">,</span> <span class="n">delta_max</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ExampleValidator.validate_cavity_modes"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_cavity_modes">[docs]</a>    <span class="k">def</span> <span class="nf">validate_cavity_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">deployment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ops&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="ExampleValidator.validate_cavity_modes"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_cavity_modes">[docs]</a>    <span class="k">def</span> <span class="nf">validate_cavity_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
+                              <span class="n">deployment</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ops&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Checks that each cavity was in the appropriate control mode or is bypassed.</span>
 
 <span class="sd">        A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event</span>
@@ -389,7 +391,7 @@
 <span class="sd">        modes of the non-bypassed cavities will be considered for invalidating the data.</span>
 
 <span class="sd">        Arguments:</span>
-<span class="sd">            mode:  The mode number associated with the proper control mode.</span>
+<span class="sd">            mode:  A list of mode numbers associated with acceptable control modes.</span>
 <span class="sd">            offset: The number of seconds before the fault event the mode setting should be checked.</span>
 <span class="sd">            deployment: The MYA archiver deployment used for querying historical PV values</span>
 
@@ -452,8 +454,15 @@
                 <span class="k">continue</span>
 
             <span class="n">val</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">mode_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cavity &#39;&quot;</span> <span class="o">+</span> <span class="n">cav</span> <span class="o">+</span> <span class="s2">&quot;&#39; not in GDR mode.  Mode = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span></div>
+            <span class="n">exc</span> <span class="o">=</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cavity &#39;&quot;</span> <span class="o">+</span> <span class="n">cav</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39; not in valid operating mode (</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">).  Mode = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">exc</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">exc</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected mode variable type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ExampleValidator.validate_zones"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_zones">[docs]</a>    <span class="k">def</span> <span class="nf">validate_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.</span>
@@ -526,7 +535,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_capture_file_waveforms</span><span class="p">()</span>
 
         <span class="c1"># Make sure that the start is not too late, and the the end is not too early.  Note max_start == 0+step_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate_waveform_times</span><span class="p">(</span><span class="n">max_start</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_end</span><span class="o">=</span><span class="p">(</span><span class="n">window_size</span><span class="o">-</span><span class="n">step_size</span><span class="p">),</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_waveform_times</span><span class="p">(</span><span class="n">max_start</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_end</span><span class="o">=</span><span class="p">(</span><span class="n">window_size</span> <span class="o">-</span> <span class="n">step_size</span><span class="p">),</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_cavity_modes</span><span class="p">(</span><span class="n">deployment</span><span class="o">=</span><span class="n">deployment</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_zones</span><span class="p">()</span></div></div>
 </pre></div>
