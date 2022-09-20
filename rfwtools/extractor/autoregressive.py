@@ -197,7 +197,7 @@ def __process_signal(signal: np.array, max_lag: int, scaler: preprocessing.Stand
 
         # AR model fitting - using old_names=True to suppress warning about future deprecation of kwargs for AutoReg
         # after v0.12
-        model = AutoReg(signal, lags=max_lag, trend='ct', old_names=True)
+        model = AutoReg(signal, lags=max_lag, trend='ct')
         model_fit = model.fit()
 
         # If AR model fits the signal with less than maxLag + 1 parameters, pad the rest with zeros
