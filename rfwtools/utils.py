@@ -33,7 +33,7 @@ def get_signal_names(cavities: List[str], waveforms: List[str]) -> List[str]:
 
 def get_events_from_web(data_server: str = None, wfb_base_url: str = None, begin: str = "2018-01-01 00:00:00",
                         end: str = None) -> dict:
-    """Downloads a a list of events from the waveforms web server which includes only their metadata.
+    """Downloads a list of events from the waveforms web server which includes only their metadata.
 
     Arguments:
         data_server: The hostname of the service running the waveform browser.  Defaults to Config().data_server.
