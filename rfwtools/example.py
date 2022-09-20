@@ -384,7 +384,7 @@ class Example(IExample):
             Returns:
                 bool: True if the filename appears to be a valid capture file.  Otherwise False.
         """
-        return Example.capture_file_regex.match(filename)
+        return Example.capture_file_regex.match(filename) is not None
 
     @staticmethod
     def parse_capture_file(file: str) -> pd.DataFrame:
