@@ -358,7 +358,7 @@ class Example(IExample):
 
         # Test if we got a good status code.
         if not r.status_code == 200:
-            raise RuntimeError("Received non-ok response - " + r.status_code)
+            raise RuntimeError(f"Received non-ok response - {r.status_code}")
         if r.content == "":
             raise RuntimeError("Received empty content from  - ")
 
