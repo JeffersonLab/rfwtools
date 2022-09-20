@@ -52,7 +52,7 @@ class IExample:
     This only defines methods and properties related to data access.
     """
 
-    def __init__(self, data_dir=None):
+    def __init__(self, data_dir: Optional[str] = None):
         """Construct an instance of the Example class."""
 
         # Will eventually hold the waveform data from the event
@@ -180,7 +180,6 @@ class Example(IExample):
 
         #: The type of example this is.
         self.e_type = ExampleType.EXAMPLE
-
 
     def load_data(self, verbose: bool = False) -> None:
         """Top-level method for loading data associated with Example instance.
@@ -676,8 +675,9 @@ class WindowedExample(Example):
     specified time range is not a strict subset of the Examples Time column.
     """
 
-    def __init__(self, zone: str, dt: datetime, cavity_label: str, fault_label: str, cavity_conf: float,
-                 fault_conf: float, label_source: str, start: float, n_samples: int, data_dir: str = None):
+    def __init__(self, zone: str, dt: datetime, cavity_label: Optional[str], fault_label: Optional[str],
+                 cavity_conf: Optional[float], fault_conf: Optional[float], label_source: Optional[str],
+                 start: Optional[float], n_samples: int, data_dir: Optional[str] = None):
         """Construct an instance th will only store the required window upon a load_data() call.
 
         Arguments:
