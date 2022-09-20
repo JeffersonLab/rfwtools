@@ -24,7 +24,7 @@ Typical usage example:
 import math
 import tarfile
 from enum import Enum
-from typing import Tuple, Dict, List
+from typing import Tuple, Dict, List, Optional
 
 import requests
 import os
@@ -153,15 +153,16 @@ class Example(IExample):
     fault_label: a string label specifying the type of fault that occurred (ExampleSet has a list of "known" labels")
     cavity_conf: A floating point number in [0, 1] representing the probability/confidence placed in the cavity label
     fault_conf: A floating point number in [0, 1] representing the probability/confidence placed in the fault label
-    label_source: The source of the labels.  Typically either label files or the output of a model
+    label_source: The source of the labels.  Typically, either label files or the output of a model
     data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.
     """
 
     # A regex for matching
     capture_file_regex = re.compile(r"R.*harv\..*\.txt")
 
-    def __init__(self, zone:str , dt: datetime, cavity_label: str, fault_label: str, cavity_conf: float,
-                 fault_conf: float, label_source: str, data_dir:str =None):
+    def __init__(self, zone: str, dt: datetime, cavity_label: Optional[str], fault_label: Optional[str],
+                 cavity_conf: Optional[float], fault_conf: Optional[float], label_source: Optional[str],
+                 data_dir: Optional[str] =None):
         """Construct an instance of the Example class."""
 
         super().__init__(data_dir=data_dir)
