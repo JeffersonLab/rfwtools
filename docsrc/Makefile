@@ -47,6 +47,7 @@ help:
 
 .PHONY: github
 github:
+    rm -rf $(BUILDDIR)/doctrees/
 	rm -rf $(BUILDDIR)/html/* $(GITHUB_DOCS)/*
 	@make html
 	mv $(BUILDDIR)/html/* $(GITHUB_DOCS)
