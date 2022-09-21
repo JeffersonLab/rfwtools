@@ -34,7 +34,15 @@ tox -e py37-linux
 cd /path/to/.../rfwtools
 python3 -m unittest
 
-# To build documentation that can be used in github
+# To build documentation that can be used in github.
+
+# From windows:
+cd docsrc
+.\make.bat github
+git add .
+git commit -m"Updated documentation"
+
+# From Linux:
 docsrc/build-docs.bash
 git add .
 git commit -m"Updated documentation"
@@ -67,8 +75,8 @@ requirements.txt are the versions that were used from within my IDE and with my 
 that worked during development, installation set will probably be different.  This is every installed package, not just
 the ones that my package directly uses.
 
-requirements_dev.txt are the versions of tools required to build, test, and distribute the package.  These are the set
+requirements-dev.txt are the versions of tools required to build, test, and distribute the package.  These are the set
 that worked during the last development cycle.
 
-requirements_testing.txt are the packages that needed to be installed for testing to work.  They are basically the same
+requirements-testing.txt are the packages that needed to be installed for testing to work.  They are basically the same
 as requirements.txt, but with a few extras used exclusively in tests and the local rfwtools package itself.

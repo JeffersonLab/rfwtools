@@ -6,6 +6,7 @@ if "%SPHINXBUILD%" == "" (
 	set SPHINXBUILD=sphinx-build
 )
 set BUILDDIR=build
+set GITHUB_DOCS=..\docs
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% source
 set I18NSPHINXOPTS=%SPHINXOPTS% source
 if NOT "%PAPER%" == "" (
@@ -40,6 +41,7 @@ if "%1" == "help" (
 	echo.  doctest    to run all doctests embedded in the documentation if enabled
 	echo.  coverage   to run coverage check of the documentation if enabled
 	echo.  dummy      to check syntax errors of document sources
+	echo.  github     to run builds needed for github.io docs - rfwtools custom
 	goto end
 )
 
@@ -73,6 +75,20 @@ if errorlevel 9009 (
 
 :sphinx_ok
 
+if "%1" == "github" (
+    del /S /Q %GITHUB_DOCS%
+    del /S /Q %BUILDDIR%\html
+    del /S /Q %BUILDDIR%\doctrees
+	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
+	if errorlevel 1 exit /b 1
+	echo.
+    rmdir /S /Q %GITHUB_DOCS%
+    move %BUILDDIR%\html %GITHUB_DOCS%
+    mkdir %BUILDDIR%\html
+
+	echo.Build finished. The HTML pages are in %GITHUB_DOCS%.
+	goto end
+)
 
 if "%1" == "html" (
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
