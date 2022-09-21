@@ -1,4 +1,4 @@
-rfwtools.example.Example
+﻿rfwtools.example.Example
 ========================
 
 .. currentmodule:: rfwtools.example
@@ -42,5 +42,15 @@ rfwtools.example.Example
    .. autosummary::
    
       ~Example.capture_file_regex
+      ~Example.cavity_label
+      ~Example.fault_label
+      ~Example.cavity_conf
+      ~Example.fault_conf
+      ~Example.label_source
+      ~Example.event_datetime
+      ~Example.event_zone
+      ~Example.e_type
+      ~Example.event_df
+      ~Example.data_dir
    
    

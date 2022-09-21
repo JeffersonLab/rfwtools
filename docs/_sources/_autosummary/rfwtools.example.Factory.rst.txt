@@ -1,4 +1,4 @@
-rfwtools.example.Factory
+﻿rfwtools.example.Factory
 ========================
 
 .. currentmodule:: rfwtools.example
@@ -22,5 +22,12 @@ rfwtools.example.Factory
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Factory.e_type
+      ~Factory.example_kwargs
    
    

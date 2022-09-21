@@ -1,41 +1,22 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>rfwtools.data_set.DataSet &mdash; rfwtools 1.0.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>rfwtools.data_set.DataSet &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rfwtools.dim_reduction" href="rfwtools.dim_reduction.html" />
@@ -44,33 +25,16 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> rfwtools
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                1.0
+                1.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -78,18 +42,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="rfwtools.html">rfwtools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="rfwtools.config.html">rfwtools.config</a></li>
@@ -112,122 +65,79 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">rfwtools</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="rfwtools.html">rfwtools</a> &raquo;</li>
-        
           <li><a href="rfwtools.data_set.html">rfwtools.data_set</a> &raquo;</li>
-        
       <li>rfwtools.data_set.DataSet</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/_autosummary/rfwtools.data_set.DataSet.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="rfwtools-data-set-dataset">
-<h1>rfwtools.data_set.DataSet<a class="headerlink" href="#rfwtools-data-set-dataset" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="rfwtools-data-set-dataset">
+<h1>rfwtools.data_set.DataSet<a class="headerlink" href="#rfwtools-data-set-dataset" title="Permalink to this heading"></a></h1>
 <dl class="py class">
-<dt id="rfwtools.data_set.DataSet">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rfwtools.data_set.</span></code><code class="sig-name descname"><span class="pre">DataSet</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">label_files=None</span></em>, <em class="sig-param"><span class="pre">example_validator=&lt;rfwtools.example_validator.ExampleValidator</span> <span class="pre">object&gt;</span></em>, <em class="sig-param"><span class="pre">e_type=&lt;ExampleType.EXAMPLE:</span> <span class="pre">1&gt;</span></em>, <em class="sig-param"><span class="pre">example_kwargs={}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rfwtools.data_set.</span></span><span class="sig-name descname"><span class="pre">DataSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_files=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_validator=&lt;rfwtools.example_validator.ExampleValidator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_type=ExampleType.EXAMPLE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_kwargs=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class manages a standard workflow from label files on disk to the generation of features</p>
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.label_files">
-<code class="sig-name descname"><span class="pre">label_files</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.label_files" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.label_files">
+<span class="sig-name descname"><span class="pre">label_files</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.label_files" title="Permalink to this definition"></a></dt>
 <dd><p>A list of strings that are the label filenames in Config().label_dir.  None implies all files.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.example_validator">
-<code class="sig-name descname"><span class="pre">example_validator</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.example_validator" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.example_validator">
+<span class="sig-name descname"><span class="pre">example_validator</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.example_validator" title="Permalink to this definition"></a></dt>
 <dd><p>An ExampleValidator object.  This defines the characteristics of valid objects in DataSet’s ExampleSet</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.config_yaml">
-<code class="sig-name descname"><span class="pre">config_yaml</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.config_yaml" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.config_yaml">
+<span class="sig-name descname"><span class="pre">config_yaml</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.config_yaml" title="Permalink to this definition"></a></dt>
 <dd><p>A YAML formatted string representing the Config() object at the time a DataSet runs save()</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.feature_set">
-<code class="sig-name descname"><span class="pre">feature_set</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.feature_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.feature_set">
+<span class="sig-name descname"><span class="pre">feature_set</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.feature_set" title="Permalink to this definition"></a></dt>
 <dd><p>A FeatureSet object containing the feature data generated by produce_feature_set()</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.example_set">
-<code class="sig-name descname"><span class="pre">example_set</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.example_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.example_set">
+<span class="sig-name descname"><span class="pre">example_set</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.example_set" title="Permalink to this definition"></a></dt>
 <dd><p>An ExampleSet object that contains all of the examples generated from label_files by produce_example_set()</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rfwtools.data_set.DataSet.example_set_model">
-<code class="sig-name descname"><span class="pre">example_set_model</span></code><a class="headerlink" href="#rfwtools.data_set.DataSet.example_set_model" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.example_set_model">
+<span class="sig-name descname"><span class="pre">example_set_model</span></span><a class="headerlink" href="#rfwtools.data_set.DataSet.example_set_model" title="Permalink to this definition"></a></dt>
 <dd><p>An ExampleSet object containing examples labeled by the production classifier during the same time span as
 example_set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">label_files=None</span></em>, <em class="sig-param"><span class="pre">example_validator=&lt;rfwtools.example_validator.ExampleValidator</span> <span class="pre">object&gt;</span></em>, <em class="sig-param"><span class="pre">e_type=&lt;ExampleType.EXAMPLE:</span> <span class="pre">1&gt;</span></em>, <em class="sig-param"><span class="pre">example_kwargs={}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_files=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_validator=&lt;rfwtools.example_validator.ExampleValidator</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_type=ExampleType.EXAMPLE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_kwargs=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Create a DataSet instance that will collect events based on the provided label files and configured filters.</p>
 <p>Some filters such as excluded zones or excluded times are set in the Config objects.</p>
 <dl class="field-list simple">
@@ -236,20 +146,20 @@ example_set.</p>
 <li><p><strong>label_files</strong> (<em>list</em><em>(</em><em>str</em><em>)</em><em>) </em><em>- Filenames of the label files to parse.  None means use all Config</em><em>(</em>) – </p></li>
 <li><p><strong>example_validator</strong> (<a class="reference internal" href="rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator" title="rfwtools.example_validator.ExampleValidator"><em>ExampleValidator</em></a>) – validation performed if None</p></li>
 <li><p><strong>e_type</strong> (<a class="reference internal" href="rfwtools.example.ExampleType.html#rfwtools.example.ExampleType" title="rfwtools.example.ExampleType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleType</span></code></a>) – The type of IExample objects that will be created.  Defaults to ExampleType.EXAMPLE.</p></li>
-<li><p><strong>example_kwargs</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – A dictionary of keyword arguments that will be passed to the e_type constructor</p></li>
+<li><p><strong>example_kwargs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – A dictionary of keyword arguments that will be passed to the e_type constructor</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.__init__" title="rfwtools.data_set.DataSet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([label_files, example_validator, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.__init__" title="rfwtools.data_set.DataSet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([label_files, example_validator, ...])</p></td>
 <td><p>Create a DataSet instance that will collect events based on the provided label files and configured filters.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.get_example_array" title="rfwtools.data_set.DataSet.get_example_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_example_array</span></code></a>()</p></td>
@@ -261,7 +171,7 @@ example_set.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set" title="rfwtools.data_set.DataSet.load_example_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set</span></code></a>(filename[, in_dir])</p></td>
 <td><p>DEPRECATED.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="rfwtools.data_set.DataSet.load_example_set_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set_csv</span></code></a>(filename[, e_type, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="rfwtools.data_set.DataSet.load_example_set_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_example_set_csv</span></code></a>(filename[, e_type, ...])</p></td>
 <td><p>Load an ExampleSet CSV file.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_feature_set" title="rfwtools.data_set.DataSet.load_feature_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_feature_set</span></code></a>(filename[, in_dir])</p></td>
@@ -270,10 +180,10 @@ example_set.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.load_feature_set_csv" title="rfwtools.data_set.DataSet.load_feature_set_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_feature_set_csv</span></code></a>(filename, **kwargs)</p></td>
 <td><p>Load a FeatureSet CSV file.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.produce_example_set" title="rfwtools.data_set.DataSet.produce_example_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">produce_example_set</span></code></a>([report, progress, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.produce_example_set" title="rfwtools.data_set.DataSet.produce_example_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">produce_example_set</span></code></a>([report, progress, ...])</p></td>
 <td><p>This method causes the DataSet object to produce a set of uniquely labeled examples based on label files.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.produce_feature_set" title="rfwtools.data_set.DataSet.produce_feature_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">produce_feature_set</span></code></a>(extraction_function[, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.produce_feature_set" title="rfwtools.data_set.DataSet.produce_feature_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">produce_feature_set</span></code></a>(extraction_function[, ...])</p></td>
 <td><p>This method produces a FeatureSet by applying extraction_function to each Example in the example set.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.data_set.DataSet.save" title="rfwtools.data_set.DataSet.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(filename[, out_dir])</p></td>
@@ -294,8 +204,8 @@ example_set.</p>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.get_example_array">
-<code class="sig-name descname"><span class="pre">get_example_array</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.get_example_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.get_example_array" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.get_example_array">
+<span class="sig-name descname"><span class="pre">get_example_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.get_example_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.get_example_array" title="Permalink to this definition"></a></dt>
 <dd><p>Convenience function for getting an array containing the Example objects held in self.example_set</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -308,8 +218,8 @@ example_set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.load">
-<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">load</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.load">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED Loads a bzipped pickle file produced by save().  Returns the resulting DataSet.</p>
 <p>Save files made with different versions of rfwtools may be impossible to load.  Please save/load ExampleSets
 and FeatureSets using their built in CSV methods for long-term storage.</p>
@@ -327,14 +237,14 @@ and FeatureSets using their built in CSV methods for long-term storage.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.load_example_set">
-<code class="sig-name descname"><span class="pre">load_example_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.load_example_set">
+<span class="sig-name descname"><span class="pre">load_example_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED.  Loads a binary bzipped pickle file containing an example set.  Old versions used pickle files</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.load_example_set_csv">
-<code class="sig-name descname"><span class="pre">load_example_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.load_example_set_csv">
+<span class="sig-name descname"><span class="pre">load_example_set_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_example_set_csv" title="Permalink to this definition"></a></dt>
 <dd><p>Load an ExampleSet CSV file.  Overwrites existing example_set with new ExampleSet.</p>
 <p>This method allows the user to specify the type of Example that will be constructed from the rows of the CSV.
 Some types will require specific example_kwargs values.</p>
@@ -351,8 +261,8 @@ Some types will require specific example_kwargs values.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.load_feature_set">
-<code class="sig-name descname"><span class="pre">load_feature_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_feature_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.load_feature_set">
+<span class="sig-name descname"><span class="pre">load_feature_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_feature_set" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED.  Loads a binary pickle file containing a feature set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -362,8 +272,8 @@ Some types will require specific example_kwargs values.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.load_feature_set_csv">
-<code class="sig-name descname"><span class="pre">load_feature_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_feature_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_feature_set_csv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.load_feature_set_csv">
+<span class="sig-name descname"><span class="pre">load_feature_set_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.load_feature_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.load_feature_set_csv" title="Permalink to this definition"></a></dt>
 <dd><p>Load a FeatureSet CSV file.  Overwrites existing feature_set with new FeatureSet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -379,8 +289,8 @@ Some types will require specific example_kwargs values.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.produce_example_set">
-<code class="sig-name descname"><span class="pre">produce_example_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_model_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.produce_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.produce_example_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.produce_example_set">
+<span class="sig-name descname"><span class="pre">produce_example_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_model_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.produce_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.produce_example_set" title="Permalink to this definition"></a></dt>
 <dd><p>This method causes the DataSet object to produce a set of uniquely labeled examples based on label files.</p>
 <p>self.example_set will contain the resulting ExampleSet.
 self.example_set_model will contain the ExampleSet corresponding to the production model’s results</p>
@@ -402,8 +312,8 @@ self.example_set_model will contain the ExampleSet corresponding to the producti
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.produce_feature_set">
-<code class="sig-name descname"><span class="pre">produce_feature_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extraction_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.produce_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.produce_feature_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.produce_feature_set">
+<span class="sig-name descname"><span class="pre">produce_feature_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extraction_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.produce_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.produce_feature_set" title="Permalink to this definition"></a></dt>
 <dd><p>This method produces a FeatureSet by applying extraction_function to each Example in the example set.</p>
 <p>extraction_function should a callable that requires exactly one positional argument, the Example on which to
 operate and returns a pandas DataFrame with one row and a constant number of columns.  The extractor function
@@ -431,8 +341,8 @@ zone, timestamp, and label_source of the example.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.save">
-<code class="sig-name descname"><span class="pre">save</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED Saves a bzipped pickle file containing this DataSet object.</p>
 <p>This is a convenient way to save all of your work within a DataSet object.  However, <strong>changes to the installed
 rfwtools software may make it difficult or impossible to load this object</strong> in the future.  Please save
@@ -453,8 +363,8 @@ e.g., save_example_set_csv().</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.save_example_set">
-<code class="sig-name descname"><span class="pre">save_example_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_example_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.save_example_set">
+<span class="sig-name descname"><span class="pre">save_example_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_example_set" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED.  Save a binary bzipped pickle file of the current example set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -464,8 +374,8 @@ e.g., save_example_set_csv().</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.save_example_set_csv">
-<code class="sig-name descname"><span class="pre">save_example_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_example_set_csv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.save_example_set_csv">
+<span class="sig-name descname"><span class="pre">save_example_set_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_example_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_example_set_csv" title="Permalink to this definition"></a></dt>
 <dd><p>Save an ExampleSet CSV file.  All keyword args are passed to ExampleSet.save_csv method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -481,8 +391,8 @@ e.g., save_example_set_csv().</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.save_feature_set">
-<code class="sig-name descname"><span class="pre">save_feature_set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_feature_set" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.save_feature_set">
+<span class="sig-name descname"><span class="pre">save_feature_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_feature_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_feature_set" title="Permalink to this definition"></a></dt>
 <dd><p>DEPRECATED.  Saves a binary pickle file containing the feature set DataFrame.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -492,8 +402,8 @@ e.g., save_example_set_csv().</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.data_set.DataSet.save_feature_set_csv">
-<code class="sig-name descname"><span class="pre">save_feature_set_csv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_feature_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_feature_set_csv" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.data_set.DataSet.save_feature_set_csv">
+<span class="sig-name descname"><span class="pre">save_feature_set_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/data_set.html#DataSet.save_feature_set_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.data_set.DataSet.save_feature_set_csv" title="Permalink to this definition"></a></dt>
 <dd><p>Save a FeatureSet CSV file.  All keyword args are passed to FeatureSet.save_csv method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -510,54 +420,37 @@ e.g., save_example_set_csv().</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="rfwtools.dim_reduction.html" class="btn btn-neutral float-right" title="rfwtools.dim_reduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="rfwtools.data_set.html" class="btn btn-neutral float-left" title="rfwtools.data_set" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rfwtools.dim_reduction.html" class="btn btn-neutral float-right" title="rfwtools.dim_reduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Jefferson Lab.
-
-    </p>
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

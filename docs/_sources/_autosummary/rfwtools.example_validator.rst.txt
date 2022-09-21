@@ -1,4 +1,4 @@
-﻿rfwtools.example\_validator
+rfwtools.example\_validator
 ===========================
 
 .. automodule:: rfwtools.example_validator

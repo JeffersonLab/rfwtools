@@ -1,41 +1,22 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>rfwtools.network.SSLContextAdapter &mdash; rfwtools 1.0.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>rfwtools.network.SSLContextAdapter &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="rfwtools.timestamp" href="rfwtools.timestamp.html" />
@@ -44,33 +25,16 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> rfwtools
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                1.0
+                1.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -78,18 +42,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="rfwtools.html">rfwtools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="rfwtools.config.html">rfwtools.config</a></li>
@@ -112,98 +65,54 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">rfwtools</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="rfwtools.html">rfwtools</a> &raquo;</li>
-        
           <li><a href="rfwtools.network.html">rfwtools.network</a> &raquo;</li>
-        
       <li>rfwtools.network.SSLContextAdapter</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/_autosummary/rfwtools.network.SSLContextAdapter.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="rfwtools-network-sslcontextadapter">
-<h1>rfwtools.network.SSLContextAdapter<a class="headerlink" href="#rfwtools-network-sslcontextadapter" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="rfwtools-network-sslcontextadapter">
+<h1>rfwtools.network.SSLContextAdapter<a class="headerlink" href="#rfwtools-network-sslcontextadapter" title="Permalink to this heading"></a></h1>
 <dl class="py class">
-<dt id="rfwtools.network.SSLContextAdapter">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">rfwtools.network.</span></code><code class="sig-name descname"><span class="pre">SSLContextAdapter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pool_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_maxsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/network.html#SSLContextAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.network.SSLContextAdapter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">requests.adapters.HTTPAdapter</span></code></p>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rfwtools.network.</span></span><span class="sig-name descname"><span class="pre">SSLContextAdapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pool_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_maxsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/network.html#SSLContextAdapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.network.SSLContextAdapter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPAdapter</span></code></p>
 <p>An HTTPAdapter that loads the default system SSL trust store</p>
 <p>This is needed since the requests module ships with its own CA cert store that does not include the JLab PKI</p>
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pool_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_maxsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pool_connections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_maxsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_block</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
+<table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.__init__" title="rfwtools.network.SSLContextAdapter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([pool_connections, pool_maxsize, …])</p></td>
-<td><p>Initialize self.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.__init__" title="rfwtools.network.SSLContextAdapter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([pool_connections, pool_maxsize, ...])</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.add_headers" title="rfwtools.network.SSLContextAdapter.add_headers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_headers</span></code></a>(request, **kwargs)</p></td>
 <td><p>Add any headers needed by the connection.</p></td>
@@ -232,14 +141,14 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.request_url" title="rfwtools.network.SSLContextAdapter.request_url"><code class="xref py py-obj docutils literal notranslate"><span class="pre">request_url</span></code></a>(request, proxies)</p></td>
 <td><p>Obtain the url to use when making the final request.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.send" title="rfwtools.network.SSLContextAdapter.send"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send</span></code></a>(request[, stream, timeout, verify, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.network.SSLContextAdapter.send" title="rfwtools.network.SSLContextAdapter.send"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send</span></code></a>(request[, stream, timeout, verify, ...])</p></td>
 <td><p>Sends PreparedRequest object.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.add_headers">
-<code class="sig-name descname"><span class="pre">add_headers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.add_headers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.add_headers">
+<span class="sig-name descname"><span class="pre">add_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.add_headers" title="Permalink to this definition"></a></dt>
 <dd><p>Add any headers needed by the connection. As of v2.0 this does
 nothing by default, but is left for overriding by users that subclass
 the <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPAdapter</span></code>.</p>
@@ -257,8 +166,8 @@ when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.build_response">
-<code class="sig-name descname"><span class="pre">build_response</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.build_response" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.build_response">
+<span class="sig-name descname"><span class="pre">build_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.build_response" title="Permalink to this definition"></a></dt>
 <dd><p>Builds a <code class="xref py py-class docutils literal notranslate"><span class="pre">Response</span></code> object from a urllib3
 response. This should not be called from user code, and is only exposed
 for use when subclassing the
@@ -277,8 +186,8 @@ for use when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.cert_verify">
-<code class="sig-name descname"><span class="pre">cert_verify</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.cert_verify" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.cert_verify">
+<span class="sig-name descname"><span class="pre">cert_verify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.cert_verify" title="Permalink to this definition"></a></dt>
 <dd><p>Verify a SSL certificate. This method should not be called from user
 code, and is only exposed for use when subclassing the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPAdapter</span></code>.</p>
@@ -297,16 +206,16 @@ to a CA bundle to use</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.close">
-<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.close" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.close" title="Permalink to this definition"></a></dt>
 <dd><p>Disposes of any internal state.</p>
 <p>Currently, this closes the PoolManager and any active ProxyManager,
 which closes any pooled connections.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.get_connection">
-<code class="sig-name descname"><span class="pre">get_connection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.get_connection" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.get_connection">
+<span class="sig-name descname"><span class="pre">get_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.get_connection" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a urllib3 connection for the given URL. This should not be
 called from user code, and is only exposed for use when subclassing the
 <code class="xref py py-class docutils literal notranslate"><span class="pre">HTTPAdapter</span></code>.</p>
@@ -324,14 +233,14 @@ called from user code, and is only exposed for use when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.init_poolmanager">
-<code class="sig-name descname"><span class="pre">init_poolmanager</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/network.html#SSLContextAdapter.init_poolmanager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.init_poolmanager" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.init_poolmanager">
+<span class="sig-name descname"><span class="pre">init_poolmanager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/network.html#SSLContextAdapter.init_poolmanager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.init_poolmanager" title="Permalink to this definition"></a></dt>
 <dd><p>Overrides the parent method to include call to load_default_certs()</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.proxy_headers">
-<code class="sig-name descname"><span class="pre">proxy_headers</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.proxy_headers" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.proxy_headers">
+<span class="sig-name descname"><span class="pre">proxy_headers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.proxy_headers" title="Permalink to this definition"></a></dt>
 <dd><p>Returns a dictionary of the headers to add to any request sent
 through a proxy. This works with urllib3 magic to ensure that they are
 correctly sent to the proxy, rather than in a tunnelled request if
@@ -350,8 +259,8 @@ when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.proxy_manager_for">
-<code class="sig-name descname"><span class="pre">proxy_manager_for</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">proxy_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.proxy_manager_for" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.proxy_manager_for">
+<span class="sig-name descname"><span class="pre">proxy_manager_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">proxy_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.proxy_manager_for" title="Permalink to this definition"></a></dt>
 <dd><p>Return urllib3 ProxyManager for the given proxy.</p>
 <p>This method should not be called from user code, and is only
 exposed for use when subclassing the
@@ -373,8 +282,8 @@ exposed for use when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.request_url">
-<code class="sig-name descname"><span class="pre">request_url</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.request_url" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.request_url">
+<span class="sig-name descname"><span class="pre">request_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.request_url" title="Permalink to this definition"></a></dt>
 <dd><p>Obtain the url to use when making the final request.</p>
 <p>If the message is being sent through a HTTP proxy, the full URL has to
 be used. Otherwise, we should only use the path portion of the URL.</p>
@@ -395,8 +304,8 @@ when subclassing the
 </dd></dl>
 
 <dl class="py method">
-<dt id="rfwtools.network.SSLContextAdapter.send">
-<code class="sig-name descname"><span class="pre">send</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.send" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rfwtools.network.SSLContextAdapter.send">
+<span class="sig-name descname"><span class="pre">send</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.network.SSLContextAdapter.send" title="Permalink to this definition"></a></dt>
 <dd><p>Sends PreparedRequest object. Returns Response object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -421,54 +330,37 @@ must be a path to a CA bundle to use</p></li>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="rfwtools.timestamp.html" class="btn btn-neutral float-right" title="rfwtools.timestamp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="rfwtools.network.html" class="btn btn-neutral float-left" title="rfwtools.network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rfwtools.timestamp.html" class="btn btn-neutral float-right" title="rfwtools.timestamp" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Jefferson Lab.
-
-    </p>
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

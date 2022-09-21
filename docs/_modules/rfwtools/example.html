@@ -1,74 +1,37 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>rfwtools.example &mdash; rfwtools 1.0.3 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>rfwtools.example &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link href="../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../index.html" class="icon icon-home"> rfwtools
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                1.0
+                1.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -76,85 +39,35 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../_autosummary/rfwtools.html">rfwtools</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">rfwtools</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../index.html">Module code</a> &raquo;</li>
-        
       <li>rfwtools.example</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for rfwtools.example</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;A package for managing the data associated with a single fault event.</span>
 
@@ -182,7 +95,7 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -210,12 +123,17 @@
 <span class="sd">    This only defines methods and properties related to data access.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="IExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="IExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct an instance of the Example class.&quot;&quot;&quot;</span>
 
         <span class="c1"># Will eventually hold the waveform data from the event</span>
+        <span class="c1">#: (pd.DataFrame): The DataFrame for holding the actual waveform data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#: (str): The directory where the waveform data can be found.  None if Config is to be referenced.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+
+        <span class="c1">#: (ExampleType): The type of example this is.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="IExample.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -253,7 +171,10 @@
 <span class="sd">                All additional keyword arguments will be passed to the responsible constructor on every get_example()</span>
 <span class="sd">                call.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: (ExampleType): The type of example that is to be made.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">e_type</span>
+
+        <span class="c1">#: (dict of str:Any): kwargs to be passed to example constructor</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">example_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="Factory.get_example"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Factory.html#rfwtools.example.Factory.get_example">[docs]</a>    <span class="k">def</span> <span class="nf">get_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_type</span><span class="p">:</span> <span class="n">ExampleType</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IExample</span><span class="p">:</span>
@@ -311,33 +232,43 @@
 <span class="sd">    fault_label: a string label specifying the type of fault that occurred (ExampleSet has a list of &quot;known&quot; labels&quot;)</span>
 <span class="sd">    cavity_conf: A floating point number in [0, 1] representing the probability/confidence placed in the cavity label</span>
 <span class="sd">    fault_conf: A floating point number in [0, 1] representing the probability/confidence placed in the fault label</span>
-<span class="sd">    label_source: The source of the labels.  Typically either label files or the output of a model</span>
+<span class="sd">    label_source: The source of the labels.  Typically, either label files or the output of a model</span>
 <span class="sd">    data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c1"># A regex for matching</span>
+    <span class="c1">#: (re.Pattern): A regex for matching capture file filenames</span>
     <span class="n">capture_file_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;R.*harv\..*\.txt&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Example.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span><span class="nb">str</span> <span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                 <span class="n">fault_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">label_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Example.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">fault_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">cavity_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">fault_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">label_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct an instance of the Example class.&quot;&quot;&quot;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
 
-        <span class="c1"># Expert/model provided labels</span>
+        <span class="c1">#: (str): Expert/model provided cavity label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span> <span class="o">=</span> <span class="n">cavity_label</span>
+
+        <span class="c1">#: (str): Expert/model provided fault label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span> <span class="o">=</span> <span class="n">fault_label</span>
+
+        <span class="c1">#: (float): Cavity label confidence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cavity_conf</span> <span class="o">=</span> <span class="n">cavity_conf</span>
+
+        <span class="c1">#: (float): Fault label confidence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fault_conf</span> <span class="o">=</span> <span class="n">fault_conf</span>
+
+        <span class="c1">#: (str): Source of labeles (which model, file, etc.)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_source</span> <span class="o">=</span> <span class="n">label_source</span>
 
-        <span class="c1"># Zone and timestamp info for the example event</span>
+        <span class="c1">#: (datetime.datetime): When did the event occur</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">=</span> <span class="n">dt</span>
+
+        <span class="c1">#: (str): Which zone had the event</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="o">=</span> <span class="n">zone</span>
 
-        <span class="c1">#: The type of example this is.</span>
+        <span class="c1">#: (ExampleType): The type of example this is.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">EXAMPLE</span></div>
-
 
 <div class="viewcode-block" id="Example.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Top-level method for loading data associated with Example instance.</span>
@@ -516,7 +447,7 @@
 
         <span class="c1"># Test if we got a good status code.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Received non-ok response - &quot;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received non-ok response - </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Received empty content from  - &quot;</span><span class="p">)</span>
 
@@ -542,7 +473,7 @@
 <span class="sd">            Returns:</span>
 <span class="sd">                bool: True if the filename appears to be a valid capture file.  Otherwise False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Example</span><span class="o">.</span><span class="n">capture_file_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Example</span><span class="o">.</span><span class="n">capture_file_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Example.parse_capture_file"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.parse_capture_file">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">parse_capture_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
@@ -833,8 +764,9 @@
 <span class="sd">    specified time range is not a strict subset of the Examples Time column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="WindowedExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-                 <span class="n">fault_conf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">label_source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="WindowedExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">fault_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">cavity_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">fault_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">label_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct an instance th will only store the required window upon a load_data() call.</span>
 
 <span class="sd">        Arguments:</span>
@@ -842,15 +774,16 @@
 <span class="sd">            n_samples: The number of samples to include after the start of the window.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">,</span> <span class="n">fault_conf</span><span class="p">,</span> <span class="n">label_source</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="c1">#: (ExampleType): The type of Example this represents.  Convenient type tracking.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">WINDOWED_EXAMPLE</span>
 
-        <span class="c1">#: The start of the window relative to the fault onset</span>
+        <span class="c1">#: (float): The start of the window relative to the fault onset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
 
-        <span class="c1">#: The number of samples requested after the start value</span>
+        <span class="c1">#: (int): The number of samples requested after the start value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
 
-        <span class="c1">#: The last Time value in the window.  Determined after loading data for the first time.</span>
+        <span class="c1">#: (float) The last Time value in the window.  Determined after loading data for the first time.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="WindowedExample.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -898,46 +831,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Jefferson Lab.
-
-    </p>
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-﻿rfwtools.mya
+rfwtools.mya
 ============
 
 .. automodule:: rfwtools.mya

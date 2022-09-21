@@ -1,4 +1,4 @@
-﻿rfwtools.data\_set
+rfwtools.data\_set
 ==================
 
 .. automodule:: rfwtools.data_set

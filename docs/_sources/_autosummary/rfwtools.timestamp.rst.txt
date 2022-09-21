@@ -1,4 +1,4 @@
-﻿rfwtools.timestamp
+rfwtools.timestamp
 ==================
 
 .. automodule:: rfwtools.timestamp

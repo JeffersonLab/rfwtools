@@ -1,4 +1,4 @@
-﻿rfwtools.visualize
+rfwtools.visualize
 ==================
 
 .. automodule:: rfwtools.visualize

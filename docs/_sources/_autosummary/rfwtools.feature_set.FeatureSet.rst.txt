@@ -53,4 +53,12 @@ rfwtools.feature\_set.FeatureSet
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FeatureSet.metadata_columns
+      ~FeatureSet.pca
+      ~FeatureSet.label_file_dataframes
+   
    

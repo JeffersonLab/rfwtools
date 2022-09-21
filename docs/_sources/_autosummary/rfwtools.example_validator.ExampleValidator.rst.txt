@@ -29,4 +29,15 @@ rfwtools.example\_validator.ExampleValidator
 
    
    
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ExampleValidator.event_datetime
+      ~ExampleValidator.event_zone
+      ~ExampleValidator.event_df
+      ~ExampleValidator.event_cf_content
+      ~ExampleValidator.event_df_exception
+      ~ExampleValidator.mya_deployment
+   
    

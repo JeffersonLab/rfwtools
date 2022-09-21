@@ -1,4 +1,4 @@
-﻿rfwtools.dim\_reduction
+rfwtools.dim\_reduction
 =======================
 
 .. automodule:: rfwtools.dim_reduction

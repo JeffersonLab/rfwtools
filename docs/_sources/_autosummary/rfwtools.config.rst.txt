@@ -1,4 +1,4 @@
-﻿rfwtools.config
+rfwtools.config
 ===============
 
 .. automodule:: rfwtools.config

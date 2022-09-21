@@ -1,4 +1,4 @@
-﻿rfwtools.extractor
+rfwtools.extractor
 ==================
 
 .. automodule:: rfwtools.extractor

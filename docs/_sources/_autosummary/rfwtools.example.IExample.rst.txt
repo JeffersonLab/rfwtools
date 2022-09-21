@@ -1,4 +1,4 @@
-rfwtools.example.IExample
+﻿rfwtools.example.IExample
 =========================
 
 .. currentmodule:: rfwtools.example
@@ -24,5 +24,13 @@ rfwtools.example.IExample
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~IExample.event_df
+      ~IExample.data_dir
+      ~IExample.e_type
    
    

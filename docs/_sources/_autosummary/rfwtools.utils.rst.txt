@@ -1,4 +1,4 @@
-﻿rfwtools.utils
+rfwtools.utils
 ==============
 
 .. automodule:: rfwtools.utils
