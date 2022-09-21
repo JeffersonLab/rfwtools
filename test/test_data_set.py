@@ -11,6 +11,7 @@ import test
 
 # Prime the pump on the timestamp map.
 from rfwtools.example import ExampleType, WindowedExample
+from rfwtools.example_validator import ExampleValidator
 from rfwtools.feature_set import FeatureSet
 
 test.load_timestamp_map()
@@ -47,7 +48,7 @@ class TestDataSet(TestCase):
     def test_save_load(self):
         # Produce a small DataSet
         Config().label_dir = test.test_label_dir
-        ds = DataSet()
+        ds = DataSet(example_validator=ExampleValidator(mya_deployment='history'))
 
         # Validating these results takes ~20 seconds - optimization, I'm looking at you!
         ds.produce_example_set(progress=False)
@@ -83,7 +84,8 @@ class TestDataSet(TestCase):
         Config().debug = old_debug
 
     def test_produce_example_set(self):
-        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'],
+                     example_validator=ExampleValidator(mya_deployment='history'))
         ds.produce_example_set(progress=False)
 
         # Check that we got something.
@@ -93,7 +95,8 @@ class TestDataSet(TestCase):
         self.assertIsNotNone(ds.example_set_model.get_example_df())
 
     def test_produce_feature_set(self):
-        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'],
+                     example_validator=ExampleValidator(mya_deployment='history'))
         ds.produce_example_set(get_model_data=False, progress=False)
         ds.produce_feature_set(my_extract, max_workers=1)
 
@@ -128,7 +131,8 @@ class TestDataSet(TestCase):
         self.assertEqual(exp, ds.feature_set)
 
     def test_save_load_example_set(self):
-        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'],
+                     example_validator=ExampleValidator(mya_deployment='history'))
         ds.produce_example_set(get_model_data=False, report=False, progress=False)
 
         # Grab a copy of the example set
@@ -154,7 +158,8 @@ class TestDataSet(TestCase):
         self.assertEqual(exp, ds.example_set)
 
     def test_save_load_windowed_example_set(self):
-        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'],
+                     example_validator=ExampleValidator(mya_deployment='history'))
         ds.produce_example_set(get_model_data=False, report=False, progress=False)
 
         # Grab a copy of the example set
@@ -183,7 +188,8 @@ class TestDataSet(TestCase):
             os.unlink(f_path)
 
     def test_save_load_feature_set(self):
-        ds = DataSet(label_files=['test1.txt', 'test2.txt'])
+        ds = DataSet(label_files=['test1.txt', 'test2.txt'],
+                     example_validator=ExampleValidator(mya_deployment='history'))
         ds.produce_example_set(get_model_data=False, report=False, progress=False)
         ds.produce_feature_set(my_extract, max_workers=1, my_var="filler")
 

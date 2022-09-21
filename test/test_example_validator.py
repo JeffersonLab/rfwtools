@@ -124,7 +124,7 @@ class TestExampleValidator(TestCase):
 
     def test_validate_cavity_modes(self):
         # The time associated with this event should have all good control modes
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_mode_example)
         ev.validate_cavity_modes()
 
