@@ -1,6 +1,5 @@
 import math
 import os
-import unittest
 
 from unittest import TestCase
 
@@ -9,7 +8,6 @@ from rfwtools.extractor.autoregressive import autoregressive_extractor
 import test
 from rfwtools.config import Config
 import pandas as pd
-import numpy as np
 import datetime
 
 # Prime the pump on the timestamp map.
