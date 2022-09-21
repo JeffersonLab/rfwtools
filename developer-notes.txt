@@ -25,8 +25,11 @@ pip install -e /path/to/rfwtools
 # listed where the ones used in the last development cycle.  You may want to update those versions, but make sure to
 # test!
 
-# To run a unittests in multiple environments
-tox
+# To run a unittests in multiple environments.  Windows and linux have slightly different configurations.  These match
+# the environment lists
+tox -e py37-windows
+tox -e py37-linux
+
 # To run them directly in an IDE with builtin test runner, do the equivalent of this
 cd /path/to/.../rfwtools
 python3 -m unittest
