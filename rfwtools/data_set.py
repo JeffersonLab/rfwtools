@@ -64,7 +64,7 @@ class DataSet:
     """
 
     def __init__(self, label_files: List[str] = None, example_validator: ExampleValidator = ExampleValidator(),
-                 e_type: ExampleType = ExampleType.EXAMPLE, example_kwargs: dict = {}):
+                 e_type: ExampleType = ExampleType.EXAMPLE, example_kwargs: Optional[dict] = None):
         """Create a DataSet instance that will collect events based on the provided label files and configured filters.
 
         Some filters such as excluded zones or excluded times are set in the Config objects.
@@ -77,6 +77,9 @@ class DataSet:
             e_type: The type of IExample objects that will be created.  Defaults to ExampleType.EXAMPLE.
             example_kwargs:  A dictionary of keyword arguments that will be passed to the e_type constructor
         """
+
+        if example_kwargs is None:
+            example_kwargs = {}
 
         self.label_files = label_files
         self.example_validator = example_validator
