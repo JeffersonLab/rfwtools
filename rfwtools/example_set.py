@@ -245,7 +245,7 @@ class ExampleSet:
             f.write(f"# known_zones: {ascii(self._known_zones)}\n")
             f.write(f"# known_fault_labels: {ascii(self._known_fault_labels)}\n")
             f.write(f"# known_cavity_labels: {ascii(self._known_cavity_labels)}\n")
-            self._example_df.drop('example', axis=1).to_csv(f, sep=sep, index=False)
+            self._example_df.drop('example', axis=1).to_csv(f, sep=sep, index=False, line_terminator='\n')
 
     def load_csv(self, filename: str, in_dir: str = None, sep: str = ',') -> None:
         """Read in a CSV file that has ExampleSet data.
