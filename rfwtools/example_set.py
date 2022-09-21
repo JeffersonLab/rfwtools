@@ -1154,6 +1154,6 @@ Number of mismatched labels: {num_mismatched_labels}
             for f in master[factor]:
                 # Add the category if it is not present
                 if f not in df[factor].cat.categories.values:
-                    df[factor].cat.add_categories(f, inplace=True)
+                    df[factor] = df[factor].cat.add_categories(f)
             # Enforce a known ordering
-            df[factor].cat.reorder_categories(sorted(df[factor].cat.categories), inplace=True)
+            df[factor] = df[factor].cat.reorder_categories(sorted(df[factor].cat.categories))
