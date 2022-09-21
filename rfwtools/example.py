@@ -56,8 +56,13 @@ class IExample:
         """Construct an instance of the Example class."""
 
         # Will eventually hold the waveform data from the event
+        #: (pd.DataFrame): The DataFrame for holding the actual waveform data
         self.event_df = None
+
+        #: (str): The directory where the waveform data can be found.  None if Config is to be referenced.
         self.data_dir = data_dir
+
+        #: (ExampleType): The type of example this is.
         self.e_type = None
 
     def load_data(self) -> None:
@@ -95,7 +100,10 @@ class Factory:
                 All additional keyword arguments will be passed to the responsible constructor on every get_example()
                 call.
         """
+        #: (ExampleType): The type of example that is to be made.
         self.e_type = e_type
+
+        #: (dict of str:Any): kwargs to be passed to example constructor
         self.example_kwargs = kwargs
 
     def get_example(self, e_type: ExampleType = None, **kwargs) -> IExample:
@@ -157,7 +165,7 @@ class Example(IExample):
     data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.
     """
 
-    # A regex for matching
+    #: (re.Pattern): A regex for matching capture file filenames
     capture_file_regex = re.compile(r"R.*harv\..*\.txt")
 
     def __init__(self, zone: str, dt: datetime, cavity_label: Optional[str], fault_label: Optional[str],
@@ -167,18 +175,28 @@ class Example(IExample):
 
         super().__init__(data_dir=data_dir)
 
-        # Expert/model provided labels
+        #: (str): Expert/model provided cavity label
         self.cavity_label = cavity_label
+
+        #: (str): Expert/model provided fault label
         self.fault_label = fault_label
+
+        #: (float): Cavity label confidence
         self.cavity_conf = cavity_conf
+
+        #: (float): Fault label confidence
         self.fault_conf = fault_conf
+
+        #: (str): Source of labeles (which model, file, etc.)
         self.label_source = label_source
 
-        # Zone and timestamp info for the example event
+        #: (datetime.datetime): When did the event occur
         self.event_datetime = dt
+
+        #: (str): Which zone had the event
         self.event_zone = zone
 
-        #: The type of example this is.
+        #: (ExampleType): The type of example this is.
         self.e_type = ExampleType.EXAMPLE
 
     def load_data(self, verbose: bool = False) -> None:
@@ -685,15 +703,16 @@ class WindowedExample(Example):
             n_samples: The number of samples to include after the start of the window.
         """
         super().__init__(zone, dt, cavity_label, fault_label, cavity_conf, fault_conf, label_source, data_dir)
+        #: (ExampleType): The type of Example this represents.  Convenient type tracking.
         self.e_type = ExampleType.WINDOWED_EXAMPLE
 
-        #: The start of the window relative to the fault onset
+        #: (float): The start of the window relative to the fault onset
         self.start = start
 
-        #: The number of samples requested after the start value
+        #: (int): The number of samples requested after the start value
         self.n_samples = n_samples
 
-        #: The last Time value in the window.  Determined after loading data for the first time.
+        #: (float) The last Time value in the window.  Determined after loading data for the first time.
         self.end = None
 
     def load_data(self, verbose: bool = False) -> None:

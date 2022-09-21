@@ -1,3 +1,4 @@
+"""This package contains methods for common visualization needs."""
 import seaborn as sns
 
 # Define some standard marker sets and palettes

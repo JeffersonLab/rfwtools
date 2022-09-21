@@ -337,7 +337,11 @@ class WindowedExampleValidator(ExampleValidator):
     """
 
     def __init__(self, mya_deployment: str = 'ops'):
-        """Construct an instance."""
+        """Construct an instance.
+
+        Args:
+            mya_deployment: Which mya deployment should be used to look up historical EPICS information
+        """
         super().__init__(mya_deployment=mya_deployment)
 
         #: The start of the Example's time window
