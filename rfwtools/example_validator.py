@@ -336,9 +336,9 @@ class WindowedExampleValidator(ExampleValidator):
     the start of the window
     """
 
-    def __init__(self):
+    def __init__(self, mya_deployment: str = 'ops'):
         """Construct an instance."""
-        super().__init__()
+        super().__init__(mya_deployment=mya_deployment)
 
         #: The start of the Example's time window
         self.window_start = None
@@ -355,7 +355,7 @@ class WindowedExampleValidator(ExampleValidator):
         self.window_start = example.start
         self.window_end = example.end
 
-    def validate_data(self, deployment: str = 'ops') -> None:
+    def validate_data(self, deployment: Optional[str] = None) -> None:
         """Check that the event directory and it's data is of the expected format.
 
         This method inspects the event directory and raises an exception if a problem is found.  The following aspects
@@ -383,6 +383,10 @@ class WindowedExampleValidator(ExampleValidator):
         step_size = 0.2
         window_size = self.window_end - self.window_start
 
+        mya_deployment = self.mya_deployment
+        if deployment is not None:
+            mya_deployment = deployment
+
         if self.event_df is None:
             raise self.event_df_exception
         self.validate_capture_file_counts()
@@ -390,5 +394,5 @@ class WindowedExampleValidator(ExampleValidator):
 
         # Make sure that the start is not too late, and the the end is not too early.  Note max_start == 0+step_size
         self.validate_waveform_times(max_start=step_size, min_end=(window_size - step_size), step_size=step_size)
-        self.validate_cavity_modes(deployment=deployment)
+        self.validate_cavity_modes(deployment=mya_deployment)
         self.validate_zones()

@@ -45,7 +45,10 @@ Reporting and Visualization.  This assumes that you have created and saved an Ex
     es.display_summary_label_heatmap(title='2L22 7AM Summary',
                                  query = 'zone=="2L22" & dtime < "2020-03-10 08:00:00" & dtime > "2020-03-10 07:00:00"')
 """
+import concurrent
+import copy
 import sys
+from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import datetime
 import warnings
 from typing import List, Tuple
@@ -499,10 +502,29 @@ Number of mismatched labels: {num_mismatched_labels}
                 tqdm.pandas()
 
                 # Apply the validator to generate a bool column we can filter on
-                valid = self._example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator)
+                # valid = self._example_df.progress_apply(func=__apply_validator, axis=1, _validator=validator)
+
+                with tqdm(total=len(self._example_df)) as progress:
+                    executor = ThreadPoolExecutor(max_workers=8)
+                    futures = []
+                    for i in range(len(self._example_df)):
+                        future = executor.submit(__apply_validator, self._example_df.iloc[i, :],
+                                                 _validator=copy.copy(validator))
+                        future.add_done_callback(lambda x: progress.update())
+                        futures.append(future)
+                    wait(futures, return_when=concurrent.futures.ALL_COMPLETED)
+                    valid = [future.result() for future in futures]
+
         else:
             # Apply the validator to generate a bool column we can filter on
-            valid = self._example_df.apply(func=__apply_validator, axis=1, _validator=validator)
+            executor = ThreadPoolExecutor(max_workers=8)
+            futures = []
+            for i in range(len(self._example_df)):
+                row = self._example_df.iloc[i, :].copy()
+                future = executor.submit(__apply_validator, row, _validator=copy.copy(validator))
+                futures.append(future)
+            wait(futures, return_when=concurrent.futures.ALL_COMPLETED)
+            valid = [future.result() for future in futures]
 
         if report:
             print(out)
