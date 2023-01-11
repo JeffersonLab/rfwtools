@@ -32,6 +32,9 @@ class TestExampleValidator(TestCase):
     good_example = Example(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
                            fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                            data_dir=os.path.join(data_dir, "good-example"))
+    good_example_2022 = Example(zone="1L25", dt=datetime.strptime("2022_06_21 195434.7", ts_fmt), cavity_label=None,
+                                fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
+                                data_dir=os.path.join(data_dir, "good-example"))
     good_meta_example = Example(zone="1L25", dt=datetime.strptime("2018_10_05 044555.3", ts_fmt), cavity_label=None,
                                 fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                                 data_dir=os.path.join(data_dir, "good-example-meta"))
@@ -149,6 +152,18 @@ class TestExampleValidator(TestCase):
         ev.validate_data()
 
         ex = WindowedExample(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
+                             fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
+                             data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250 * 5)
+        wev = WindowedExampleValidator()
+        wev.set_example(ex)
+        wev.validate_data()
+
+    def test_validate_data_2022(self):
+        # Test overall validation of Examples
+        ev = ExampleValidator()
+        ev.set_example(TestExampleValidator.good_example_2022)
+        ev.validate_data()
+        ex = WindowedExample(zone="1L25", dt=datetime.strptime("2022_06_21 195434.7", ts_fmt), cavity_label=None,
                              fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                              data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250 * 5)
         wev = WindowedExampleValidator()

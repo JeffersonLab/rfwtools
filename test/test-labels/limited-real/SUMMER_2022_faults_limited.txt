@@ -1,0 +1,14 @@
+zone	cavity	cav#	fault	time
+1L22	2	18	Quench_100ms	2022/05/01 13:16:08
+1L22	0	17	Multi Cav turn off	2022/05/02 06:18:04
+1L22	0	17	Multi Cav turn off	2022/05/03 06:40:38
+2L25	0	81	Multi Cav turn off	2022/05/03 21:30:15
+2L25	0	81	Multi Cav turn off	2022/05/03 21:32:39
+2L25	0	81	Multi Cav turn off	2022/05/03 21:33:45
+1L22	0	17	Multi Cav turn off	2022/05/04 06:23:13
+1L24	0	33	Multi Cav turn off	2022/05/04 06:23:28
+1L22	0	17	Multi Cav turn off	2022/05/05 06:47:31
+1L24	0	33	Multi Cav turn off	2022/05/05 06:47:39
+1L22	2	18	Controls Fault	2022/05/06 23:04:27
+1L24	4	36	Controls Fault	2022/05/06 23:04:27
+1L22	8	24	E_Quench	2022/05/07 01:24:43
