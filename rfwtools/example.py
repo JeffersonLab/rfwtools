@@ -246,10 +246,13 @@ class Example(IExample):
             return path
 
     def get_capture_file_list(self) -> List[str]:
-        """Creates a dictionary of capture file content.  Typically eight files, each is ~1 MB.
+        """Creates a list of capture file names.  Typically, this has eight file names.
+
+        This replaced a method that reads in file contents and returned a dictionary of names to content.  The only
+        internal use case was getting the list of file names, so it was replaced with the simpler method.
 
         Returns:
-            A dictionary of capture file content keyed on the name of the capture file.
+            A list of capture file names for the Example.
         """
 
         content = []
