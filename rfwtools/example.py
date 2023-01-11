@@ -439,27 +439,27 @@ class Example(IExample):
                     if not Example.is_capture_file(os.path.basename(member.name)):
                         continue
                     if zone_df is None:
-                        zone_df = Example.parse_capture_file(tar.extractfile(member))
+                        zone_df = Example.parse_capture_file(tar.extractfile(member)).set_index('Time')
                     else:
                         zone_df = zone_df.join(Example.parse_capture_file(tar.extractfile(member)).set_index('Time'),
-                                               on="Time")
+                                               how='outer')
         else:
             for filename in sorted(os.listdir(event_path)):
                 # Only try to process files that look like capture files
                 if not Example.is_capture_file(filename):
                     continue
                 if zone_df is None:
-                    zone_df = Example.parse_capture_file(os.path.join(event_path, filename))
+                    zone_df = Example.parse_capture_file(os.path.join(event_path, filename)).set_index('Time')
                 else:
                     # Join the existing zone data with the new capture file by using the "Time" column as an index to
                     # match rows
                     zone_df = zone_df.join(
-                        Example.parse_capture_file(os.path.join(event_path, filename)).set_index("Time"), on="Time")
+                        Example.parse_capture_file(os.path.join(event_path, filename)).set_index('Time'), how='outer')
 
         # Now format the column names to remove the zone information but keep a cavity and signal identifiers
         zone_df.columns = Example.convert_waveform_column_names(zone_df.columns)
 
-        return zone_df
+        return zone_df.reset_index()
 
     @staticmethod
     def convert_waveform_column_names(columns: List[str]) -> List[str]:
