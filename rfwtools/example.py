@@ -245,20 +245,19 @@ class Example(IExample):
         else:
             return path
 
-    def get_capture_file_contents(self) -> Dict[str, str]:
+    def get_capture_file_list(self) -> List[str]:
         """Creates a dictionary of capture file content.  Typically eight files, each is ~1 MB.
 
         Returns:
             A dictionary of capture file content keyed on the name of the capture file.
         """
 
-        content = {}
+        content = []
         # Directly read each file into the dictionary
         if self.capture_files_on_disk(compressed=False):
             for filename in os.listdir(self.get_event_path(compressed=False)):
                 if Example.is_capture_file(filename):
-                    with open(os.path.join(self.get_event_path(compressed=False), filename), "r") as f:
-                        content[filename] = f.read()
+                    content.append(filename)
 
         # Wend our way through the tarfile and read the content
         elif self.capture_files_on_disk(compressed=True):
@@ -268,7 +267,7 @@ class Example(IExample):
                         # Make sure to remove the base directory from the name
                         file = os.path.basename(member.name)
                         if Example.is_capture_file(file):
-                            content[file] = f.extractfile(member)
+                            content.append(file)
 
         return content
 
