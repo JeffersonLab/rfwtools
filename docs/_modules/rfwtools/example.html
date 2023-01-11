@@ -316,20 +316,22 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">path</span></div>
 
-<div class="viewcode-block" id="Example.get_capture_file_contents"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.get_capture_file_contents">[docs]</a>    <span class="k">def</span> <span class="nf">get_capture_file_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Creates a dictionary of capture file content.  Typically eight files, each is ~1 MB.</span>
+<div class="viewcode-block" id="Example.get_capture_file_list"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.get_capture_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_capture_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Creates a list of capture file names.  Typically, this has eight file names.</span>
+
+<span class="sd">        This replaced a method that reads in file contents and returned a dictionary of names to content.  The only</span>
+<span class="sd">        internal use case was getting the list of file names, so it was replaced with the simpler method.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            A dictionary of capture file content keyed on the name of the capture file.</span>
+<span class="sd">            A list of capture file names for the Example.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># Directly read each file into the dictionary</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="n">content</span><span class="p">[</span><span class="n">filename</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                    <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># Wend our way through the tarfile and read the content</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -339,7 +341,7 @@
                         <span class="c1"># Make sure to remove the base directory from the name</span>
                         <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-                            <span class="n">content</span><span class="p">[</span><span class="n">file</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+                            <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">content</span></div>
 
@@ -511,27 +513,27 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
                         <span class="k">continue</span>
                     <span class="k">if</span> <span class="n">zone_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">))</span>
+                        <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">zone_df</span> <span class="o">=</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span>
-                                               <span class="n">on</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+                                               <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">event_path</span><span class="p">)):</span>
                 <span class="c1"># Only try to process files that look like capture files</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">zone_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
+                    <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># Join the existing zone data with the new capture file by using the &quot;Time&quot; column as an index to</span>
                     <span class="c1"># match rows</span>
                     <span class="n">zone_df</span> <span class="o">=</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;Time&quot;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;Time&quot;</span><span class="p">)</span>
+                        <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
 
         <span class="c1"># Now format the column names to remove the zone information but keep a cavity and signal identifiers</span>
         <span class="n">zone_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">convert_waveform_column_names</span><span class="p">(</span><span class="n">zone_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">zone_df</span></div>
+        <span class="k">return</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Example.convert_waveform_column_names"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.convert_waveform_column_names">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">convert_waveform_column_names</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

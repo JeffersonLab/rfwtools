@@ -135,8 +135,8 @@ specified time range is not a strict subset of the Examples Time column.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.example.WindowedExample.convert_waveform_column_names" title="rfwtools.example.WindowedExample.convert_waveform_column_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_waveform_column_names</span></code></a>(columns)</p></td>
 <td><p>Turns waveform PV names (R1M1WFSGMES) into more uniform name based on cavity and waveform (1_GMES)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.example.WindowedExample.get_capture_file_contents" title="rfwtools.example.WindowedExample.get_capture_file_contents"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_capture_file_contents</span></code></a>()</p></td>
-<td><p>Creates a dictionary of capture file content.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.example.WindowedExample.get_capture_file_list" title="rfwtools.example.WindowedExample.get_capture_file_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_capture_file_list</span></code></a>()</p></td>
+<td><p>Creates a list of capture file names.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.example.WindowedExample.get_event_path" title="rfwtools.example.WindowedExample.get_event_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_event_path</span></code></a>([compressed])</p></td>
 <td><p>Generates the expected location for uncompressed event waveform data.</p></td>
@@ -351,15 +351,17 @@ specified time range is not a strict subset of the Examples Time column.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="rfwtools.example.WindowedExample.get_capture_file_contents">
-<span class="sig-name descname"><span class="pre">get_capture_file_contents</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example.WindowedExample.get_capture_file_contents" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a dictionary of capture file content.  Typically eight files, each is ~1 MB.</p>
+<dt class="sig sig-object py" id="rfwtools.example.WindowedExample.get_capture_file_list">
+<span class="sig-name descname"><span class="pre">get_capture_file_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.example.WindowedExample.get_capture_file_list" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a list of capture file names.  Typically, this has eight file names.</p>
+<p>This replaced a method that reads in file contents and returned a dictionary of names to content.  The only
+internal use case was getting the list of file names, so it was replaced with the simpler method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dictionary of capture file content keyed on the name of the capture file.</p>
+<dd class="field-even"><p>A list of capture file names for the Example.</p>
 </dd>
 </dl>
 </dd></dl>

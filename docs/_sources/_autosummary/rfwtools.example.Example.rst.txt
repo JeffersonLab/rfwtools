@@ -19,7 +19,7 @@
       ~Example.__init__
       ~Example.capture_files_on_disk
       ~Example.convert_waveform_column_names
-      ~Example.get_capture_file_contents
+      ~Example.get_capture_file_list
       ~Example.get_event_path
       ~Example.get_example_type
       ~Example.has_matching_labels

@@ -1,4 +1,4 @@
-rfwtools.example\_validator.WindowedExampleValidator
+﻿rfwtools.example\_validator.WindowedExampleValidator
 ====================================================
 
 .. currentmodule:: rfwtools.example_validator
@@ -38,7 +38,7 @@ rfwtools.example\_validator.WindowedExampleValidator
       ~WindowedExampleValidator.event_datetime
       ~WindowedExampleValidator.event_zone
       ~WindowedExampleValidator.event_df
-      ~WindowedExampleValidator.event_cf_content
+      ~WindowedExampleValidator.event_capture_filenames
       ~WindowedExampleValidator.event_df_exception
       ~WindowedExampleValidator.mya_deployment
    

@@ -1,4 +1,4 @@
-rfwtools.example\_validator.ExampleValidator
+﻿rfwtools.example\_validator.ExampleValidator
 ============================================
 
 .. currentmodule:: rfwtools.example_validator
@@ -36,7 +36,7 @@ rfwtools.example\_validator.ExampleValidator
       ~ExampleValidator.event_datetime
       ~ExampleValidator.event_zone
       ~ExampleValidator.event_df
-      ~ExampleValidator.event_cf_content
+      ~ExampleValidator.event_capture_filenames
       ~ExampleValidator.event_df_exception
       ~ExampleValidator.mya_deployment
    
