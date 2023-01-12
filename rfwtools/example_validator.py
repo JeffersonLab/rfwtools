@@ -38,6 +38,7 @@ Basic Usage Example:
 import datetime
 import itertools
 from typing import Tuple, Union, Optional
+import concurrent.futures
 
 from rfwtools import mya
 from rfwtools.example import Example, WindowedExample
@@ -222,7 +223,7 @@ class ExampleValidator:
                              .format(step_size, min_step, max_step, delta_max))
 
     def validate_cavity_modes(self, mode: Union[Tuple[int, ...], int] = (4,), offset: float = -1.0,
-                              deployment: Optional[str] = None) -> None:
+                              deployment: Optional[str] = None, max_workers: int = 6) -> None:
         """Checks that each cavity was in the appropriate control mode or is bypassed.
 
         A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event
@@ -243,6 +244,7 @@ class ExampleValidator:
             mode:  A list of mode numbers associated with acceptable control modes.
             offset: The number of seconds before the fault event the mode setting should be checked.
             deployment: The MYA archiver deployment used for querying historical PV values
+            max_workers: This makes web-based MYA requests in parallel.  This sizes the thread pool.
 
         Raises:
             ValueError: if any cavity mode does not match the value specified by the mode parameter.
@@ -252,7 +254,7 @@ class ExampleValidator:
         if deployment is not None:
             mya_deployment = deployment
 
-    # The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.
+        # The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.
         mode_template = '{}CNTL2MODE'
 
         # "Newer" C100 bypass control.  It's a bit word that represents the bypass status of all cavities
@@ -276,15 +278,46 @@ class ExampleValidator:
         if zone is None:
             raise ValueError("Could parse zone name from capture file name")
 
-        # Get the bypassed bit word.  Check each cavity's status in the loop below.
+        cavs = []
+        for filename in self.event_capture_filenames:
+            cavs.append(filename[0:4])
+
+        # Run this in parallel.  There are 17 requests total.  Keep it at six workers to not overwhelm the remote web
+        # server
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {'bypassed': executor.submit(mya.get_pv_value, PV=bypassed_template.format(zone),
+                                                   datetime=pre_fault_dt, deployment=mya_deployment)}
+            for cav in cavs:
+                cav_number = int(cav[3])
+                futures[f"gset_{cav_number}"] = executor.submit(mya.get_pv_value, PV=gset_template.format(cav),
+                                                                datetime=pre_fault_dt, deployment=mya_deployment)
+                futures[f'mode_{cav_number}'] = executor.submit(mya.get_pv_value, PV=mode_template.format(cav),
+                                                                datetime=pre_fault_dt, deployment=mya_deployment)
+
+        # Initialize the response lists
         bypassed = None
-        try:
-            bypassed = mya.get_pv_value(PV=bypassed_template.format(zone), datetime=pre_fault_dt,
-                                        deployment=mya_deployment)
-        except ValueError:
-            # Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate
-            # archival of the R...XMOUT PVs
-            pass
+        gsets = [None] * 8
+        modes = [None] * 8
+
+        for job_name in futures:
+            if job_name == 'bypassed':
+                try:
+                    # Get the bypassed bit word.
+                    bypassed = futures[job_name].result()
+                except ValueError:
+                    # Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate
+                    # archival of the R...XMOUT PVs
+                    pass
+            elif job_name.startswith('gset_'):
+                cav = int(job_name.split('_')[1])
+                gsets[cav - 1] = futures[job_name].result()
+            elif job_name.startswith('mode_'):
+                cav = int(job_name.split('_')[1])
+                modes[cav - 1] = futures[job_name].result()
+            else:
+                raise RuntimeError("Unexpected job name")
+
+        #### Process the results ####
 
         # Switch to binary string.  "08b" means include leading zeros ("0"), have eight bits ("8"), and format string as
         # binary number ("b").  The [::-1] is an extended slice that says to step along the characters in reverse.
@@ -293,30 +326,30 @@ class ExampleValidator:
         if bypassed is not None:
             bypassed_bits = format(bypassed, "08b")[::-1]
 
-        for filename in self.event_capture_filenames:
-            cav = filename[0:4]
+        for cav in cavs:
+            cav_number = int(cav[3])
+            gset = gsets[cav_number - 1]
+            mode_val = modes[cav_number - 1]
 
-            # Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don't care about it's
-            # control mode
-            gset = mya.get_pv_value(PV=gset_template.format(cav), datetime=pre_fault_dt, deployment=mya_deployment)
+            # Sometimes cavities are bypassed by setting gset to 0.  Check that.
             if gset == 0:
                 continue
 
             # Check if the cavity was formally bypassed.  bypassed_bits is zero indexed, while cavities are one
             # indexed.  1 is bypassed, 0 is not
-            if bypassed_bits[int(cav[3]) - 1] == 0:
+            if bypassed_bits[cav_number - 1] == 0:
                 continue
 
-            val = mya.get_pv_value(PV=mode_template.format(cav), datetime=pre_fault_dt, deployment=mya_deployment)
-            exc = ValueError("Cavity '" + cav + f"' not in valid operating mode ({mode}).  Mode = " + str(val))
+            exc = ValueError("Cavity '" + cav + f"' not in valid operating mode ({mode}).  Mode = " + str(mode_val))
             if type(mode) == tuple or type(mode) == list:
-                if val not in mode:
+                if mode_val not in mode:
                     raise exc
             elif type(mode) == int:
-                if val != mode:
+                if mode_val != mode:
                     raise exc
             else:
                 raise ValueError(f"Unexpected mode variable type '{type(mode).__name__}'")
+
 
     def validate_zones(self) -> None:
         """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.
