@@ -109,6 +109,7 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">concurrent.futures</span>
 
 <span class="kn">from</span> <span class="nn">rfwtools</span> <span class="kn">import</span> <span class="n">mya</span>
 <span class="kn">from</span> <span class="nn">rfwtools.example</span> <span class="kn">import</span> <span class="n">Example</span><span class="p">,</span> <span class="n">WindowedExample</span>
@@ -293,7 +294,7 @@
                              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step_size</span><span class="p">,</span> <span class="n">min_step</span><span class="p">,</span> <span class="n">max_step</span><span class="p">,</span> <span class="n">delta_max</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="ExampleValidator.validate_cavity_modes"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_cavity_modes">[docs]</a>    <span class="k">def</span> <span class="nf">validate_cavity_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span>
-                              <span class="n">deployment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+                              <span class="n">deployment</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Checks that each cavity was in the appropriate control mode or is bypassed.</span>
 
 <span class="sd">        A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event</span>
@@ -314,6 +315,7 @@
 <span class="sd">            mode:  A list of mode numbers associated with acceptable control modes.</span>
 <span class="sd">            offset: The number of seconds before the fault event the mode setting should be checked.</span>
 <span class="sd">            deployment: The MYA archiver deployment used for querying historical PV values</span>
+<span class="sd">            max_workers: This makes web-based MYA requests in parallel.  This sizes the thread pool.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: if any cavity mode does not match the value specified by the mode parameter.</span>
@@ -323,7 +325,7 @@
         <span class="k">if</span> <span class="n">deployment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mya_deployment</span> <span class="o">=</span> <span class="n">deployment</span>
 
-    <span class="c1"># The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.</span>
+        <span class="c1"># The R???CNTL2MODE PV is a float, treated like a bit word.  GDR (I/Q) mode corresponds to a value of 4.</span>
         <span class="n">mode_template</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">CNTL2MODE&#39;</span>
 
         <span class="c1"># &quot;Newer&quot; C100 bypass control.  It&#39;s a bit word that represents the bypass status of all cavities</span>
@@ -347,15 +349,46 @@
         <span class="k">if</span> <span class="n">zone</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could parse zone name from capture file name&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Get the bypassed bit word.  Check each cavity&#39;s status in the loop below.</span>
+        <span class="n">cavs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_capture_filenames</span><span class="p">:</span>
+            <span class="n">cavs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+
+        <span class="c1"># Run this in parallel.  There are 17 requests total.  Keep it at six workers to not overwhelm the remote web</span>
+        <span class="c1"># server</span>
+        <span class="k">with</span> <span class="n">concurrent</span><span class="o">.</span><span class="n">futures</span><span class="o">.</span><span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">futures</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bypassed&#39;</span><span class="p">:</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">,</span> <span class="n">PV</span><span class="o">=</span><span class="n">bypassed_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">),</span>
+                                                   <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)}</span>
+            <span class="k">for</span> <span class="n">cav</span> <span class="ow">in</span> <span class="n">cavs</span><span class="p">:</span>
+                <span class="n">cav_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cav</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">futures</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;gset_</span><span class="si">{</span><span class="n">cav_number</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">,</span> <span class="n">PV</span><span class="o">=</span><span class="n">gset_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span>
+                                                                <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)</span>
+                <span class="n">futures</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;mode_</span><span class="si">{</span><span class="n">cav_number</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">,</span> <span class="n">PV</span><span class="o">=</span><span class="n">mode_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span>
+                                                                <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)</span>
+
+        <span class="c1"># Initialize the response lists</span>
         <span class="n">bypassed</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">bypassed</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">bypassed_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span>
-                                        <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="c1"># Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate</span>
-            <span class="c1"># archival of the R...XMOUT PVs</span>
-            <span class="k">pass</span>
+        <span class="n">gsets</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+        <span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">8</span>
+
+        <span class="k">for</span> <span class="n">job_name</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">job_name</span> <span class="o">==</span> <span class="s1">&#39;bypassed&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Get the bypassed bit word.</span>
+                    <span class="n">bypassed</span> <span class="o">=</span> <span class="n">futures</span><span class="p">[</span><span class="n">job_name</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="c1"># Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate</span>
+                    <span class="c1"># archival of the R...XMOUT PVs</span>
+                    <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">job_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;gset_&#39;</span><span class="p">):</span>
+                <span class="n">cav</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">job_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">gsets</span><span class="p">[</span><span class="n">cav</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">futures</span><span class="p">[</span><span class="n">job_name</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">job_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;mode_&#39;</span><span class="p">):</span>
+                <span class="n">cav</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">job_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">modes</span><span class="p">[</span><span class="n">cav</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">futures</span><span class="p">[</span><span class="n">job_name</span><span class="p">]</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unexpected job name&quot;</span><span class="p">)</span>
+
+        <span class="c1">#### Process the results ####</span>
 
         <span class="c1"># Switch to binary string.  &quot;08b&quot; means include leading zeros (&quot;0&quot;), have eight bits (&quot;8&quot;), and format string as</span>
         <span class="c1"># binary number (&quot;b&quot;).  The [::-1] is an extended slice that says to step along the characters in reverse.</span>
@@ -364,30 +397,30 @@
         <span class="k">if</span> <span class="n">bypassed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">bypassed_bits</span> <span class="o">=</span> <span class="nb">format</span><span class="p">(</span><span class="n">bypassed</span><span class="p">,</span> <span class="s2">&quot;08b&quot;</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_capture_filenames</span><span class="p">:</span>
-            <span class="n">cav</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">cav</span> <span class="ow">in</span> <span class="n">cavs</span><span class="p">:</span>
+            <span class="n">cav_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cav</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">gset</span> <span class="o">=</span> <span class="n">gsets</span><span class="p">[</span><span class="n">cav_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">mode_val</span> <span class="o">=</span> <span class="n">modes</span><span class="p">[</span><span class="n">cav_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 
-            <span class="c1"># Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don&#39;t care about it&#39;s</span>
-            <span class="c1"># control mode</span>
-            <span class="n">gset</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">gset_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)</span>
+            <span class="c1"># Sometimes cavities are bypassed by setting gset to 0.  Check that.</span>
             <span class="k">if</span> <span class="n">gset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Check if the cavity was formally bypassed.  bypassed_bits is zero indexed, while cavities are one</span>
             <span class="c1"># indexed.  1 is bypassed, 0 is not</span>
-            <span class="k">if</span> <span class="n">bypassed_bits</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">cav</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bypassed_bits</span><span class="p">[</span><span class="n">cav_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">val</span> <span class="o">=</span> <span class="n">mya</span><span class="o">.</span><span class="n">get_pv_value</span><span class="p">(</span><span class="n">PV</span><span class="o">=</span><span class="n">mode_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">),</span> <span class="n">datetime</span><span class="o">=</span><span class="n">pre_fault_dt</span><span class="p">,</span> <span class="n">deployment</span><span class="o">=</span><span class="n">mya_deployment</span><span class="p">)</span>
-            <span class="n">exc</span> <span class="o">=</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cavity &#39;&quot;</span> <span class="o">+</span> <span class="n">cav</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39; not in valid operating mode (</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">).  Mode = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+            <span class="n">exc</span> <span class="o">=</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cavity &#39;&quot;</span> <span class="o">+</span> <span class="n">cav</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;&#39; not in valid operating mode (</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">).  Mode = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">mode_val</span><span class="p">))</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mode</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">exc</span>
             <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode_val</span> <span class="o">!=</span> <span class="n">mode</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">exc</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected mode variable type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ExampleValidator.validate_zones"><a class="viewcode-back" href="../../_autosummary/rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator.validate_zones">[docs]</a>    <span class="k">def</span> <span class="nf">validate_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.</span>
