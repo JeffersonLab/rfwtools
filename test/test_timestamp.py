@@ -22,7 +22,7 @@ class TestTimestamp(TestCase):
         TimestampMapper._label_to_database_timestamp_map = None
 
         # Update the map and check that some data is present
-        tsm.update_timestamp_map()
+        tsm.update_timestamp_map(begin='2018-05-01 00:00:00', end='2018-05-08 00:00:00')
         self.assertIsNotNone(tsm._label_to_database_timestamp_map)
         self.assertIn('1L22', tsm._label_to_database_timestamp_map.keys())
 

@@ -3,7 +3,7 @@
 from datetime import datetime
 import os
 import pickle
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import tzlocal
 
@@ -41,14 +41,17 @@ class TimestampMapper:
         return TimestampMapper._label_to_database_timestamp_map[zone][dt]
 
     @staticmethod
-    def update_timestamp_map(mapper: Dict[str, Dict[datetime, datetime]] = None) -> None:
+    def update_timestamp_map(mapper: Dict[str, Dict[datetime, datetime]] = None, begin: str = "2018-01-01 00:00:00",
+                            end: Optional[str] = None) -> None:
         """Creates/replaces a nested dict mapping event timestamps without fractional seconds to those with fractions
 
         Args:
             mapper: If none, one is generated.  Otherwise, the given map replaces the existing one.
+            begin: What time should the timestamp mapper begin at if a new one is to be generated
+            end: What time should the timestamp mapper stop at if a new one is to be generated
         """
         if mapper is None:
-            results = utils.get_events_from_web()
+            results = utils.get_events_from_web(begin=begin, end=end)
             TimestampMapper._label_to_database_timestamp_map = TimestampMapper._generate_timestamp_map(
                 results['events'])
         else:
