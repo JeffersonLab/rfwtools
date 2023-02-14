@@ -47,7 +47,7 @@ help:
 
 .PHONY: github
 github:
-    rm -rf $(BUILDDIR)/doctrees/
+	rm -rf $(BUILDDIR)/doctrees/
 	rm -rf $(BUILDDIR)/html/* $(GITHUB_DOCS)/*
 	@make html
 	cp -r $(BUILDDIR)/certified_files/* $(GITHUB_DOCS)/
