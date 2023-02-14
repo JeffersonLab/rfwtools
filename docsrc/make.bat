@@ -83,7 +83,8 @@ if "%1" == "github" (
 	if errorlevel 1 exit /b 1
 	echo.
     rmdir /S /Q %GITHUB_DOCS%
-    move %BUILDDIR%\html %GITHUB_DOCS%
+    xcopy %BUILDDDIR%\certified_files\* %GITHUB_DOCS%\ /E /H
+    move %BUILDDIR%\html %GITHUB_DOCS%\lib_guide\
     mkdir %BUILDDIR%\html
 
 	echo.Build finished. The HTML pages are in %GITHUB_DOCS%.
