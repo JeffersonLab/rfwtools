@@ -71,7 +71,7 @@ class TestExampleValidator(TestCase):
 
     def test_validate_capture_file_counts(self):
         # Should work
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_example)
         ev.validate_capture_file_counts()
 
@@ -90,7 +90,7 @@ class TestExampleValidator(TestCase):
 
     def test_validate_capture_file_waveforms(self):
         # This should work and not raise an exception
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_example)
         ev.validate_capture_file_waveforms()
 
@@ -108,7 +108,7 @@ class TestExampleValidator(TestCase):
 
     def test_validate_waveform_times(self):
         # This should work
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_example)
         ev.validate_waveform_times(step_size=0.2, delta_max=0.012)
 
@@ -117,7 +117,7 @@ class TestExampleValidator(TestCase):
         ev.validate_waveform_times(step_size=0.05, delta_max=0.0011)
 
         # This should raise a ValueError since two of the files have different time columns
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.mismatched_time_example)
         self.assertRaises(ValueError, ev.validate_waveform_times)
 
@@ -147,25 +147,25 @@ class TestExampleValidator(TestCase):
 
     def test_validate_data(self):
         # Test overall validation of Examples
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_example)
         ev.validate_data()
 
         ex = WindowedExample(zone="1L24", dt=datetime.strptime("2020_01_08 091300.6", ts_fmt), cavity_label=None,
                              fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                              data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250 * 5)
-        wev = WindowedExampleValidator()
+        wev = WindowedExampleValidator(mya_deployment='history')
         wev.set_example(ex)
         wev.validate_data()
 
     def test_validate_data_2022(self):
         # Test overall validation of Examples
-        ev = ExampleValidator()
+        ev = ExampleValidator(mya_deployment='history')
         ev.set_example(TestExampleValidator.good_example_2022)
-        ev.validate_data()
+        ev.validate_data(deployment='history')
         ex = WindowedExample(zone="1L25", dt=datetime.strptime("2022_06_21 195434.7", ts_fmt), cavity_label=None,
                              fault_label=None, cavity_conf=None, fault_conf=None, label_source="test",
                              data_dir=os.path.join(data_dir, "good-example"), start=-200, n_samples=250 * 5)
-        wev = WindowedExampleValidator()
+        wev = WindowedExampleValidator(mya_deployment='history')
         wev.set_example(ex)
         wev.validate_data()
