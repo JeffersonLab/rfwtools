@@ -33,14 +33,12 @@ Loading from file:
 """
 
 
-import os
 from typing import List, Tuple
 
 import pandas as pd
 
 from rfwtools.dim_reduction import pca
 from rfwtools.visualize import scatterplot
-from rfwtools.config import Config
 from rfwtools.example_set import ExampleSet
 
 
