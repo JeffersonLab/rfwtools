@@ -50,8 +50,8 @@ github:
 	rm -rf $(BUILDDIR)/doctrees/
 	rm -rf $(BUILDDIR)/html/* $(GITHUB_DOCS)/*
 	@make html
-	cp -r $(BUILDDIR)/certified_files/* $(GITHUB_DOCS)/
-	cp $(BUILDDIR)/html/* $(GITHUB_DOCS)/lib_guide
+	cp -r certified_files/* $(GITHUB_DOCS)/
+	cp -r $(BUILDDIR)/html/* $(GITHUB_DOCS)/lib_guide
 
 .PHONY: clean
 clean:
