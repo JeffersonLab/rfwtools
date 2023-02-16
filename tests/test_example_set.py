@@ -10,16 +10,16 @@ import pandas as pd
 from rfwtools.example_validator import ExampleValidator
 from rfwtools.example_set import ExampleSet
 from rfwtools.example import Example, ExampleType, WindowedExample
-import test
+import tests
 from rfwtools.config import Config
 
 # Prime the pump on the timestamp map.
-test.load_timestamp_map()
+tests.load_timestamp_map()
 
 # Update the config object to reflect these paths
-Config().label_dir = test.test_label_dir
-Config().output_dir = test.test_output_dir
-Config().data_dir = os.path.join(test.test_data_dir, 'tmp')
+Config().label_dir = tests.test_label_dir
+Config().output_dir = tests.test_output_dir
+Config().data_dir = os.path.join(tests.test_data_dir, 'tmp')
 
 
 class TestValidator(ExampleValidator):
@@ -221,34 +221,34 @@ Number of mismatched labels: 6
         tsv_file = "test-example_set.tsv"
 
         # Load the TSV file and save it to a tmp dir.  Make sure the files match, and that at least one field matches
-        es.load_csv(tsv_file, in_dir=test.test_data_dir, sep='\t')
-        es.save_csv(tsv_file, out_dir=test.tmp_data_dir, sep='\t')
-        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, tsv_file),
-                                    os.path.join(test.tmp_data_dir, tsv_file)))
+        es.load_csv(tsv_file, in_dir=tests.test_data_dir, sep='\t')
+        es.save_csv(tsv_file, out_dir=tests.tmp_data_dir, sep='\t')
+        self.assertTrue(filecmp.cmp(os.path.join(tests.test_data_dir, tsv_file),
+                                    os.path.join(tests.tmp_data_dir, tsv_file)))
         self.assertEqual(es.get_example_df().loc[0, 'cavity_label'], "5")
         self.assertTrue(math.isnan(es.get_example_df().loc[0, 'cavity_conf']))
 
         # Clean up the tmp TSV file
-        os.unlink(os.path.join(test.tmp_data_dir, tsv_file))
+        os.unlink(os.path.join(tests.tmp_data_dir, tsv_file))
 
         # Do the same test with CSV file/separator
-        es.load_csv(csv_file, in_dir=test.test_data_dir)
-        es.save_csv(csv_file, out_dir=test.tmp_data_dir)
-        self.assertTrue(filecmp.cmp(os.path.join(test.test_data_dir, csv_file),
-                                    os.path.join(test.tmp_data_dir, csv_file)))
+        es.load_csv(csv_file, in_dir=tests.test_data_dir)
+        es.save_csv(csv_file, out_dir=tests.tmp_data_dir)
+        self.assertTrue(filecmp.cmp(os.path.join(tests.test_data_dir, csv_file),
+                                    os.path.join(tests.tmp_data_dir, csv_file)))
         self.assertEqual(es.get_example_df().loc[0, 'fault_label'], "Microphonics")
         self.assertTrue(math.isnan(es.get_example_df().loc[0, 'fault_conf']))
 
         # Clean up the tmp CSV file
-        os.unlink(os.path.join(test.tmp_data_dir, csv_file))
+        os.unlink(os.path.join(tests.tmp_data_dir, csv_file))
 
         # Try to load a "bad" file (missing dtime column)
         with self.assertRaises(ValueError):
-            es.load_csv(bad_csv_file, in_dir=test.test_data_dir)
+            es.load_csv(bad_csv_file, in_dir=tests.test_data_dir)
 
         # Run the test with a WindowedExample
         es = ExampleSet(e_type=ExampleType.WINDOWED_EXAMPLE, example_kwargs={'start': -1000, 'n_samples': 100*5})
-        es.load_csv(csv_file, in_dir=test.test_data_dir)
+        es.load_csv(csv_file, in_dir=tests.test_data_dir)
 
         self.assertEqual(es.get_example_df().loc[0, 'example'].get_example_type(), ExampleType.WINDOWED_EXAMPLE)
         self.assertEqual(es.get_example_df().loc[0, 'cavity_label'], "5")

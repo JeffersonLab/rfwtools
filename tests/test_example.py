@@ -4,7 +4,7 @@ import os
 import unittest
 
 import pandas as pd
-import test
+import tests
 from unittest import TestCase
 from rfwtools.example import Example, WindowedExample, Factory, ExampleType
 from rfwtools.config import Config
@@ -17,12 +17,12 @@ cav_label = "4"
 f_label = "Heat_Riser_Choke"
 
 # Prime the pump on the timestamp map.
-test.load_timestamp_map()
+tests.load_timestamp_map()
 
 # Update the config object to reflect these paths
-Config().label_dir = test.test_label_dir
-Config().output_dir = test.test_output_dir
-Config().data_dir = test.tmp_data_dir
+Config().label_dir = tests.test_label_dir
+Config().output_dir = tests.test_output_dir
+Config().data_dir = tests.tmp_data_dir
 
 
 def check_list_equal(list1, list2):
@@ -57,7 +57,7 @@ class TestExample(TestCase):
                                "8_wf1": [81, 84, 818], "8_wf2": [836, -817, 85]
                                }, dtype='float64')
 
-        Config().data_dir = os.path.join(test.test_data_dir, "short-test")
+        Config().data_dir = os.path.join(tests.test_data_dir, "short-test")
         simple_example = Example(zone="1L24",
                                  dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
                                  cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None,
@@ -82,7 +82,7 @@ class TestExample(TestCase):
         simple_example = Example(zone="1L24",
                                  dt=datetime.datetime.strptime("2000_01_01 000001.1", "%Y_%m_%d %H%M%S.%f"),
                                  cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None,
-                                 label_source="test", data_dir=os.path.join(test.test_data_dir, "short-test"))
+                                 label_source="test", data_dir=os.path.join(tests.test_data_dir, "short-test"))
         simple_example.load_data()
         result_df = simple_example.event_df
 
@@ -106,7 +106,7 @@ class TestExample(TestCase):
                                      dt=datetime.datetime.strptime("2019_01_30 120349.5", "%Y_%m_%d %H%M%S.%f"),
                                      cavity_label=None, fault_label=None, cavity_conf=None, fault_conf=None,
                                      label_source="test",
-                                     data_dir=os.path.join(test.test_data_dir, "compressed-example"))
+                                     data_dir=os.path.join(tests.test_data_dir, "compressed-example"))
         compress_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=True), compressed=True)
         uncompressed_res = Example.parse_event_dir(compressed_example.get_event_path(compressed=False),
                                                    compressed=False)
@@ -117,13 +117,13 @@ class TestExample(TestCase):
 
     def test_example_construction(self):
         # Make an example object - check that this doesn't raise exception
-        Config().data_dir = test.tmp_data_dir
+        Config().data_dir = tests.tmp_data_dir
         Example(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=None, fault_conf=None,
                 label_source="test")
 
     def test_example_string_ops(self):
         # Make an example object
-        Config().data_dir = test.tmp_data_dir
+        Config().data_dir = tests.tmp_data_dir
         e = Example(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=None, fault_conf=None,
                     label_source="test")
         # Test that the string operations are working as expected
@@ -131,7 +131,7 @@ class TestExample(TestCase):
         self.assertTupleEqual(e._get_web_time_strings(), ("2019-02-24 04:22:01", "2019-02-24 04:22:02"))
 
     def test_example_data_ops(self):
-        Config().data_dir = test.tmp_data_dir
+        Config().data_dir = tests.tmp_data_dir
         e = Example(zone=zone, dt=dt, cavity_label=cav_label, fault_label=f_label, cavity_conf=None, fault_conf=None,
                     label_source="test")
 

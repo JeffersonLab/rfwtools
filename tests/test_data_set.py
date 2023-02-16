@@ -7,19 +7,19 @@ from rfwtools.config import Config
 from rfwtools.data_set import DataSet
 import os
 import pandas as pd
-import test
+import tests
 
 # Prime the pump on the timestamp map.
 from rfwtools.example import ExampleType, WindowedExample
 from rfwtools.example_validator import ExampleValidator
 from rfwtools.feature_set import FeatureSet
 
-test.load_timestamp_map()
+tests.load_timestamp_map()
 
 # Update the config object to reflect these paths
-Config().label_dir = test.test_label_dir
-Config().output_dir = test.test_output_dir
-Config().data_dir = os.path.join(test.test_data_dir, 'tmp')
+Config().label_dir = tests.test_label_dir
+Config().output_dir = tests.test_output_dir
+Config().data_dir = os.path.join(tests.test_data_dir, 'tmp')
 
 pd.set_option("display.max_columns", None)
 
@@ -47,7 +47,7 @@ class TestDataSet(TestCase):
 
     def test_save_load(self):
         # Produce a small DataSet
-        Config().label_dir = test.test_label_dir
+        Config().label_dir = tests.test_label_dir
         ds = DataSet(example_validator=ExampleValidator(mya_deployment='history'))
 
         # Validating these results takes ~20 seconds - optimization, I'm looking at you!
