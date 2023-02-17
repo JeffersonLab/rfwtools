@@ -226,11 +226,11 @@ compact_local () {
     rm -rf dist/
     rm -rf .eggs/
     rm -rf .tox/
-    rm -rf rf_classifier.egg-info
-    rm -rf src/rf_classifier.egg-info
+    rm -rf rfwtools.egg-info
+    rm -rf src/rfwtools.egg-info
     find src/ -type d -name __pycache__ -delete -o -type f -name '*.py[co]' -delete
     find tests/ -type d -name __pycache__ -delete -o -type f -name '*.py[co]' -delete
-    find ./ -type d -name "rf_classifier.egg-info" -delete
+    find ./ -type d -name "rfwtools.egg-info" -delete
     rm -rf UNKNOWN.egg-info
 }
 
