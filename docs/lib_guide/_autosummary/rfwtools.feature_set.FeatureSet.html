@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rfwtools.feature_set.FeatureSet &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rfwtools.mya" href="rfwtools.mya.html" />
+    <link rel="prev" title="rfwtools.feature_set" href="rfwtools.feature_set.html" />
+    <link href="../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            rfwtools
+          </a>
+              <div class="version">
+                1.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="rfwtools.html">rfwtools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.config.html">rfwtools.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.data_set.html">rfwtools.data_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.dim_reduction.html">rfwtools.dim_reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example.html">rfwtools.example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example_set.html">rfwtools.example_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example_validator.html">rfwtools.example_validator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.extractor.html">rfwtools.extractor</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="rfwtools.feature_set.html">rfwtools.feature_set</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">rfwtools.feature_set.FeatureSet</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rfwtools.feature_set.FeatureSet"><code class="docutils literal notranslate"><span class="pre">FeatureSet</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.mya.html">rfwtools.mya</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.network.html">rfwtools.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.timestamp.html">rfwtools.timestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.utils.html">rfwtools.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.visualize.html">rfwtools.visualize</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rfwtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="rfwtools.html">rfwtools</a></li>
+          <li class="breadcrumb-item"><a href="rfwtools.feature_set.html">rfwtools.feature_set</a></li>
+      <li class="breadcrumb-item active">rfwtools.feature_set.FeatureSet</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/rfwtools.feature_set.FeatureSet.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rfwtools-feature-set-featureset">
+<h1>rfwtools.feature_set.FeatureSet<a class="headerlink" href="#rfwtools-feature-set-featureset" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rfwtools.feature_set.</span></span><span class="sig-name descname"><span class="pre">FeatureSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet" title="rfwtools.example_set.ExampleSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleSet</span></code></a></p>
+<p>A class for managing common operations on a collection of labeled faults and associated features</p>
+<p>This class is an extension on ExampleSet meant to handle additional analysis operations.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a FeatureSet.  Can use either a DataFrame or CSV-like file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – A DataFrame containing the FeatureSet data to include.  The following columns must be included -
+[‘zone’, ‘dtime’, ‘cavity_label’, ‘fault_label’, ‘label_source’].  Any additional columns will be
+treated as the features.  Note: A copy of df is saved.</p></li>
+<li><p><strong>filename</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The filename to load.  Will be relative to in_dir</p></li>
+<li><p><strong>in_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The directory to find the CSV-like file in.  Defaults to Config().output_dir</p></li>
+<li><p><strong>sep</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Delimiter string used by Pandas to parse given CSV-like file</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – A string that may be used to help identify this FeatureSet</p></li>
+<li><p><strong>metadata_columns</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of the names of the columns that are metadata (e.g., “zone” or “cavity_label”).  Any supplied
+column names are in addition to the mandatory columns for an ExampleSet.  metadata_columns are treated
+as required columns.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.__init__" title="rfwtools.feature_set.FeatureSet.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([df, filename, in_dir, sep, name, ...])</p></td>
+<td><p>Construct a FeatureSet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.add_label_file_data" title="rfwtools.feature_set.FeatureSet.add_label_file_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_label_file_data</span></code></a>([label_files, ...])</p></td>
+<td><p>Process and add label files' data to the ExampleSet's internal collection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.add_web_service_data" title="rfwtools.feature_set.FeatureSet.add_web_service_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_web_service_data</span></code></a>([server, begin, end, ...])</p></td>
+<td><p>Add web service data (faults labeled by in-service model) to the ExampleSet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_duplicated_events" title="rfwtools.feature_set.FeatureSet.count_duplicated_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_duplicated_events</span></code></a>()</p></td>
+<td><p>Count the number of events that appear multiple times, i.e., were labeled more than once.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_duplicated_events_with_mismatched_labels" title="rfwtools.feature_set.FeatureSet.count_duplicated_events_with_mismatched_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_duplicated_events_with_mismatched_labels</span></code></a>()</p></td>
+<td><p>Count the number of events that appear multiple times with different labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_duplicated_labels" title="rfwtools.feature_set.FeatureSet.count_duplicated_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_duplicated_labels</span></code></a>()</p></td>
+<td><p>Count the number of labeling occurrences for events that appear multiple times.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_events" title="rfwtools.feature_set.FeatureSet.count_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_events</span></code></a>()</p></td>
+<td><p>Count the number of unique events (zone/datetime combinations</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_labels" title="rfwtools.feature_set.FeatureSet.count_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_labels</span></code></a>()</p></td>
+<td><p>Counts the number of labels (rows in label files)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_mismatched_labels" title="rfwtools.feature_set.FeatureSet.count_mismatched_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_mismatched_labels</span></code></a>()</p></td>
+<td><p>Count the number of times an event with mismatched labels appears in the ExampleSet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.count_unduplicated_events" title="rfwtools.feature_set.FeatureSet.count_unduplicated_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">count_unduplicated_events</span></code></a>()</p></td>
+<td><p>Count the number of events that appear exactly once.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_2d_scatterplot" title="rfwtools.feature_set.FeatureSet.display_2d_scatterplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_2d_scatterplot</span></code></a>([technique, alpha, ...])</p></td>
+<td><p>Display a two-dimensional scatterplot of the dimensionally reduced feature set.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_examples_by_weekday_barplot" title="rfwtools.feature_set.FeatureSet.display_examples_by_weekday_barplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_examples_by_weekday_barplot</span></code></a>([...])</p></td>
+<td><p>Show example counts by the day of the week as a stacked barplot</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_frequency_barplot" title="rfwtools.feature_set.FeatureSet.display_frequency_barplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_frequency_barplot</span></code></a>(x[, color_by, ...])</p></td>
+<td><p>Display the example count against one or two different factors, as a (stacked) bar chart.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_summary_label_heatmap" title="rfwtools.feature_set.FeatureSet.display_summary_label_heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_summary_label_heatmap</span></code></a>([title, query])</p></td>
+<td><p>Display a heatmap of fault vs cavity labels for all examples in this object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_timeline" title="rfwtools.feature_set.FeatureSet.display_timeline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_timeline</span></code></a>([query])</p></td>
+<td><p>Display a timeline of examples as a swarmplot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.display_zone_label_heatmap" title="rfwtools.feature_set.FeatureSet.display_zone_label_heatmap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">display_zone_label_heatmap</span></code></a>([zones, query])</p></td>
+<td><p>Display a heatmap of fault vs cavity labels for all examples in this object for each unique zone category</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.do_pca_reduction" title="rfwtools.feature_set.FeatureSet.do_pca_reduction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">do_pca_reduction</span></code></a>([metadata_cols, report, ...])</p></td>
+<td><p>Perform PCA on subset of columns of example_df and maintain example metadata in results.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_classification_report" title="rfwtools.feature_set.FeatureSet.get_classification_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_classification_report</span></code></a>(other[, label, ...])</p></td>
+<td><p>This prints a classification report of this ExampleSet's cavity labels considering other as ground truth.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_duplicated_labels" title="rfwtools.feature_set.FeatureSet.get_duplicated_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_duplicated_labels</span></code></a>()</p></td>
+<td><p>&quot;Identify the fault events that appear multiple times in the ExampleSet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_events_with_mismatched_labels" title="rfwtools.feature_set.FeatureSet.get_events_with_mismatched_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_events_with_mismatched_labels</span></code></a>()</p></td>
+<td><p>Identify fault events that appear multiple times with different labels.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_example_df" title="rfwtools.feature_set.FeatureSet.get_example_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_example_df</span></code></a>()</p></td>
+<td><p>Returns the example set as a DataFrame (copy)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_label_file_report" title="rfwtools.feature_set.FeatureSet.get_label_file_report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_label_file_report</span></code></a>()</p></td>
+<td><p>Generate a string containing a report on the processed label files</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_pca_df" title="rfwtools.feature_set.FeatureSet.get_pca_df"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pca_df</span></code></a>()</p></td>
+<td><p>Get a copy of the PCA reduction as a DataFrame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_required_columns" title="rfwtools.feature_set.FeatureSet.get_required_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_required_columns</span></code></a>()</p></td>
+<td><p>Generates the list of column names that must appear in a DataFrame for it to be a valid example_df.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.get_unduplicated_events" title="rfwtools.feature_set.FeatureSet.get_unduplicated_events"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unduplicated_events</span></code></a>()</p></td>
+<td><p>Identify the fault events that appear exactly once in the ExampleSet.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.has_required_columns" title="rfwtools.feature_set.FeatureSet.has_required_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_required_columns</span></code></a>(df[, dtypes, skip_example])</p></td>
+<td><p>Check if the given DataFrame has the required columns.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.load_csv" title="rfwtools.feature_set.FeatureSet.load_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_csv</span></code></a>(filename[, in_dir, sep, ...])</p></td>
+<td><p>Read in a CSV file that has FeatureSet data.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.purge_invalid_examples" title="rfwtools.feature_set.FeatureSet.purge_invalid_examples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">purge_invalid_examples</span></code></a>(validator[, report, ...])</p></td>
+<td><p>Removes all examples from the ExampleSet that do not pass validation</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.remove_duplicates_and_mismatches" title="rfwtools.feature_set.FeatureSet.remove_duplicates_and_mismatches"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_duplicates_and_mismatches</span></code></a>([report])</p></td>
+<td><p>Removes duplicate example entries and removes all instances of examples that have mismatched labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.save_csv" title="rfwtools.feature_set.FeatureSet.save_csv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_csv</span></code></a>(filename[, out_dir, sep])</p></td>
+<td><p>Write out the ExampleSet data as a CSV file relative to out_dir.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.update_example_set" title="rfwtools.feature_set.FeatureSet.update_example_set"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_example_set</span></code></a>(df[, metadata_columns])</p></td>
+<td><p>Update the _example_df and blanks other internal data derived from it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.update_metadata_columns" title="rfwtools.feature_set.FeatureSet.update_metadata_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_metadata_columns</span></code></a>(metadata_columns)</p></td>
+<td><p>This updates the metadata columns and alters other related data structures.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.metadata_columns" title="rfwtools.feature_set.FeatureSet.metadata_columns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata_columns</span></code></a></p></td>
+<td><p>These columns are required in internal DataFrames and are excluded from analysis routines.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#rfwtools.feature_set.FeatureSet.pca" title="rfwtools.feature_set.FeatureSet.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a></p></td>
+<td><p>The pca model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.add_label_file_data">
+<span class="sig-name descname"><span class="pre">add_label_file_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_zones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.add_label_file_data" title="Permalink to this definition"></a></dt>
+<dd><p>Process and add label files’ data to the ExampleSet’s internal collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_files</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – List of label files to process.  If None, all files in Config().label_dir are read.  Relative paths are
+resolved relative to Config().label_dir.</p></li>
+<li><p><strong>exclude_zones</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – List of zones to exclude.  Defaults to Config().exclude_zones.</p></li>
+<li><p><strong>exclude_times</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code>]]]) – List of 2-tuples of datetime objects.  Each 2-tuple specifies a range to exclude.  None implie +/-Inf.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.add_web_service_data">
+<span class="sig-name descname"><span class="pre">add_web_service_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">begin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.add_web_service_data" title="Permalink to this definition"></a></dt>
+<dd><p>Add web service data (faults labeled by in-service model) to the ExampleSet.</p>
+<p>Note: Should be used exclusive of label data since they will largely overlap</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>server</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The server to query for the data.  If None, use the value in Config</p></li>
+<li><p><strong>begin</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code>]) – The earliest time for which a fault should be included.  If None, defaults to Jan 1, 2018</p></li>
+<li><p><strong>end</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code>]) – The latest time for which a fault should be included.  If None defaults to “now”</p></li>
+<li><p><strong>models</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of model names that should be included in the results.  None means include all</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_duplicated_events">
+<span class="sig-name descname"><span class="pre">count_duplicated_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_duplicated_events" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of events that appear multiple times, i.e., were labeled more than once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the number of events that appear multiple times, i.e., were labeled more than once.</p>
+</dd>
+</dl>
+<p>This would count as one since only one event appeared that did occur multiple times
+4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
+4241  2L26 2020-09-22 06:53:17.500            6             E_Quench
+4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_duplicated_events_with_mismatched_labels">
+<span class="sig-name descname"><span class="pre">count_duplicated_events_with_mismatched_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_duplicated_events_with_mismatched_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of events that appear multiple times with different labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of events that appear multiple times with different labels</p>
+</dd>
+</dl>
+<p>This would count as one since one event appeared that had mismatched labels
+4240  2L26 2020-09-21 06:53:16.500            5             E_Quench
+4241  2L26 2020-09-21 06:53:16.500            6             E_Quench
+4242  2L26 2020-09-21 06:53:16.500            6             E_Quench</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_duplicated_labels">
+<span class="sig-name descname"><span class="pre">count_duplicated_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_duplicated_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of labeling occurrences for events that appear multiple times.</p>
+<p>This is basically the number of rows in the label files that are not for unique fault events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of labeling occurrences for events that appear multiple times</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_events">
+<span class="sig-name descname"><span class="pre">count_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_events" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of unique events (zone/datetime combinations</p>
+<p>This would count as two since two unique zone/datetime pairs appeared
+4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
+4241  2L26 2020-09-22 06:53:17.500            6             E_Quench
+4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the number of unique events (zone/datetime combinations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_labels">
+<span class="sig-name descname"><span class="pre">count_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Counts the number of labels (rows in label files)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the number of labels (rows in label files)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_mismatched_labels">
+<span class="sig-name descname"><span class="pre">count_mismatched_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_mismatched_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of times an event with mismatched labels appears in the ExampleSet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of times an event with mismatched labels appears in the ExampleSet.</p>
+</dd>
+</dl>
+<p>This would count as three mismatched labels since one event with mismatched labels appeared three times
+4240  2L26 2020-09-21 06:53:16.500            5             E_Quench
+4241  2L26 2020-09-21 06:53:16.500            6             E_Quench
+4242  2L26 2020-09-21 06:53:16.500            6             E_Quench</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.count_unduplicated_events">
+<span class="sig-name descname"><span class="pre">count_unduplicated_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.count_unduplicated_events" title="Permalink to this definition"></a></dt>
+<dd><p>Count the number of events that appear exactly once.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The number of events that appear exactly once.</p>
+</dd>
+</dl>
+<p>This would count as one since only one event appeared that did not occur multiple times
+4240  2L25 2020-09-21 06:53:16.500            5             E_Quench
+4241  2L26 2020-09-22 06:53:17.500            6             E_Quench
+4242  2L26 2020-09-22 06:53:17.500            6             E_Quench</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_2d_scatterplot">
+<span class="sig-name descname"><span class="pre">display_2d_scatterplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">technique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(12,</span> <span class="pre">12)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.display_2d_scatterplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_2d_scatterplot" title="Permalink to this definition"></a></dt>
+<dd><p>Display a two-dimensional scatterplot of the dimensionally reduced feature set.</p>
+<p>If the type specified has not already been generated, an exception is raised.  Note: consider passing
+hue=&lt;pca_df column_name&gt; and/or style=&lt;pca_df column_name&gt; to control which column colors/styles each point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>technique</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The type of dim reduction data to display.  Currently the only supported option is pca.</p></li>
+<li><p><strong>alpha</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Controls point transparency</p></li>
+<li><p><strong>s</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Controls point size</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The title of the scatterplot</p></li>
+<li><p><strong>figsize</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – The two dimensions of the size of the figure.  Passed to plt.figure.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – A pd.DataFrame.query() expr argument.  Used to subset the data prior to plotting.</p></li>
+<li><p><strong>**kwargs</strong> – All remaining parameters are passed directly to the scatterplot command</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_examples_by_weekday_barplot">
+<span class="sig-name descname"><span class="pre">display_examples_by_weekday_barplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_examples_by_weekday_barplot" title="Permalink to this definition"></a></dt>
+<dd><p>Show example counts by the day of the week as a stacked barplot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>color_by</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The DataFrame column on which the bars will be split/colored.</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The title to put on the plot.  A reasonable default will be generated if None.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The expr argument to DataFrame.query.  Subsets data before plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_frequency_barplot">
+<span class="sig-name descname"><span class="pre">display_frequency_barplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_frequency_barplot" title="Permalink to this definition"></a></dt>
+<dd><p>Display the example count against one or two different factors, as a (stacked) bar chart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The column name for which each bar will appear.  Should probably be categorical.</p></li>
+<li><p><strong>color_by</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The column name by which each bar will be split and colored (for a stacked bar plot).  If
+None, then a simple bar plot will be displayed.</p></li>
+<li><p><strong>title</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The title to put on the chart.  If None, a reasonable default will be generated.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The expr argument to DataFrame.query.  Subsets data before plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_summary_label_heatmap">
+<span class="sig-name descname"><span class="pre">display_summary_label_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Label</span> <span class="pre">Summary'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_summary_label_heatmap" title="Permalink to this definition"></a></dt>
+<dd><p>Display a heatmap of fault vs cavity labels for all examples in this object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The title of the plot</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The expr argument to DataFrame.query.  Subsets data before plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_timeline">
+<span class="sig-name descname"><span class="pre">display_timeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_timeline" title="Permalink to this definition"></a></dt>
+<dd><p>Display a timeline of examples as a swarmplot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The expr argument to DataFrame.query.  Subsets data before plot</p></li>
+<li><p><strong>kwargs</strong> – Other named parameters are passed to swarm_timeline method</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.display_zone_label_heatmap">
+<span class="sig-name descname"><span class="pre">display_zone_label_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zones</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.display_zone_label_heatmap" title="Permalink to this definition"></a></dt>
+<dd><p>Display a heatmap of fault vs cavity labels for all examples in this object for each unique zone category</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>zones</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of the zones to display.</p></li>
+<li><p><strong>query</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The expr argument to DataFrame.query.  Subsets data before plot</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.do_pca_reduction">
+<span class="sig-name descname"><span class="pre">do_pca_reduction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.do_pca_reduction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.do_pca_reduction" title="Permalink to this definition"></a></dt>
+<dd><p>Perform PCA on subset of columns of example_df and maintain example metadata in results.</p>
+<p>The results are accessible through the get_pca_df() method and the fitted model through the pca attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metadata_cols</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – The column names of feature_df that contain the metadata of the events (labels, etc.).  All columns not
+listed in event_cols are used in PCA analysis.  If None, it defaults to the values supplied at
+construction of FeatureSet.</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Should a report of explained variance be printed</p></li>
+<li><p><strong>n_components</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – The number of principal components to calculate.</p></li>
+<li><p><strong>**kwargs</strong> – Remaining keyword arguments will be passed to sklearn.decomposition.PCA</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_classification_report">
+<span class="sig-name descname"><span class="pre">get_classification_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cavity_label'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_classification_report" title="Permalink to this definition"></a></dt>
+<dd><p>This prints a classification report of this ExampleSet’s cavity labels considering other as ground truth.</p>
+<p>Only examples from other for which there is an example in this ExampleSet are considered</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>other</strong> (<a class="reference internal" href="rfwtools.example_set.ExampleSet.html#rfwtools.example_set.ExampleSet" title="rfwtools.example_set.ExampleSet"><em>ExampleSet</em></a>) – An ExampleSet that contains cavity labels considered the ground truth.</p></li>
+<li><p><strong>label</strong> (<em>str</em>) – The column name of containing the label values to compare.</p></li>
+<li><p><strong>query</strong> (<em>str</em>) – </p></li>
+<li><p><strong>other_query</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_duplicated_labels">
+<span class="sig-name descname"><span class="pre">get_duplicated_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_duplicated_labels" title="Permalink to this definition"></a></dt>
+<dd><p>“Identify the fault events that appear multiple times in the ExampleSet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing labels for events that appear multiple times</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_events_with_mismatched_labels">
+<span class="sig-name descname"><span class="pre">get_events_with_mismatched_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_events_with_mismatched_labels" title="Permalink to this definition"></a></dt>
+<dd><p>Identify fault events that appear multiple times with different labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataFrame containing the events that have mismatched labels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_example_df">
+<span class="sig-name descname"><span class="pre">get_example_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_example_df" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the example set as a DataFrame (copy)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the internal ExampleSet DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_label_file_report">
+<span class="sig-name descname"><span class="pre">get_label_file_report</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_label_file_report" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a string containing a report on the processed label files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A formatted string containing the report.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_pca_df">
+<span class="sig-name descname"><span class="pre">get_pca_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.get_pca_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_pca_df" title="Permalink to this definition"></a></dt>
+<dd><p>Get a copy of the PCA reduction as a DataFrame.  Will be None if the reduction has not been done.</p>
+<p>Each example is on it’s own row with it’s primary components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the PCA results along with the example’s metadata.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_required_columns">
+<span class="sig-name descname"><span class="pre">get_required_columns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_required_columns" title="Permalink to this definition"></a></dt>
+<dd><p>Generates the list of column names that must appear in a DataFrame for it to be a valid example_df.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The list of column names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.get_unduplicated_events">
+<span class="sig-name descname"><span class="pre">get_unduplicated_events</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.get_unduplicated_events" title="Permalink to this definition"></a></dt>
+<dd><p>Identify the fault events that appear exactly once in the ExampleSet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame of the events that appear exactly once in the ExampleSet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.has_required_columns">
+<span class="sig-name descname"><span class="pre">has_required_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtypes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_example</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.has_required_columns" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the given DataFrame has the required columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – The DataFrame to check</p></li>
+<li><p><strong>dtypes</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Check for matching dtypes of “mandatory” columns.  Uses existing _example_df’s dtypes.  Skips if
+_examples_df is None.</p></li>
+<li><p><strong>skip_example</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If True, requires that the ‘example’ column name is present.  Otherwise it is not checked.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if all required column names are present.  False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.label_file_dataframes">
+<span class="sig-name descname"><span class="pre">label_file_dataframes</span></span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.label_file_dataframes" title="Permalink to this definition"></a></dt>
+<dd><p>A dictionary holding label file contents, keyed on file names</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.load_csv">
+<span class="sig-name descname"><span class="pre">load_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.load_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.load_csv" title="Permalink to this definition"></a></dt>
+<dd><p>Read in a CSV file that has FeatureSet data.  Relative to in_dir if filename is str.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The filename to load.  Will be relative in_dir</p></li>
+<li><p><strong>in_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The directory to find the file in.  Defaults to Config().output_dir</p></li>
+<li><p><strong>sep</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Delimiter string used by Pandas to parse given “csv” file</p></li>
+<li><p><strong>metadata_columns</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A list of column names to treat as metadata.  This updates the FeatureSet’s list.  No changes are made
+if it is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.metadata_columns">
+<span class="sig-name descname"><span class="pre">metadata_columns</span></span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.metadata_columns" title="Permalink to this definition"></a></dt>
+<dd><p>These columns are required in internal DataFrames and are excluded from analysis routines.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.pca">
+<span class="sig-name descname"><span class="pre">pca</span></span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.pca" title="Permalink to this definition"></a></dt>
+<dd><p>The pca model.  Either None or is the fitted sklearn PCA object.  This is left publicly accessible so users
+have access for custom analysis or visualization (e.g., transforming future examples).  Users beware
+modifying this!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.purge_invalid_examples">
+<span class="sig-name descname"><span class="pre">purge_invalid_examples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.purge_invalid_examples" title="Permalink to this definition"></a></dt>
+<dd><p>Removes all examples from the ExampleSet that do not pass validation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>validator</strong> (<a class="reference internal" href="rfwtools.example_validator.ExampleValidator.html#rfwtools.example_validator.ExampleValidator" title="rfwtools.example_validator.ExampleValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleValidator</span></code></a>) – A object that follows the ExampleValidator interface.</p></li>
+<li><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Should information about what is purged be printed?</p></li>
+<li><p><strong>progress</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Should a progress bar be displayed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.remove_duplicates_and_mismatches">
+<span class="sig-name descname"><span class="pre">remove_duplicates_and_mismatches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.remove_duplicates_and_mismatches" title="Permalink to this definition"></a></dt>
+<dd><p>Removes duplicate example entries and removes all instances of examples that have mismatched labels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>report</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Should information about what was removed be included?</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.save_csv">
+<span class="sig-name descname"><span class="pre">save_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">','</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.save_csv" title="Permalink to this definition"></a></dt>
+<dd><p>Write out the ExampleSet data as a CSV file relative to out_dir.  Only writes out example_df equivalent.</p>
+<p>This also writes out a comment header section that includes information about ExampleSet parameters at the time
+the file was written.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The filename to save.  Will be relative out_dir</p></li>
+<li><p><strong>out_dir</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – The directory to save the file in.  Defaults to Config().output_dir</p></li>
+<li><p><strong>sep</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Delimiter string used by Pandas to parse given “csv” file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.update_example_set">
+<span class="sig-name descname"><span class="pre">update_example_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.update_example_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.update_example_set" title="Permalink to this definition"></a></dt>
+<dd><p>Update the _example_df and blanks other internal data derived from it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – A DataFrame containing an example per row with additional feature information.  Must be valid for this
+FeatureSet.</p></li>
+<li><p><strong>metadata_columns</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – A new list of metadata columns for df</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rfwtools.feature_set.FeatureSet.update_metadata_columns">
+<span class="sig-name descname"><span class="pre">update_metadata_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metadata_columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/feature_set.html#FeatureSet.update_metadata_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.feature_set.FeatureSet.update_metadata_columns" title="Permalink to this definition"></a></dt>
+<dd><p>This updates the metadata columns and alters other related data structures.</p>
+<p>self.metadata_columns always include ExampleSet._mandatory_columns.  Does deduplication should you include those
+as well.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metadata_columns</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – A list of metadata columns.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rfwtools.feature_set.html" class="btn btn-neutral float-left" title="rfwtools.feature_set" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rfwtools.mya.html" class="btn btn-neutral float-right" title="rfwtools.mya" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

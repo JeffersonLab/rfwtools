@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rfwtools.example &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rfwtools
+          </a>
+              <div class="version">
+                1.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/rfwtools.html">rfwtools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rfwtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rfwtools.example</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rfwtools.example</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A package for managing the data associated with a single fault event.</span>
+
+<span class="sd">The has a single class that manages basic data access for an individual fault event Example.  If the data is not found</span>
+<span class="sd">in the specified location, then it will attempt to download the data and create the appropriate directory structure.</span>
+<span class="sd">This functionality typically requires access to JLab&#39;s internal networks (e.g., VPN).</span>
+
+<span class="sd">Expected data structure is &lt;data_dir&gt;/&lt;zone&gt;/&lt;date&gt;/&lt;timestamp&gt;/&lt;capture files&gt;.  Alternatively, event data may be</span>
+<span class="sd">compressed at the &lt;timestamp&gt; directory level, i.e. &lt;timestamp&gt;.tar.gz.</span>
+
+<span class="sd">Typical usage example:</span>
+
+<span class="sd">::</span>
+
+<span class="sd">   import Example</span>
+<span class="sd">   e = Example(zone=&quot;1L23&quot;, dt=datetime.strptime(&quot;%Y-%m-%d %H:%M:%S.%f&quot;), cavity_label=&quot;1&quot;, fault_label=&quot;Microphonics&quot;,</span>
+<span class="sd">               cavity_conf=math.nan, fault_conf=math.nan, label_source=&#39;my_label_file.txt&#39;)</span>
+<span class="sd">   e.load_data()</span>
+<span class="sd">   df = e.event_df</span>
+<span class="sd">   e.unload_data()</span>
+<span class="sd">   # Now do something with the data</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">rfwtools.network</span> <span class="kn">import</span> <span class="n">SSLContextAdapter</span>
+<span class="kn">from</span> <span class="nn">rfwtools.config</span> <span class="kn">import</span> <span class="n">Config</span>
+
+
+<div class="viewcode-block" id="ExampleType"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.ExampleType.html#rfwtools.example.ExampleType">[docs]</a><span class="k">class</span> <span class="nc">ExampleType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The types of supported IExample types&quot;&quot;&quot;</span>
+    <span class="n">EXAMPLE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">WINDOWED_EXAMPLE</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="IExample"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample">[docs]</a><span class="k">class</span> <span class="nc">IExample</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class that defines the basic interface for an Example.</span>
+
+<span class="sd">    This only defines methods and properties related to data access.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance of the Example class.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Will eventually hold the waveform data from the event</span>
+        <span class="c1">#: (pd.DataFrame): The DataFrame for holding the actual waveform data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#: (str): The directory where the waveform data can be found.  None if Config is to be referenced.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+
+        <span class="c1">#: (ExampleType): The type of example this is.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="IExample.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method should do everything necessary to create an example_df DataFrame at a minimum.</span>
+
+<span class="sd">        Subclasses should use this method as the interface for loading all data associated with the fault event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This method has not been implement by child class&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IExample.unload_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.unload_data">[docs]</a>    <span class="k">def</span> <span class="nf">unload_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method should do everything necessary to free up memory used in load_data.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This method has not been implement by child class&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IExample.get_example_type"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.IExample.html#rfwtools.example.IExample.get_example_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_example_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExampleType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get this Example&#39;s ExampleType.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            The Enum corresponding to the class type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span></div></div>
+
+
+<div class="viewcode-block" id="Factory"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Factory.html#rfwtools.example.Factory">[docs]</a><span class="k">class</span> <span class="nc">Factory</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for producing a variety of types of IExample objects&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Factory.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Factory.html#rfwtools.example.Factory.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_type</span><span class="p">:</span> <span class="n">ExampleType</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a factory for creating Example objects with a default type.</span>
+
+<span class="sd">        All additional keyword arguments will be passed to the Example type constructor.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            e_type:</span>
+<span class="sd">                The default type of IExample object that will be created.</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                All additional keyword arguments will be passed to the responsible constructor on every get_example()</span>
+<span class="sd">                call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: (ExampleType): The type of example that is to be made.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">e_type</span>
+
+        <span class="c1">#: (dict of str:Any): kwargs to be passed to example constructor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="Factory.get_example"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Factory.html#rfwtools.example.Factory.get_example">[docs]</a>    <span class="k">def</span> <span class="nf">get_example</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_type</span><span class="p">:</span> <span class="n">ExampleType</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IExample</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get an IExample object.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            e_type:</span>
+<span class="sd">                The type of IExample object to create.  If None, defaults to the e_type given at construction.</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                All additional keyword arguments will be passed to the responsible constructor on every get_example()</span>
+<span class="sd">                call.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">              ValueError: When no e_type is available or if an unsupported e_type is specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">e_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">e_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No e_type specified at construction or get_example.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">EXAMPLE</span><span class="p">:</span>
+            <span class="n">ex</span> <span class="o">=</span> <span class="n">Example</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">example_kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">WINDOWED_EXAMPLE</span><span class="p">:</span>
+            <span class="n">ex</span> <span class="o">=</span> <span class="n">WindowedExample</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">example_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported ExampleType </span><span class="si">{</span><span class="n">e_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ex</span></div></div>
+
+
+<div class="viewcode-block" id="Example"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example">[docs]</a><span class="k">class</span> <span class="nc">Example</span><span class="p">(</span><span class="n">IExample</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing a (SME) labeled fault event.  Manages data access and can download missing data.</span>
+
+<span class="sd">    Harvester fault data typically occupies ~10 MB of memory/disk space, and collections of these events often number in</span>
+<span class="sd">    the thousands.  Holding all of this event data in memory is typically not an option.  Additionally, the data is</span>
+<span class="sd">    found in multiple files organized in a directory tree, saved as a single tar.gz file, or is downloadable from web</span>
+<span class="sd">    services.  This class provides methods for easing access of this data and quickly loading/unloading it from memory.</span>
+
+<span class="sd">    If the data is not found in the specified location, then it will attempt to download the data and create the</span>
+<span class="sd">    appropriate directory structure.  This functionality typically requires access to JLab&#39;s internal networks (e.g.,</span>
+<span class="sd">    VPN).</span>
+
+<span class="sd">    Expected data structure is &lt;data_dir&gt;/&lt;zone&gt;/&lt;date&gt;/&lt;timestamp&gt;/&lt;capture files&gt;.  Alternatively, event data may be</span>
+<span class="sd">    compressed at the &lt;timestamp&gt; directory level, i.e. &lt;timestamp&gt;.tar.gz.</span>
+
+<span class="sd">    Attributes:</span>
+
+<span class="sd">    zone: A string identifying the zone in CED format (e.g., 1L21)</span>
+<span class="sd">    dt: datetime object matching the local time of the fault event</span>
+<span class="sd">    cavity_label: a string label specifying the cavity that caused fault (typically &quot;0&quot;, &quot;1&quot;, ..., &quot;8&quot;)</span>
+<span class="sd">    fault_label: a string label specifying the type of fault that occurred (ExampleSet has a list of &quot;known&quot; labels&quot;)</span>
+<span class="sd">    cavity_conf: A floating point number in [0, 1] representing the probability/confidence placed in the cavity label</span>
+<span class="sd">    fault_conf: A floating point number in [0, 1] representing the probability/confidence placed in the fault label</span>
+<span class="sd">    label_source: The source of the labels.  Typically, either label files or the output of a model</span>
+<span class="sd">    data_dir: string defining filesystem path under which data can be found.  If None, Config().data_dir is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#: (re.Pattern): A regex for matching capture file filenames</span>
+    <span class="n">capture_file_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;R.*harv\..*\.txt&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Example.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">fault_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">cavity_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">fault_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">label_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance of the Example class.&quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+
+        <span class="c1">#: (str): Expert/model provided cavity label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span> <span class="o">=</span> <span class="n">cavity_label</span>
+
+        <span class="c1">#: (str): Expert/model provided fault label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span> <span class="o">=</span> <span class="n">fault_label</span>
+
+        <span class="c1">#: (float): Cavity label confidence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cavity_conf</span> <span class="o">=</span> <span class="n">cavity_conf</span>
+
+        <span class="c1">#: (float): Fault label confidence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fault_conf</span> <span class="o">=</span> <span class="n">fault_conf</span>
+
+        <span class="c1">#: (str): Source of labeles (which model, file, etc.)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_source</span> <span class="o">=</span> <span class="n">label_source</span>
+
+        <span class="c1">#: (datetime.datetime): When did the event occur</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">=</span> <span class="n">dt</span>
+
+        <span class="c1">#: (str): Which zone had the event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="o">=</span> <span class="n">zone</span>
+
+        <span class="c1">#: (ExampleType): The type of example this is.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">EXAMPLE</span></div>
+
+<div class="viewcode-block" id="Example.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Top-level method for loading data associated with Example instance.</span>
+
+<span class="sd">        Some early waveforms were saved with the Time column essentially inverted.  This method checks for and fixes</span>
+<span class="sd">        that problem by means a simple criteria.  If Time[0] &gt; -1000, then the Time array is flipped.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            verbose: Should extra information be printed to STDOUT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loading data - &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retrieve_event_df</span><span class="p">()</span>
+
+        <span class="c1"># Some early events had a bug where the Time column was wrong.  Flip the order and change sign to fix.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">1000.0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="si">}</span><span class="s2">: Found flipped Time column.  Fixing.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">values</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Example.unload_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.unload_data">[docs]</a>    <span class="k">def</span> <span class="nf">unload_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Top-level method for deleting the Examples data (event_df) from memory.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            verbose: Should extra information be printed to STDOUT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;unloading data - &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Example.get_event_path"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.get_event_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_event_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates the expected location for uncompressed event waveform data.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            compressed: Should the returned path be for a compressed (tgz) event</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The expected path to uncompressed directory of waveform data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">data_dir</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_file_system_time_string</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">compressed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.tar.gz&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="Example.get_capture_file_list"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.get_capture_file_list">[docs]</a>    <span class="k">def</span> <span class="nf">get_capture_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a list of capture file names.  Typically, this has eight file names.</span>
+
+<span class="sd">        This replaced a method that reads in file contents and returned a dictionary of names to content.  The only</span>
+<span class="sd">        internal use case was getting the list of file names, so it was replaced with the simpler method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of capture file names for the Example.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Directly read each file into the dictionary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="c1"># Wend our way through the tarfile and read the content</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r:gz&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">getmembers</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">isfile</span><span class="p">():</span>
+                        <span class="c1"># Make sure to remove the base directory from the name</span>
+                        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                            <span class="n">content</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">content</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_file_system_time_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the file system formatted time string.</span>
+
+<span class="sd">        A common issue here is that Tom records faults down to the second, while the filesystem records them to the</span>
+<span class="sd">        tenth of a second.  This method simply returns the Example&#39;s timestamp (dt) as a string in the proper format.</span>
+
+
+<span class="sd">        Note :The ExamlpeSet class has functionality for determining the proper timestamp from the the waveform browser</span>
+<span class="sd">        service.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The timestamp formatted in as expected in the accelerator filesystem. e.g. &quot;2020_01_28/234556.1&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y_%m_</span><span class="si">%d</span><span class="s2">/%H%M%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_normal_time_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a &#39;normally&#39; formatted time string (not quite ISO-8601) formatted time string.</span>
+
+<span class="sd">        Accuracy down to 0.1 since that is as much as we record on the file system.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The event timestamp in local time and nearly ISO-8601 - &quot;%Y-%m-%d_%H:%M:%S.%f&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">_%H:%M:%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_web_time_strings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generates two datetime strings that bound the fault at one second accuracy.</span>
+
+<span class="sd">        Many label files do not record the timestamps down to the tenth of a second as is needed by the web interface.</span>
+<span class="sd">        This method generates the two timestamps that should bound the actual event time.  These are not URL formatted.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            fmt: datetime.strftime format string</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of the web API formatted time strings (begin, end).  Needs to be encoded for url queries.</span>
+
+<span class="sd">        Since Tom only has down to the second, we have to query the API for begin and end times that will surround the</span>
+<span class="sd">        event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">begin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">begin</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">),</span> <span class="n">end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_retrieve_event_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the event waveform data and save it into event_df.  Saves capture files to disk after retrieval.</span>
+
+<span class="sd">        First tries to get it from disk if it exists.  If not, then it downloads it from the web and saves it to disk.</span>
+<span class="sd">        Only drawback from downloading it from the web is that is loses the per-capture file timestamps, and it is</span>
+<span class="sd">        slower.</span>
+
+<span class="sd">        Note: first clears any existing data, i.e., self.event_df.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Try to get the data from the web if we don&#39;t already have it</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="c1"># Load up the data into event_df</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_event_dir</span><span class="p">(</span><span class="n">event_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="c1"># Uncompress and load the data into event_df</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_event_dir</span><span class="p">(</span><span class="n">event_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_download_waveforms_from_web</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_download_waveforms_from_web</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_server</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wfb_base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Downloads the data from accweb for the specified zone and timestamp.</span>
+
+<span class="sd">        This has to do some guesstimating about which event to download because of imprecise time stamps.  Also access</span>
+<span class="sd">        to accweb requires that you be on a JLab network (VPN should be fine, but probably not the guest wifi).</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            data_server:</span>
+<span class="sd">                The hostname of the server to query for the event data.  If None, Config.data_server is used.</span>
+<span class="sd">            wfb_base_url:</span>
+<span class="sd">                The base URL/context root of the web-based data app.  If None, Config.wfb_base_rul is used.  E.g.,</span>
+<span class="sd">                &quot;wfbrowser&quot;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">             A viable event_df waveform DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Use default config values if none supplied.</span>
+        <span class="k">if</span> <span class="n">data_server</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data_server</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">data_server</span>
+        <span class="k">if</span> <span class="n">wfb_base_url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wfb_base_url</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">wfb_base_url</span>
+
+        <span class="c1"># Setup to download the data</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://</span><span class="si">{</span><span class="n">data_server</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">wfb_base_url</span><span class="si">}</span><span class="s1">/ajax/event?&#39;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_web_time_strings</span><span class="p">()</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">begin</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="s1">&#39;out=csv&amp;includeData=true&amp;location=&#39;</span> <span class="o">+</span> <span class="n">z</span> <span class="o">+</span> <span class="s1">&#39;&amp;begin=&#39;</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="s1">&#39;&amp;end=&#39;</span> <span class="o">+</span> <span class="n">e</span>
+
+        <span class="c1"># Download the data - supply the session/SSLContextAdapter to use Windows trust store</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="n">adapter</span> <span class="o">=</span> <span class="n">SSLContextAdapter</span><span class="p">()</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">adapter</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># Test if we got a good status code.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received non-ok response - </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">content</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Received empty content from  - &quot;</span><span class="p">)</span>
+
+        <span class="c1"># Read the data in from the response stream.  The web api gives you one big CSV file for the whole zone</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;time_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;Time&#39;</span><span class="p">))</span>
+        <span class="n">event_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Should save the event with the original PVs to keep data on disk looking as usual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_event_df_to_disk</span><span class="p">(</span><span class="n">event_df</span><span class="p">)</span>
+
+        <span class="c1"># Convert the column names to be the standard generic names</span>
+        <span class="n">event_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">convert_waveform_column_names</span><span class="p">(</span><span class="n">event_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">event_df</span>
+
+<div class="viewcode-block" id="Example.is_capture_file"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.is_capture_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_capture_file</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates if filename appears to be a valid capture file.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                filename (str): The name of the file that is to be validated</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the filename appears to be a valid capture file.  Otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Example</span><span class="o">.</span><span class="n">capture_file_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Example.parse_capture_file"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.parse_capture_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_capture_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parses an individual capture file into a Pandas DataFrame object.</span>
+
+<span class="sd">        Reads all data in as float64 dtypes because a column of all integers will default to integers (e.g., all zeroes)</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                file (file): A file like object.  Either the string of the filename or a file_like_object</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                DataFrame: A pandas DataFrame containing the data from the specified capture file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">skip_blank_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Example.parse_event_dir"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.parse_event_dir">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">parse_event_dir</span><span class="p">(</span><span class="n">event_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">compressed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parses the  capture files in the BaseModel&#39;s event_dir and sets event_df to the appropriate pandas DataFrame.</span>
+
+<span class="sd">        The waveform names are converted from &lt;EPICS_NAME&gt;&lt;Waveform&gt; (e.g., R123WFSGMES), to &lt;Cavity_Number&gt;_&lt;Waveform&gt;</span>
+<span class="sd">        (e.g., 3_GMES).  This allows analysis code to more easily handle waveforms from different zones.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            event_path: The path to the event directory or compressed tar.gz file</span>
+<span class="sd">            compressed: Is the data a compressed tar.gz file or a regular directory</span>
+<span class="sd">        Raises:</span>
+<span class="sd">             ValueError: if a column name is discovered with an unexpected format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">zone_df</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">compressed</span><span class="p">:</span>
+            <span class="c1"># Here we open the tarfile in memory, only opening the members whose name matches the capture file pattern</span>
+            <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">event_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">getmembers</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">name</span><span class="p">)):</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">zone_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">zone_df</span> <span class="o">=</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">tar</span><span class="o">.</span><span class="n">extractfile</span><span class="p">(</span><span class="n">member</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span>
+                                               <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">event_path</span><span class="p">)):</span>
+                <span class="c1"># Only try to process files that look like capture files</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">is_capture_file</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">zone_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">zone_df</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Join the existing zone data with the new capture file by using the &quot;Time&quot; column as an index to</span>
+                    <span class="c1"># match rows</span>
+                    <span class="n">zone_df</span> <span class="o">=</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">Example</span><span class="o">.</span><span class="n">parse_capture_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Now format the column names to remove the zone information but keep a cavity and signal identifiers</span>
+        <span class="n">zone_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">Example</span><span class="o">.</span><span class="n">convert_waveform_column_names</span><span class="p">(</span><span class="n">zone_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">zone_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Example.convert_waveform_column_names"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.convert_waveform_column_names">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_waveform_column_names</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turns waveform PV names (R1M1WFSGMES) into more uniform name based on cavity and waveform (1_GMES)</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            columns: List of waveform columns from a single zone, i.e., a list of event waveform names to convert.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The updated/standardized column names sans zone identifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;R\d\w\dWF[TS]&#39;</span><span class="p">)</span>
+        <span class="n">new_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="o">!=</span> <span class="s2">&quot;Time&quot;</span><span class="p">:</span>
+                <span class="c1"># This only works for PV/waveform names of the proper format.  That&#39;s all we should be working with.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Found unexpected waveform data - &quot;</span> <span class="o">+</span> <span class="n">column</span><span class="p">)</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">column</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">column</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+            <span class="n">new_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_columns</span></div>
+
+<div class="viewcode-block" id="Example.save_event_df_to_disk"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.save_event_df_to_disk">[docs]</a>    <span class="k">def</span> <span class="nf">save_event_df_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This method is saves the event waveform DataFrame to disk.  Can provide faster access to &#39;raw&#39; data later.</span>
+
+<span class="sd">        If capture files already exist, it won&#39;t try to overwrite them.  Does nothing if event_path is None.  Note that</span>
+<span class="sd">        every capture file will end up with the same timestamp as self.event_datetime.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            event_df: The DataFrame for which we should create a fault event directory of capture files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Do nothing if compressed file exists</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">)):</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create the event directory tree</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">)):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+        <span class="c1"># Get the capture file name components</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y_%m_</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H%M%S.</span><span class="si">%f</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">event_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+
+        <span class="c1"># Make all of the capture files for cavities in the downloaded data</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">):</span>
+            <span class="n">cav</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">cav_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">event_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span> <span class="k">if</span> <span class="n">cav</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span>
+            <span class="n">out_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+                                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">WFSharv.</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cav</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">time</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">out_file</span><span class="p">):</span>
+                <span class="n">event_df</span><span class="p">[</span><span class="n">cav_columns</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Example.remove_event_df_from_disk"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.remove_event_df_from_disk">[docs]</a>    <span class="k">def</span> <span class="nf">remove_event_df_from_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes the &#39;cached&#39; event waveform data for this event from disk.  Both compressed and uncompressed data.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Remove the event directory if uncompressed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+        <span class="c1"># Remove the tar.gz compressed event directory if on disk</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_files_on_disk</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Example.capture_files_on_disk"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.capture_files_on_disk">[docs]</a>    <span class="k">def</span> <span class="nf">capture_files_on_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if captures files are currently saved to disk.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            compressed: Are we checking for compressed file (True), or uncompressed (False, default)?</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the compressed file or regular directors were found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">compressed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="ow">and</span> \
+                   <span class="nb">len</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_event_path</span><span class="p">(</span><span class="n">compressed</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Example.has_matching_labels"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.has_matching_labels">[docs]</a>    <span class="k">def</span> <span class="nf">has_matching_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">example</span><span class="p">:</span> <span class="s1">&#39;Example&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the supplied example has the same cavity and fault type label.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            example: A Example object to compare labels against</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if both cavity and fault labels match.  False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">example</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span> <span class="o">==</span> <span class="n">example</span><span class="o">.</span><span class="n">fault_label</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span> <span class="o">==</span> <span class="n">example</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Example.plot_waveforms"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.plot_waveforms">[docs]</a>    <span class="k">def</span> <span class="nf">plot_waveforms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">downsample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the waveform data associated with this example.  Optionally down sample the signals.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            signals:</span>
+<span class="sd">                A list of signal names to plot, e.g. &#39;1_GMES&#39;.  If None, then GMES, DETA2, GASK, CRFP, and PMES will be</span>
+<span class="sd">                plotted for all cavities</span>
+<span class="sd">            downsample:</span>
+<span class="sd">                The down sampling factor, i.e., keep every &lt;downsample&gt;-th point.  By default keep every 32nd point</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make sure we&#39;ve downloaded the data if needed and loaded it into memory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+        <span class="c1"># Create the default set of signals.  This matching approach is preferable to an explicit list in case some</span>
+        <span class="c1"># some cavities are missing</span>
+        <span class="k">if</span> <span class="n">signals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;GMES&#39;</span><span class="p">,</span> <span class="s1">&#39;DETA2&#39;</span><span class="p">,</span> <span class="s1">&#39;GASK&#39;</span><span class="p">,</span> <span class="s1">&#39;CRFP&#39;</span><span class="p">,</span> <span class="s1">&#39;PMES&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">wf</span><span class="p">):</span>
+                        <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+        <span class="c1"># Get the unique set of waveforms (GMES, CRRP, etc.) each one will get it&#39;s own plot</span>
+        <span class="n">waveforms</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">wf</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">signals</span><span class="p">)</span>
+
+        <span class="c1"># Create a data structure that holds the signals needed for each waveform plot</span>
+        <span class="n">plot_signals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="n">waveforms</span><span class="p">:</span>
+            <span class="n">plot_signals</span><span class="p">[</span><span class="n">wf</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">signal</span> <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">signals</span> <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">wf</span><span class="p">)]</span>
+
+        <span class="c1"># Let make a single multi-plot that has square-ish dimensions.  This is the size we&#39;re shooting for</span>
+        <span class="n">ncols</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_signals</span><span class="p">)))</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_signals</span><span class="p">)</span> <span class="o">/</span> <span class="n">ncols</span><span class="p">)</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">axn</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="n">ncols</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">nrows</span><span class="p">))</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="c1"># Set the lines to be a little narrower</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;lines.linewidth&#39;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">})</span>
+
+        <span class="k">for</span> <span class="n">wf</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">plot_signals</span><span class="p">):</span>
+            <span class="c1"># Select the axis to draw on</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+            <span class="n">plot_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[[</span><span class="s1">&#39;Time&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">plot_signals</span><span class="p">[</span><span class="n">wf</span><span class="p">]]</span>
+
+            <span class="c1"># SNS likes the long DF format over the wide DF format.  Use pd.melt to convert, value/variable are the</span>
+            <span class="c1"># default column names after melting</span>
+            <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;variable&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span><span class="n">plot_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="n">downsample</span><span class="p">,</span> <span class="p">:],</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">]))</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">wf</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; - down sampled </span><span class="si">{</span><span class="n">downsample</span><span class="si">}</span><span class="s2">:1&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">borderaxespad</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Add the main title and display</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="si">}</span><span class="s2"> - cav=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span><span class="si">}</span><span class="s2">, fault=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span><span class="si">}</span><span class="s2"> &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label_source</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.925</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.35</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Example.to_string"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.Example.html#rfwtools.example.Example.to_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This provides a more descriptive string than __str__.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A string representation of the example including zone, time, label info, and label source.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;zone:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="si">}</span><span class="s2">  ts:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="si">}</span><span class="s2">  cav_label:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span><span class="si">}</span><span class="s2">  fault_label:&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span><span class="si">}</span><span class="s2">  cav_conf:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cavity_conf</span><span class="si">}</span><span class="s2">  fault_conf:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fault_conf</span><span class="si">}</span><span class="s2">  &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;label_source:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label_source</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Example&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines equality by zone, datetime, labels, and confidence values.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            other: An Example object to compare.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the Examples are equivalent, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">event_datetime</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">event_zone</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">fault_label</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">__float_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cavity_conf</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">cavity_conf</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Example</span><span class="o">.</span><span class="n">__float_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fault_conf</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">fault_conf</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__float_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A smarter equality check for floating point numbers.  This considers nan == nan as True&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__key</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns essential attributes of the Example.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cavity_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cavity_conf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fault_label</span><span class="p">,</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">fault_conf</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the hash of self&#39;s key attributes.  Needed for inclusion in dictionaries.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The results of hash.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__key</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Example&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines inequality.  Inverse of __eq__&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a short string representing this Example - only zone and datetime.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_zone</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_datetime</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="WindowedExample"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample">[docs]</a><span class="k">class</span> <span class="nc">WindowedExample</span><span class="p">(</span><span class="n">Example</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An extension of Example class that allows the caller to specify only a time-window of event_df be returned.</span>
+
+<span class="sd">    This window is based on the relative values in the Time column.  The standard time range is approximately</span>
+<span class="sd">    [-1500, 100], but this is variable depending on control system settings.  An Exception is raised at load time if the</span>
+<span class="sd">    specified time range is not a strict subset of the Examples Time column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="WindowedExample.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">fault_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">cavity_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">fault_conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">label_source</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an instance th will only store the required window upon a load_data() call.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            start: The start of the time window.</span>
+<span class="sd">            n_samples: The number of samples to include after the start of the window.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">cavity_label</span><span class="p">,</span> <span class="n">fault_label</span><span class="p">,</span> <span class="n">cavity_conf</span><span class="p">,</span> <span class="n">fault_conf</span><span class="p">,</span> <span class="n">label_source</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="c1">#: (ExampleType): The type of Example this represents.  Convenient type tracking.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e_type</span> <span class="o">=</span> <span class="n">ExampleType</span><span class="o">.</span><span class="n">WINDOWED_EXAMPLE</span>
+
+        <span class="c1">#: (float): The start of the window relative to the fault onset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+
+        <span class="c1">#: (int): The number of samples requested after the start value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
+
+        <span class="c1">#: (float) The last Time value in the window.  Determined after loading data for the first time.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="WindowedExample.load_data"><a class="viewcode-back" href="../../_autosummary/rfwtools.example.WindowedExample.html#rfwtools.example.WindowedExample.load_data">[docs]</a>    <span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the fault event data according to Example.load_data() and retain only the defined time window.</span>
+
+<span class="sd">        This changes the Time column from being relative to the fault onset to being relative to the start of the</span>
+<span class="sd">        window.  This means that the first time value is unlikely to be exactly 0, but should be a small positive</span>
+<span class="sd">        number.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            verbose: Should extra information be printed during operation</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If the specified window of data is not available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Check that start is in the data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Requested window is before start of event_df data.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Requested window is after end of event_df data.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute some importance index values</span>
+        <span class="n">start_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="p">[</span><span class="s2">&quot;Time&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">]</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">idxmin</span><span class="p">()</span>
+        <span class="n">end_i</span> <span class="o">=</span> <span class="n">start_i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span>
+        <span class="n">i_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">i_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="n">t_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="p">[</span><span class="n">i_min</span><span class="p">]</span>
+        <span class="n">t_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="p">[</span><span class="n">i_max</span><span class="p">]</span>
+
+        <span class="c1"># Check if the requested window is in the data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;=</span> <span class="n">t_min</span> <span class="ow">and</span> <span class="n">end_i</span> <span class="o">&lt;=</span> <span class="n">i_max</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Requested window of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="si">}</span><span class="s2"> plus </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="si">}</span><span class="s2"> samples, but event data is&quot;</span>
+                               <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">t_min</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">t_max</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Grab the window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">start_i</span><span class="p">:</span><span class="n">end_i</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="c1"># Set the end time before changing the Time column meaning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+        <span class="c1"># Convert the Time column to be relative to the start of the window, not the fault onset.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_df</span><span class="o">.</span><span class="n">Time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

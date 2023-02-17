@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rfwtools.config &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rfwtools
+          </a>
+              <div class="version">
+                1.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_autosummary/rfwtools.html">rfwtools</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rfwtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rfwtools.config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rfwtools.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module is used for managing the configuration of rfwtools.</span>
+
+<span class="sd">This module contains as single class, a Singleton, that manages the configuration of many parts of rfwtools.  This</span>
+<span class="sd">includes the definition of several resource locations, debug behavior, and filters on valid data.</span>
+
+<span class="sd">Basic Usage:</span>
+<span class="sd">::</span>
+
+<span class="sd">    from rfwtools.config import Config</span>
+<span class="sd">    config = Config()</span>
+<span class="sd">    config.output_dir = &#39;/path/to/my/save/files/&#39;</span>
+
+<span class="sd">    # Or equivalently</span>
+
+<span class="sd">    Config().output_dir = &#39;/path/to/my/save/files/&#39;</span>
+
+<span class="sd">Config File Example:</span>
+
+<span class="sd">Most values are straightforward.  exclude_times is a list of lists where null implies None.</span>
+<span class="sd">::</span>
+
+<span class="sd">    app_dir: /projects/rfw-stuff</span>
+<span class="sd">    data_dir: /projects/rfw-stuff/data/waveforms/data/rf</span>
+<span class="sd">    data_server: accweb.acc.jlab.org</span>
+<span class="sd">    debug: true</span>
+<span class="sd">    exclude_times:</span>
+<span class="sd">    - - 2020-01-01 12:34:56.700000</span>
+<span class="sd">      - 2020-01-02 12:34:56.700000</span>
+<span class="sd">    - - 2020-01-03 12:34:56.700000</span>
+<span class="sd">      - null</span>
+<span class="sd">    exclude_zones:</span>
+<span class="sd">    - 1L07</span>
+<span class="sd">    label_dir: /projects/rfw-stuff/data/labels</span>
+<span class="sd">    output_dir: /projects/rfw-stuff/processed-output</span>
+<span class="sd">    wfb_base_url: wfbrowser</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">yaml</span>
+
+
+<div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A singleton class for containing application configuration.  Written as a singleton to enable easy extension.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        instance:</span>
+<span class="sd">            The internal configuration object.</span>
+<span class="sd">        app_dir:</span>
+<span class="sd">            A string defining the root directory of the application.  Currently used in initial setup only.  Defaults</span>
+<span class="sd">            to the current working directory.</span>
+<span class="sd">        data_dir:</span>
+<span class="sd">            A string defining the path to waveform data.  Defaults to CWD/data/waveforms/data/rf.</span>
+<span class="sd">        debug:</span>
+<span class="sd">            A boolean that controls debug output.  Defaults to False (meaning no debug output).</span>
+<span class="sd">        label_dir:</span>
+<span class="sd">            A string defining the directory that holds label files. Defaults to CWD/data/labels</span>
+<span class="sd">        output_dir:</span>
+<span class="sd">            A string defining the directory to read/write saved files produced by this package.  Defaults to</span>
+<span class="sd">            CWD/processed-output.</span>
+<span class="sd">        exclude_zones:</span>
+<span class="sd">            A list of strings that define zones to exclude from parsing operations.  Defaults to [&#39;0L04&#39;]</span>
+<span class="sd">        exclude_times:</span>
+<span class="sd">            A list of 2-tuples of datetime.datetime objects.  Each tuple is a range of time to exclude from analysis.</span>
+<span class="sd">            Both endpoints are inclusive, and a value of  None is interpreted as +/- Inf.  Defaults to None.</span>
+<span class="sd">        data_server:</span>
+<span class="sd">            A string for the server hostname to contact for the web-based data API.  Defaults to accweb.acc.jlab.org.</span>
+<span class="sd">        wfb_base_url:</span>
+<span class="sd">            A string that is the base URL (context root) of the waveform browser web app.  Defaults to wfbrowser.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">__Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;This private inner class is used to implement the singleton interface&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1"># The base directory of the application.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">app_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+
+            <span class="c1"># The path to the root of the data directory for all events (similar to /usr/opsdata/waveforms/data/rf)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_dir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;waveforms&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;rf&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Controls how much information is printed during processing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Directory containing label files</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_dir</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;labels&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Directory to use for saving file output</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_dir</span><span class="p">,</span> <span class="s2">&quot;processed-output&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Default zones to exclude from sources</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exclude_zones</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;0L04&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Default time ranges to exclude from sources</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exclude_times</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="c1"># Default hostname of the production waveform browser web server</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_server</span> <span class="o">=</span> <span class="s1">&#39;accweb.acc.jlab.org&#39;</span>
+
+            <span class="c1"># Default URL for the waveform browser (wfbrowser)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfb_base_url</span> <span class="o">=</span> <span class="s2">&quot;wfbrowser&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Config</span><span class="o">.</span><span class="n">dump_yaml_string</span><span class="p">()</span>
+
+    <span class="n">instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Config.__init__"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Only make an instance of the inner Config object if its missing&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Config</span><span class="o">.</span><span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">Config</span><span class="o">.</span><span class="n">__Config</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;./rfwtools.cfg&#39;</span><span class="p">):</span>
+                <span class="n">Config</span><span class="o">.</span><span class="n">read_config_file</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Config.dump_yaml_string"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config.dump_yaml_string">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">dump_yaml_string</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write config out to a YAML formatted string.</span>
+
+<span class="sd">        Note: the nested Class causes trouble with pickle so this is a reasonable alternative in most scenarioes.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The YAML-formatted configuration string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Config.load_yaml_string"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config.load_yaml_string">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_yaml_string</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read in a YAML formatted string containing configuration information.</span>
+
+<span class="sd">        This method overwrites only the values defined in the string.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            string: The YAML-formatted string to parse.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">cfg</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;exclude_times&#39;</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">Config</span><span class="o">.</span><span class="n">__validate_exclude_times</span><span class="p">(</span><span class="n">cfg</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception processing exclude_times.  Setting it to None.</span><span class="se">\n</span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">Config</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__validate_exclude_times</span><span class="p">(</span><span class="n">exclude_times</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates the structure and types of exclude_times.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            exclude_times: A list of tuples of datetime objects or None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">exclude_times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">e_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">exclude_times</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;list&#39;</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">exclude_times</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;tuple&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Received unexpected exclude_times format.&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">exclude_times</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Range does not have two values&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Range is not a list.&quot;</span><span class="p">)</span>
+
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">values</span>
+            <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;datetime&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;start should be of type datetime or None&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">end</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;datetime&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;end should be of type datetime or None&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Config.write_config_file"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config.write_config_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">write_config_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Writes out the current configuration to the specified file.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            file: The name file the name to write configuration infomration to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Make sure the singleton config exists</span>
+        <span class="n">Config</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">dump_yaml_string</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Config.read_config_file"><a class="viewcode-back" href="../../_autosummary/rfwtools.config.Config.html#rfwtools.config.Config.read_config_file">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_config_file</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parses a YAML-formatted config file and updates internal configuration.</span>
+
+<span class="sd">        Relative files will be considered relative to the current working directory.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            file:</span>
+<span class="sd">                Path to the file to read.  Relative paths are considered as relative to the current working directory.</span>
+<span class="sd">                Default value is rfwtools.cfg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;rfwtools.cfg&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">file</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File not found - &#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">Config</span><span class="o">.</span><span class="n">load_yaml_string</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Redirect unresolved attribute queries to the single instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Redirect attribute modification to the single instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">setattr</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

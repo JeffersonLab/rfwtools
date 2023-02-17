@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rfwtools.mya.get_json &mdash; rfwtools 1.1.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rfwtools.mya.get_pv_value" href="rfwtools.mya.get_pv_value.html" />
+    <link rel="prev" title="rfwtools.mya" href="rfwtools.mya.html" />
+    <link href="../_static/rtd_custom.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            rfwtools
+          </a>
+              <div class="version">
+                1.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="rfwtools.html">rfwtools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.config.html">rfwtools.config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.data_set.html">rfwtools.data_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.dim_reduction.html">rfwtools.dim_reduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example.html">rfwtools.example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example_set.html">rfwtools.example_set</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.example_validator.html">rfwtools.example_validator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.extractor.html">rfwtools.extractor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.feature_set.html">rfwtools.feature_set</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="rfwtools.mya.html">rfwtools.mya</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">rfwtools.mya.get_json</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rfwtools.mya.get_json"><code class="docutils literal notranslate"><span class="pre">get_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rfwtools.mya.get_pv_value.html">rfwtools.mya.get_pv_value</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.network.html">rfwtools.network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.timestamp.html">rfwtools.timestamp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.utils.html">rfwtools.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rfwtools.visualize.html">rfwtools.visualize</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rfwtools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="rfwtools.html">rfwtools</a></li>
+          <li class="breadcrumb-item"><a href="rfwtools.mya.html">rfwtools.mya</a></li>
+      <li class="breadcrumb-item active">rfwtools.mya.get_json</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/rfwtools.mya.get_json.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rfwtools-mya-get-json">
+<h1>rfwtools.mya.get_json<a class="headerlink" href="#rfwtools-mya-get-json" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="rfwtools.mya.get_json">
+<span class="sig-prename descclassname"><span class="pre">rfwtools.mya.</span></span><span class="sig-name descname"><span class="pre">get_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rfwtools/mya.html#get_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rfwtools.mya.get_json" title="Permalink to this definition"></a></dt>
+<dd><p>Simple function for making an HTTP GET request that should return a valid JSON content-type.</p>
+<p>This method creates a custom SSLContextAdapter that has access to the system’s trusted CA certificates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The URL on which to perform the HTTP GET</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary object representing the JSON response</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the URL returns a non-200 status code or if the response is not valid JSON content</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="rfwtools.mya.html" class="btn btn-neutral float-left" title="rfwtools.mya" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rfwtools.mya.get_pv_value.html" class="btn btn-neutral float-right" title="rfwtools.mya.get_pv_value" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Jefferson Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
