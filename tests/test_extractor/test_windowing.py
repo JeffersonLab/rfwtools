@@ -5,18 +5,18 @@ from unittest import TestCase
 
 from rfwtools.example import Example, IExample
 from rfwtools.extractor.windowing import window_extractor
-import test
+import tests
 from rfwtools.config import Config
 import pandas as pd
 import datetime
 
 # Prime the pump on the timestamp map.
-test.load_timestamp_map()
+tests.load_timestamp_map()
 
 # Update the config object to reflect these paths
-Config().label_dir = test.test_label_dir
-Config().output_dir = test.test_output_dir
-Config().data_dir = test.tmp_data_dir
+Config().label_dir = tests.test_label_dir
+Config().output_dir = tests.test_output_dir
+Config().data_dir = tests.tmp_data_dir
 
 
 class TestExample(Example):
@@ -104,7 +104,7 @@ class TestWindowExtractor(TestCase):
         # Test that we get expected feature extraction results on a small set of data.
 
         # Read in the expected values.  There are lots of features here.
-        exp = pd.read_csv(os.path.join(test.test_data_dir, "test-window-feature_set.csv"), comment="#", index_col=False)
+        exp = pd.read_csv(os.path.join(tests.test_data_dir, "test-window-feature_set.csv"), comment="#", index_col=False)
         exp.window_label = pd.Categorical(exp.window_label, categories=['good', 'bad'])
 
         # Calculate the result
@@ -120,7 +120,7 @@ class TestWindowExtractor(TestCase):
         result = pd.concat([window_extractor(ex, windows=windows, n_samples=500) for ex in examples], axis=0,
                            ignore_index=True)
 
-        #result.to_csv(os.path.join(test.test_data_dir, "test-window-feature_set.csv"), index=False)
+        #result.to_csv(os.path.join(tests.test_data_dir, "test-window-feature_set.csv"), index=False)
 
         # Uses pandas testing routine to see if they are equal
         pd.testing.assert_frame_equal(exp.drop(columns=['window_downsample_size']),

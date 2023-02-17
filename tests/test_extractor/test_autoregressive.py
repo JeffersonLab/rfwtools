@@ -5,18 +5,18 @@ from unittest import TestCase
 
 from rfwtools.example import Example
 from rfwtools.extractor.autoregressive import autoregressive_extractor
-import test
+import tests
 from rfwtools.config import Config
 import pandas as pd
 import datetime
 
 # Prime the pump on the timestamp map.
-test.load_timestamp_map()
+tests.load_timestamp_map()
 
 # Update the config object to reflect these paths
-Config().label_dir = test.test_label_dir
-Config().output_dir = test.test_output_dir
-Config().data_dir = test.tmp_data_dir
+Config().label_dir = tests.test_label_dir
+Config().output_dir = tests.test_output_dir
+Config().data_dir = tests.tmp_data_dir
 
 
 class TestARExtractor(TestCase):
@@ -25,7 +25,7 @@ class TestARExtractor(TestCase):
         # Test that we get expected feature extraction results on a small set of data.
 
         # Read in the expected values.  There are lots of features here.
-        exp = pd.read_csv(os.path.join(test.test_data_dir, "test-AR-feature_set.csv"), comment="#")
+        exp = pd.read_csv(os.path.join(tests.test_data_dir, "test-AR-feature_set.csv"), comment="#")
 
         # Calculate the result
         fmt = "%Y-%m-%d %H:%M:%S.%f"
